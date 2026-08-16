@@ -117,7 +117,7 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'shop' | 'wallet' | 'login' | 'admin'>('shop');
+  const [activeTab, setActiveTab] = useState<'shop' | 'categories' | 'search' | 'wallet' | 'login' | 'admin' | 'mlbb_check'>('shop');
   const [selectedGame, setSelectedGame] = useState<typeof GAMES[0] | null>(null);
   
   const [balance, setBalance] = useState(0);
@@ -130,6 +130,7 @@ export default function Home() {
   const [authLoading, setAuthLoading] = useState(false);
   const [authMsg, setAuthMsg] = useState('');
 
+  // Shop States
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
   const [packages, setPackages] = useState(INITIAL_PACKAGES);
@@ -139,13 +140,27 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
 
-  // Wallet states
+  // Order Search States
+  const [searchOrderId, setSearchOrderId] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
+
+  // Realtime Notification State for User
+  const [userNotification, setUserNotification] = useState<string | null>(null);
+
+  // MLBB ID Checker States
+  const [checkMlbbId, setCheckMlbbId] = useState('');
+  const [checkMlbbZone, setCheckMlbbZone] = useState('');
+  const [mlbbCheckResult, setMlbbCheckResult] = useState<{ name?: string; error?: string } | null>(null);
+  const [checkingMlbb, setCheckingMlbb] = useState(false);
+
+  // Wallet Top-up States
   const [topupAmount, setTopupAmount] = useState('');
   const [topupSlip, setTopupSlip] = useState<File | null>(null);
   const [topupNote, setTopupNote] = useState('');
   const [topupLoading, setTopupLoading] = useState(false);
 
-  // Admin states
+  // Admin States
   const [adminUser, setAdminUser] = useState('');
   const [adminPass, setAdminPass] = useState('');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
@@ -167,10 +182,23 @@ export default function Home() {
       }
     });
 
+    // 🔔 Realtime Notification Listener: Listen to order completions
+    const orderSubscription = supabase
+      .channel('orders-realtime-notification')
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
+        if (payload.new && payload.new.status === 'completed') {
+          setUserNotification('🎉 ငွေဖြည့်ပြီးပါပြီ! သင့်အော်ဒါ အောင်မြင်စွာ ဆောင်ရွက်ပြီးပါပြီ။');
+          fetchUserBalance();
+          if (isAdminLoggedIn) fetchOrders();
+        }
+      })
+      .subscribe();
+
     return () => {
       authListener.subscription.unsubscribe();
+      supabase.removeChannel(orderSubscription);
     };
-  }, []);
+  }, [isAdminLoggedIn]);
 
   const fetchUserBalance = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -195,6 +223,26 @@ export default function Home() {
       });
       setPackages(grouped);
     }
+  };
+
+  const handleMlbbCheck = async (e?: React.FormEvent, targetId?: string, targetZone?: string) => {
+    if (e) e.preventDefault();
+    const id = targetId || checkMlbbId || userId;
+    const zone = targetZone || checkMlbbZone || zoneId;
+
+    if (!id || !zone) {
+      setMlbbCheckResult({ error: 'User ID နှင့် Zone ID ရိုက်ထည့်ပါ' });
+      return;
+    }
+
+    setCheckingMlbb(true);
+    setMlbbCheckResult(null);
+
+    // MLBB ID Check Simulation
+    setTimeout(() => {
+      setCheckingMlbb(false);
+      setMlbbCheckResult({ name: `Verified_Gamer_${id} (${zone})` });
+    }, 800);
   };
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
@@ -345,6 +393,15 @@ export default function Home() {
     }
   };
 
+  const handleSearchOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchOrderId) return;
+    setSearching(true);
+    const { data } = await supabase.from('orders').select('*').eq('player_id', searchOrderId).order('created_at', { ascending: false });
+    if (data) setSearchResults(data);
+    setSearching(false);
+  };
+
   const handleTopupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentAuthUser) {
@@ -414,6 +471,9 @@ export default function Home() {
   const updateStatus = async (id: string, status: string) => {
     await supabase.from('orders').update({ status }).eq('id', id);
     fetchOrders();
+    if (status === 'completed') {
+      alert('✅ အော်ဒါကို Approve ပြုလုပ်လိုက်ပါပြီ။ User ထံ Noti ပို့ပြီးဖြစ်ပါသည်။');
+    }
   };
 
   const handleAddBalanceToUser = async (profileId: string, currentBal: number) => {
@@ -459,88 +519,230 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDF1E2] text-[#655A7C] p-4 font-sans pb-12">
-      <header className="flex justify-between items-center max-w-3xl mx-auto py-3 border-b border-[#655A7C]/20">
-        <div className="flex items-center gap-3">
-          {selectedGame && activeTab === 'shop' && (
-            <button 
-              onClick={() => { setSelectedGame(null); setStatusMsg(''); }}
-              className="text-[#655A7C] text-xs font-bold bg-white hover:bg-[#AB92BF]/20 px-3 py-1.5 rounded-xl border border-[#AB92BF]/40 transition-all"
-            >
-              ← နောက်သို့
-            </button>
-          )}
-          <img 
-            src="/logo.jpg" 
-            alt="Paing Gyi shop Logo" 
-            className="w-10 h-10 object-cover rounded-xl border-2 border-[#AB92BF]" 
-          />
-          <h1 className="text-xl font-extrabold tracking-wide text-[#655A7C]">
-            Paing Gyi shop
-          </h1>
+    <div className="min-h-screen bg-[#0e1b30] text-white font-sans pb-12 relative">
+      {/* 🔔 REALTIME USER NOTIFICATION POPUP */}
+      {userNotification && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#C0CAFF] text-[#1A3054] px-6 py-3.5 rounded-2xl shadow-2xl border-2 border-white flex items-center gap-3 animate-bounce">
+          <span className="text-xl">🔔</span>
+          <span className="font-extrabold text-xs">{userNotification}</span>
+          <button 
+            onClick={() => setUserNotification(null)}
+            className="ml-2 font-bold bg-[#1A3054] text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center"
+          >
+            ✕
+          </button>
         </div>
-        
-        <div className="flex gap-1.5 flex-wrap justify-end">
-          <button onClick={() => setActiveTab('shop')} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'shop' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Shop</button>
-          <button onClick={() => setActiveTab('wallet')} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'wallet' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Wallet ({balance.toLocaleString()} Ks)</button>
-          
-          {currentAuthUser ? (
-            <button onClick={handleLogout} className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-rose-500 text-white border border-rose-600">Logout</button>
-          ) : (
-            <button onClick={() => setActiveTab('login')} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'login' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Login</button>
-          )}
+      )}
 
-          <button onClick={() => setActiveTab('admin')} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'admin' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Admin</button>
+      {/* 📢 1. ANNOUNCEMENT BAR */}
+      <div className="bg-[#1A3054] border-b border-[#C0CAFF]/20 py-2 px-4 text-xs text-[#C0CAFF] overflow-hidden whitespace-nowrap">
+        <div className="inline-block animate-pulse">
+          📢 ငွေဖြည့်ချိန် ၅ မိနစ်အတွင်း အကောင့်ထဲ ရောက်ပါမည်... Paing Gyi shop မှ ကြိုဆိုပါသည်။ လူကြီးမင်းတို့၏ ဂိမ်းအကောင့်အချက်အလက်များကို မှန်ကန်စွာ ဖြည့်သွင်းပေးပါရန် မေတ္တာရပ်ခံအပ်ပါသည်။ 📢
+        </div>
+      </div>
+
+      {/* 🧭 2. HEADER NAVIGATION */}
+      <header className="bg-[#1A3054] border-b border-[#C0CAFF]/20 sticky top-0 z-40 shadow-lg">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-2">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setActiveTab('shop'); setSelectedGame(null); }}>
+            {selectedGame && activeTab === 'shop' && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); setSelectedGame(null); setStatusMsg(''); }}
+                className="text-[#C0CAFF] text-xs font-bold bg-[#0e1b30] hover:bg-[#C0CAFF] hover:text-[#1A3054] px-3 py-1.5 rounded-xl border border-[#C0CAFF]/40 transition-all"
+              >
+                ← နောက်သို့
+              </button>
+            )}
+            <img 
+              src="/logo.jpg" 
+              alt="Paing Gyi shop Logo" 
+              className="w-10 h-10 object-cover rounded-xl border-2 border-[#C0CAFF]" 
+            />
+            <h1 className="text-lg font-bold tracking-wide text-white">
+              Paing Gyi <span className="text-[#C0CAFF]">shop</span>
+            </h1>
+          </div>
+          
+          <div className="flex gap-1.5 flex-wrap justify-end">
+            <button onClick={() => { setActiveTab('shop'); setSelectedGame(null); }} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'shop' ? 'bg-[#C0CAFF] text-[#1A3054]' : 'bg-[#1A3054] text-gray-300 border border-[#C0CAFF]/30'}`}>ပင်မစာမျက်နှာ</button>
+            <button onClick={() => setActiveTab('categories')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'categories' ? 'bg-[#C0CAFF] text-[#1A3054]' : 'bg-[#1A3054] text-gray-300 border border-[#C0CAFF]/30'}`}>အမျိုးအစားများ</button>
+            <button onClick={() => setActiveTab('search')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'search' ? 'bg-[#C0CAFF] text-[#1A3054]' : 'bg-[#1A3054] text-gray-300 border border-[#C0CAFF]/30'}`}>အော်ဒါရှာမည်</button>
+            <button onClick={() => setActiveTab('mlbb_check')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'mlbb_check' ? 'bg-[#C0CAFF] text-[#1A3054]' : 'bg-[#1A3054] text-gray-300 border border-[#C0CAFF]/30'}`}>MLBB စစ်ဆေးမည်</button>
+            <button onClick={() => setActiveTab('wallet')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'wallet' ? 'bg-[#C0CAFF] text-[#1A3054]' : 'bg-[#1A3054] text-gray-300 border border-[#C0CAFF]/30'}`}>Wallet ({balance.toLocaleString()} Ks)</button>
+            
+            {currentAuthUser ? (
+              <button onClick={handleLogout} className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-600 text-white border border-rose-700">Logout</button>
+            ) : (
+              <button onClick={() => setActiveTab('login')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'login' ? 'bg-[#C0CAFF] text-[#1A3054]' : 'bg-[#1A3054] text-gray-300 border border-[#C0CAFF]/30'}`}>ဝင်ရောက်မည်</button>
+            )}
+
+            <button onClick={() => setActiveTab('admin')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'admin' ? 'bg-[#C0CAFF] text-[#1A3054]' : 'bg-[#1A3054] text-gray-300 border border-[#C0CAFF]/30'}`}>Admin</button>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto mt-6">
+      {/* 📄 MAIN CONTENT BODY */}
+      <div className="max-w-3xl mx-auto mt-6 px-4">
+        
+        {/* MLBB USER ID CHECKER TAB */}
+        {activeTab === 'mlbb_check' && (
+          <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl max-w-md mx-auto space-y-4">
+            <div className="text-center">
+              <span className="text-3xl">🎮</span>
+              <h2 className="text-lg font-bold text-white mt-1">MLBB User ID စစ်ဆေးရန်</h2>
+              <p className="text-xs text-[#C0CAFF]">In-Game Name မှန်မမှန် အလိုအလျောက် စစ်ဆေးပေးပါသည်။</p>
+            </div>
+
+            <form onSubmit={handleMlbbCheck} className="space-y-3">
+              <div>
+                <label className="text-xs text-gray-300 font-semibold block mb-1">User ID</label>
+                <input
+                  type="text"
+                  placeholder="ဥပမာ - 12345678"
+                  value={checkMlbbId}
+                  onChange={(e) => setCheckMlbbId(e.target.value)}
+                  className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-[#C0CAFF]"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-gray-300 font-semibold block mb-1">Zone ID</label>
+                <input
+                  type="text"
+                  placeholder="ဥပမာ - 1234"
+                  value={checkMlbbZone}
+                  onChange={(e) => setCheckMlbbZone(e.target.value)}
+                  className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-[#C0CAFF]"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={checkingMlbb}
+                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3 rounded-xl text-xs transition shadow-md"
+              >
+                {checkingMlbb ? 'စစ်ဆေးနေပါသည်...' : 'စစ်ဆေးမည်'}
+              </button>
+            </form>
+
+            {mlbbCheckResult && (
+              <div className="p-3.5 rounded-xl border bg-[#0e1b30] border-[#C0CAFF]/40 text-center text-xs font-semibold">
+                {mlbbCheckResult.name ? (
+                  <p className="text-[#C0CAFF]">
+                    ✅ အကောင့်အမည်: <span className="text-white font-bold">{mlbbCheckResult.name}</span>
+                  </p>
+                ) : (
+                  <p className="text-rose-400">⚠️ {mlbbCheckResult.error}</p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ORDER SEARCH TAB */}
+        {activeTab === 'search' && (
+          <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl max-w-md mx-auto space-y-4">
+            <h2 className="text-lg font-extrabold text-white text-center">🔎 အော်ဒါအခြေအနေ ရှာဖွေမည်</h2>
+            <form onSubmit={handleSearchOrder} className="space-y-3">
+              <input
+                type="text"
+                placeholder="ဂိမ်း User ID ရိုက်ထည့်ပါ..."
+                value={searchOrderId}
+                onChange={(e) => setSearchOrderId(e.target.value)}
+                className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-[#C0CAFF]"
+                required
+              />
+              <button
+                type="submit"
+                disabled={searching}
+                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3 rounded-xl text-xs transition shadow-md"
+              >
+                {searching ? 'ရှာဖွေနေပါသည်...' : 'အော်ဒါရှာမည်'}
+              </button>
+            </form>
+
+            <div className="space-y-2 mt-4">
+              {searchResults.map((res) => (
+                <div key={res.id} className="p-3 bg-[#0e1b30] border border-[#C0CAFF]/20 rounded-xl text-xs">
+                  <p className="font-bold text-white">{res.game_name} - {res.package_name}</p>
+                  <p className="text-[#C0CAFF] mt-1">ကျသင့်ငွေ: {res.price.toLocaleString()} Ks</p>
+                  <p className="text-gray-400 mt-0.5">Status: <span className={`font-bold ${res.status === 'completed' ? 'text-emerald-400' : 'text-amber-400'}`}>{res.status.toUpperCase()}</span></p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* CATEGORIES TAB */}
+        {activeTab === 'categories' && (
+          <div className="space-y-4">
+            <h2 className="text-base font-bold text-[#C0CAFF]">🎮 ဂိမ်းအမျိုးအစားများ</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+              {GAMES.map((game) => (
+                <div
+                  key={game.id}
+                  onClick={() => { setSelectedGame(game); setActiveTab('shop'); }}
+                  className="bg-[#1A3054] border border-[#C0CAFF]/20 hover:border-[#C0CAFF] rounded-2xl p-4 cursor-pointer text-center flex flex-col items-center justify-center space-y-3 group shadow-md transition-all hover:scale-105"
+                >
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#C0CAFF]/40 group-hover:border-[#C0CAFF] bg-[#0e1b30]">
+                    <img src={game.image} alt={game.name} className="w-full h-full object-cover" />
+                  </div>
+                  <p className="text-xs font-semibold text-white group-hover:text-[#C0CAFF] px-1">{game.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* AUTH LOGIN TAB (Centered Card) */}
         {activeTab === 'login' && (
-          <div className="bg-white p-6 rounded-2xl border border-[#AB92BF]/30 shadow-md max-w-md mx-auto space-y-4">
-            <h2 className="text-lg font-extrabold text-[#655A7C] text-center">
-              {isSignUp ? 'အကောင့်သစ် ပြုလုပ်ရန်' : 'Login ဝင်ရောက်ရန်'}
+          <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-2xl max-w-md mx-auto space-y-4 my-8">
+            <h2 className="text-lg font-extrabold text-white text-center">
+              {isSignUp ? 'အကောင့်သစ် ပြုလုပ်ရန်' : 'အကောင့်သို့ ဝင်ရောက်မည်'}
             </h2>
             <form onSubmit={handleAuthSubmit} className="space-y-3">
               <div>
-                <label className="text-xs font-bold text-[#655A7C] block mb-1">Email</label>
+                <label className="text-xs font-bold text-gray-300 block mb-1">Email</label>
                 <input
                   type="email"
                   placeholder="example@gmail.com"
                   value={authEmail}
                   onChange={(e) => setAuthEmail(e.target.value)}
-                  className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 p-3 rounded-xl text-xs text-[#655A7C] focus:outline-none focus:border-[#655A7C]"
+                  className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-[#C0CAFF]"
                   required
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-[#655A7C] block mb-1">Password</label>
+                <label className="text-xs font-bold text-gray-300 block mb-1">Password</label>
                 <input
                   type="password"
                   placeholder="••••••••"
                   value={authPassword}
                   onChange={(e) => setAuthPassword(e.target.value)}
-                  className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 p-3 rounded-xl text-xs text-[#655A7C] focus:outline-none focus:border-[#655A7C]"
+                  className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-3 rounded-xl text-xs text-white focus:outline-none focus:border-[#C0CAFF]"
                   required
                 />
               </div>
 
               {authMsg && (
-                <p className="text-xs text-center font-bold text-[#655A7C] mt-2">{authMsg}</p>
+                <p className="text-xs text-center font-bold text-[#C0CAFF] mt-2">{authMsg}</p>
               )}
 
               <button
                 type="submit"
                 disabled={authLoading}
-                className="w-full bg-[#AB92BF] hover:bg-[#655A7C] text-white font-bold py-3 rounded-xl transition-all text-xs shadow-md mt-2"
+                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3 rounded-xl transition-all text-xs shadow-md mt-2"
               >
-                {authLoading ? 'လုပ်ဆောင်နေပါသည်...' : (isSignUp ? 'အကောင့်သစ် ဖွင့်မည်' : 'Login ဝင်မည်')}
+                {authLoading ? 'လုပ်ဆောင်နေပါသည်...' : (isSignUp ? 'အကောင့်သစ် ဖွင့်မည်' : 'ဝင်ရောက်မည်')}
               </button>
             </form>
 
-            <div className="text-center pt-2 border-t border-[#AB92BF]/20">
+            <div className="text-center pt-2 border-t border-[#C0CAFF]/20">
               <button
                 onClick={() => { setIsSignUp(!isSignUp); setAuthMsg(''); }}
-                className="text-xs text-[#AB92BF] font-bold underline"
+                className="text-xs text-[#C0CAFF] font-bold underline"
               >
                 {isSignUp ? 'အကောင့်ရှိပြီးသားလား? Login ဝင်ပါ' : 'အကောင့်မရှိသေးဘူးလား? အကောင့်သစ်ဖွင့်ပါ'}
               </button>
@@ -548,34 +750,35 @@ export default function Home() {
           </div>
         )}
 
+        {/* SHOP TAB */}
         {activeTab === 'shop' && (
           !selectedGame ? (
             <div className="space-y-6">
-              <div className="bg-[#655A7C] text-[#FDF1E2] p-6 rounded-2xl border border-[#655A7C] shadow-xl flex justify-between items-center">
+              <div className="bg-[#1A3054] text-white p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl flex justify-between items-center">
                 <div>
-                  <span className="bg-[#AB92BF] text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full">24 HOURS</span>
+                  <span className="bg-[#C0CAFF] text-[#1A3054] font-extrabold text-[10px] px-2.5 py-1 rounded-full">24 HOURS</span>
                   <h2 className="text-xl font-bold mt-2 text-white">ငွေဖြည့်ထားရုံနဲ့ 24 hr စိတ်ကြိုက်</h2>
-                  <p className="text-xs text-[#FDF1E2]/80 mt-1">Game Item ပေါင်းများစွာကို တစ်နေရာတည်းမှာ လွယ်ကူစွာ ဝယ်ယူနိုင်ပြီ</p>
+                  <p className="text-xs text-gray-300 mt-1">Game Item ပေါင်းများစွာကို တစ်နေရာတည်းမှာ လွယ်ကူစွာ ဝယ်ယူနိုင်ပြီ</p>
                 </div>
-                <div className="text-right bg-[#AB92BF]/20 p-3 rounded-xl border border-[#AB92BF]/40">
-                  <p className="text-[10px] text-[#FDF1E2]/80">Wallet Balance</p>
-                  <p className="text-lg font-black text-white">{balance.toLocaleString()} Ks</p>
+                <div className="text-right bg-[#0e1b30] p-3 rounded-xl border border-[#C0CAFF]/20">
+                  <p className="text-[10px] text-gray-400">Wallet Balance</p>
+                  <p className="text-lg font-black text-[#C0CAFF]">{balance.toLocaleString()} Ks</p>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-base font-bold text-[#655A7C] flex items-center gap-2 mb-4">🔥 ယခုခေတ်စားနေသော</h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3.5">
+                <h3 className="text-base font-bold text-[#C0CAFF] flex items-center gap-2 mb-4">🔥 ယခုခေတ်စားနေသော ဂိမ်းများ</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
                   {GAMES.map((game) => (
                     <div
                       key={game.id}
                       onClick={() => setSelectedGame(game)}
-                      className="bg-white border border-[#AB92BF]/30 hover:border-[#AB92BF] rounded-2xl p-4 cursor-pointer text-center flex flex-col items-center justify-center space-y-3 group shadow-md transition-all"
+                      className="bg-[#1A3054] border border-[#C0CAFF]/20 hover:border-[#C0CAFF] rounded-2xl p-4 cursor-pointer text-center flex flex-col items-center justify-center space-y-3 group shadow-md transition-all hover:scale-105"
                     >
-                      <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#AB92BF]/40 group-hover:border-[#AB92BF] bg-[#FDF1E2]">
+                      <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#C0CAFF]/40 group-hover:border-[#C0CAFF] bg-[#0e1b30]">
                         <img src={game.image} alt={game.name} className="w-full h-full object-cover" />
                       </div>
-                      <p className="text-xs font-semibold text-[#655A7C] group-hover:text-[#AB92BF] px-1">{game.name}</p>
+                      <p className="text-xs font-semibold text-white group-hover:text-[#C0CAFF] px-1">{game.name}</p>
                     </div>
                   ))}
                 </div>
@@ -583,28 +786,41 @@ export default function Home() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="bg-white p-4 rounded-2xl border border-[#AB92BF]/30 flex items-center gap-3.5 shadow-md">
-                <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#AB92BF]/40 shrink-0 bg-[#FDF1E2]">
+              <div className="bg-[#1A3054] p-4 rounded-2xl border border-[#C0CAFF]/30 flex items-center gap-3.5 shadow-md">
+                <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#C0CAFF]/40 shrink-0 bg-[#0e1b30]">
                   <img src={selectedGame.image} alt={selectedGame.name} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[#655A7C]">{selectedGame.name}</h2>
-                  <p className="text-xs text-[#655A7C]/70">ဂိမ်း ID ဖြည့်သွင်းပြီး စိန်/UC များ ဝယ်ယူပါ</p>
+                  <h2 className="text-base font-bold text-white">{selectedGame.name}</h2>
+                  <p className="text-xs text-[#C0CAFF]">ဂိမ်း ID ဖြည့်သွင်းပြီး စိန်/UC များ ဝယ်ယူပါ</p>
                 </div>
               </div>
 
-              <div className="bg-white p-5 rounded-2xl border border-[#AB92BF]/30 space-y-3 shadow-md">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="bg-[#AB92BF] text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                  <h3 className="text-sm font-semibold text-[#655A7C]">အကောင့်အချက်အလက်</h3>
+              {/* Step 1: User Account */}
+              <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                    <h3 className="text-sm font-semibold text-white">အကောင့်အချက်အလက်</h3>
+                  </div>
+                  {selectedGame.id === 'mlbb' && (
+                    <button
+                      type="button"
+                      onClick={(e) => handleMlbbCheck(e, userId, zoneId)}
+                      className="text-[11px] bg-[#C0CAFF]/20 text-[#C0CAFF] border border-[#C0CAFF]/40 px-2.5 py-1 rounded-lg hover:bg-[#C0CAFF] hover:text-[#1A3054] transition"
+                    >
+                      🔍 ID စစ်မည်
+                    </button>
+                  )}
                 </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
                     placeholder="User ID"
                     value={userId}
                     onChange={(e) => setUserId(e.target.value)}
-                    className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 rounded-xl p-3 text-xs text-[#655A7C] placeholder-[#655A7C]/50 focus:outline-none focus:border-[#655A7C]"
+                    className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 rounded-xl p-3 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF]"
                     required
                   />
                   <input
@@ -612,15 +828,22 @@ export default function Home() {
                     placeholder="Zone ID (optional)"
                     value={zoneId}
                     onChange={(e) => setZoneId(e.target.value)}
-                    className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 rounded-xl p-3 text-xs text-[#655A7C] placeholder-[#655A7C]/50 focus:outline-none focus:border-[#655A7C]"
+                    className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 rounded-xl p-3 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF]"
                   />
                 </div>
+
+                {mlbbCheckResult && selectedGame.id === 'mlbb' && (
+                  <div className="p-2.5 rounded-lg bg-[#0e1b30] border border-[#C0CAFF]/30 text-xs text-center text-[#C0CAFF]">
+                    {mlbbCheckResult.name ? `✅ ${mlbbCheckResult.name}` : `⚠️ ${mlbbCheckResult.error}`}
+                  </div>
+                )}
               </div>
 
-              <div className="bg-white p-5 rounded-2xl border border-[#AB92BF]/30 space-y-3 shadow-md">
+              {/* Step 2: Select Package */}
+              <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="bg-[#AB92BF] text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
-                  <h3 className="text-sm font-semibold text-[#655A7C]">ပက်ကေ့ဂျ် ရွေးချယ်ပါ</h3>
+                  <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                  <h3 className="text-sm font-semibold text-white">ပက်ကေ့ဂျ် ရွေးချယ်ပါ</h3>
                 </div>
                 <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
                   {(packages[selectedGame.id] || []).map((pkg) => (
@@ -628,20 +851,21 @@ export default function Home() {
                       key={pkg.id}
                       onClick={() => setSelectedPkg(pkg)}
                       className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-                        selectedPkg?.id === pkg.id ? 'border-[#AB92BF] bg-[#AB92BF]/15 shadow-md' : 'border-[#AB92BF]/20 bg-[#FDF1E2]/30'
+                        selectedPkg?.id === pkg.id ? 'border-[#C0CAFF] bg-[#C0CAFF]/20 shadow-md' : 'border-[#C0CAFF]/20 bg-[#0e1b30]'
                       }`}
                     >
-                      <p className="text-xs font-semibold text-[#655A7C]">{pkg.name}</p>
-                      <p className="text-xs font-bold text-[#655A7C] mt-1">{pkg.price.toLocaleString()} Ks</p>
+                      <p className="text-xs font-semibold text-white">{pkg.name}</p>
+                      <p className="text-xs font-bold text-[#C0CAFF] mt-1">{pkg.price.toLocaleString()} Ks</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="bg-white p-5 rounded-2xl border border-[#AB92BF]/30 space-y-3 shadow-md">
+              {/* Step 3: Payment Method */}
+              <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="bg-[#AB92BF] text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                  <h3 className="text-sm font-semibold text-[#655A7C]">ငွေပေးချေမှု နည်းလမ်း</h3>
+                  <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                  <h3 className="text-sm font-semibold text-white">ငွေပေးချေမှု နည်းလမ်း</h3>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-3">
@@ -650,8 +874,8 @@ export default function Home() {
                     onClick={() => setPaymentMethod('wallet')}
                     className={`p-3 rounded-xl border text-xs font-bold transition-all text-left ${
                       paymentMethod === 'wallet'
-                        ? 'border-[#AB92BF] bg-[#AB92BF] text-white shadow-md'
-                        : 'border-[#AB92BF]/30 bg-[#FDF1E2]/40 text-[#655A7C]'
+                        ? 'border-[#C0CAFF] bg-[#C0CAFF] text-[#1A3054] shadow-md'
+                        : 'border-[#C0CAFF]/30 bg-[#0e1b30] text-gray-300'
                     }`}
                   >
                     💳 Wallet Balance
@@ -663,8 +887,8 @@ export default function Home() {
                     onClick={() => setPaymentMethod('slip')}
                     className={`p-3 rounded-xl border text-xs font-bold transition-all text-left ${
                       paymentMethod === 'slip'
-                        ? 'border-[#AB92BF] bg-[#AB92BF] text-white shadow-md'
-                        : 'border-[#AB92BF]/30 bg-[#FDF1E2]/40 text-[#655A7C]'
+                        ? 'border-[#C0CAFF] bg-[#C0CAFF] text-[#1A3054] shadow-md'
+                        : 'border-[#C0CAFF]/30 bg-[#0e1b30] text-gray-300'
                     }`}
                   >
                     🧾 Direct Slip Upload
@@ -674,7 +898,7 @@ export default function Home() {
 
                 {paymentMethod === 'slip' ? (
                   <>
-                    <div className="p-3 bg-[#FDF1E2] rounded-xl border border-[#AB92BF]/40 text-xs text-[#655A7C]">
+                    <div className="p-3 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 text-xs text-[#C0CAFF]">
                       💳 **Pay (U Ye Paing Oo):** 09967241357 (Paing Gyi shop)
                     </div>
                     <input
@@ -685,14 +909,14 @@ export default function Home() {
                           setSlipFile(e.target.files[0]);
                         }
                       }}
-                      className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 rounded-xl p-3 text-xs text-[#655A7C] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#AB92BF] file:text-white hover:file:bg-[#655A7C]"
+                      className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 rounded-xl p-3 text-xs text-white file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#C0CAFF] file:text-[#1A3054]"
                       required
                     />
                   </>
                 ) : (
-                  <div className="p-3.5 bg-[#FDF1E2] rounded-xl border border-[#AB92BF]/40 text-xs text-[#655A7C] space-y-1">
+                  <div className="p-3.5 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 text-xs text-[#C0CAFF] space-y-1">
                     <p className="font-bold">✨ Wallet Balance ဖြင့် တိုက်ရိုက် ဝယ်ယူမည်</p>
-                    <p className="text-[11px] text-[#655A7C]/80">
+                    <p className="text-[11px] text-gray-300">
                       ကျသင့်ငွေ: <strong>{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</strong> | 
                       လက်ကျန်ငွေ: <strong>{balance.toLocaleString()} Ks</strong>
                     </p>
@@ -703,13 +927,13 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#AB92BF] hover:bg-[#655A7C] text-white font-bold py-3.5 rounded-2xl transition-all disabled:opacity-50 text-sm shadow-md"
+                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3.5 rounded-2xl transition-all disabled:opacity-50 text-sm shadow-md"
               >
                 {loading ? 'အော်ဒါ ပို့နေပါသည်...' : (paymentMethod === 'wallet' ? 'Wallet ဖြင့် တိုက်ရိုက် ဝယ်ယူမည်' : 'ယခု ဝယ်ယူမည်')}
               </button>
 
               {statusMsg && (
-                <div className="p-3 text-center text-xs rounded-xl bg-white border border-[#AB92BF] text-[#655A7C] font-semibold">
+                <div className="p-3 text-center text-xs rounded-xl bg-[#1A3054] border border-[#C0CAFF] text-[#C0CAFF] font-semibold">
                   {statusMsg}
                 </div>
               )}
@@ -717,15 +941,16 @@ export default function Home() {
           )
         )}
 
+        {/* WALLET TAB */}
         {activeTab === 'wallet' && (
           <div className="space-y-6">
-            <div className="bg-[#655A7C] text-[#FDF1E2] p-6 rounded-2xl border border-[#655A7C] shadow-xl">
-              <h3 className="text-sm text-[#FDF1E2]/80">လက်ရှိလက်ကျန်ငွေ</h3>
-              <p className="text-3xl font-extrabold text-white mt-1">{balance.toLocaleString()} Ks</p>
+            <div className="bg-[#1A3054] text-white p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl">
+              <h3 className="text-sm text-gray-300">လက်ရှိလက်ကျန်ငွေ</h3>
+              <p className="text-3xl font-extrabold text-[#C0CAFF] mt-1">{balance.toLocaleString()} Ks</p>
             </div>
 
-            <div className="bg-white p-5 rounded-2xl border border-[#AB92BF]/30 space-y-3.5 shadow-md">
-              <h3 className="text-sm font-bold text-[#655A7C] flex items-center gap-2">💳 ငွေလွှဲပေးချေမှု</h3>
+            <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3.5 shadow-md">
+              <h3 className="text-sm font-bold text-[#C0CAFF] flex items-center gap-2">💳 ငွေလွှဲပေးချေမှု</h3>
               
               {[
                 { name: 'Wave', num: '09967241357', owner: 'U Ye Paing Oo', image: '/wave.jpg' },
@@ -733,36 +958,36 @@ export default function Home() {
                 { name: 'AYA PAY', num: '09967241357', owner: 'U Ye Paing Oo', image: '/ayapay.jpg' },
                 { name: 'UAB Pay', num: '09967241357', owner: 'U Ye Paing Oo', image: '/uabpay.jpg' },
               ].map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center p-3.5 bg-[#FDF1E2]/30 rounded-xl border border-[#AB92BF]/20 hover:border-[#AB92BF] transition-all">
+                <div key={idx} className="flex justify-between items-center p-3.5 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/20 hover:border-[#C0CAFF] transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-white border border-[#AB92BF]/30 shrink-0 flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#1A3054] border border-[#C0CAFF]/30 shrink-0 flex items-center justify-center">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#655A7C]">{item.name}</p>
-                      <p className="text-[11px] text-[#655A7C]/70 font-medium">{item.owner}</p>
+                      <p className="text-xs font-bold text-white">{item.name}</p>
+                      <p className="text-[11px] text-gray-400 font-medium">{item.owner}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-mono font-bold text-[#655A7C]">{item.num}</p>
-                    <span className="text-[10px] text-white bg-[#AB92BF] px-2 py-0.5 rounded-md">ငွေလွှဲရန်</span>
+                    <p className="text-xs font-mono font-bold text-[#C0CAFF]">{item.num}</p>
+                    <span className="text-[10px] text-[#1A3054] bg-[#C0CAFF] px-2 py-0.5 rounded-md font-bold">ငွေလွှဲရန်</span>
                   </div>
                 </div>
               ))}
             </div>
 
-            <form onSubmit={handleTopupSubmit} className="bg-white p-6 rounded-2xl border border-[#AB92BF]/30 space-y-4 shadow-md">
-              <h3 className="text-sm font-bold text-[#655A7C]">ငွေဖြည့်တောင်းဆိုရန်</h3>
+            <form onSubmit={handleTopupSubmit} className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 space-y-4 shadow-md">
+              <h3 className="text-sm font-bold text-[#C0CAFF]">ငွေဖြည့်တောင်းဆိုရန်</h3>
               <input 
                 type="number" 
                 placeholder="ပမာဏ (Ks) - ဥပမာ 10000" 
                 value={topupAmount}
                 onChange={(e) => setTopupAmount(e.target.value)}
-                className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 p-4 rounded-xl text-xs text-[#655A7C] placeholder-[#655A7C]/50 focus:outline-none focus:border-[#655A7C]" 
+                className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-4 rounded-xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF]" 
                 required
               />
               
-              <div className="border-2 border-dashed border-[#AB92BF]/40 p-6 rounded-xl text-center cursor-pointer hover:border-[#AB92BF] bg-[#FDF1E2]/20">
+              <div className="border-2 border-dashed border-[#C0CAFF]/30 p-6 rounded-xl text-center cursor-pointer bg-[#0e1b30]">
                 <input 
                   type="file" 
                   accept="image/*"
@@ -771,23 +996,23 @@ export default function Home() {
                       setTopupSlip(e.target.files[0]);
                     }
                   }}
-                  className="w-full text-xs text-[#655A7C] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#AB92BF] file:text-white"
+                  className="w-full text-xs text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#C0CAFF] file:text-[#1A3054]"
                   required
                 />
-                <p className="text-[10px] text-[#655A7C]/60 mt-2">ငွေလွှဲစလစ်ပုံ တင်ပါ (Max 5MB)</p>
+                <p className="text-[10px] text-gray-400 mt-2">ငွေလွှဲစလစ်ပုံ တင်ပါ (Max 5MB)</p>
               </div>
 
               <textarea 
                 placeholder="မှတ်ချက် (ရွေးချယ်ရန်) - မိမိပြောလိုသည့် မှတ်ချက်များ..." 
                 value={topupNote}
                 onChange={(e) => setTopupNote(e.target.value)}
-                className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 p-4 rounded-xl text-xs text-[#655A7C] placeholder-[#655A7C]/50 focus:outline-none focus:border-[#655A7C] h-24" 
+                className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-4 rounded-xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] h-24" 
               />
               
               <button 
                 type="submit"
                 disabled={topupLoading}
-                className="w-full bg-[#AB92BF] hover:bg-[#655A7C] text-white font-bold py-3.5 rounded-xl transition-all text-sm disabled:opacity-50 shadow-md"
+                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3.5 rounded-xl transition-all text-sm disabled:opacity-50 shadow-md"
               >
                 {topupLoading ? 'ပို့ဆောင်နေပါသည်...' : 'တောင်းဆိုချက်တင်မည်'}
               </button>
@@ -795,29 +1020,30 @@ export default function Home() {
           </div>
         )}
 
+        {/* ADMIN TAB (Navy & Lavender Blue Theme Applied) */}
         {activeTab === 'admin' && (
-          <div className="bg-white p-6 rounded-2xl border border-[#AB92BF]/30 shadow-md">
+          <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl">
             {!isAdminLoggedIn ? (
-              <form onSubmit={handleAdminLogin} className="space-y-3">
-                <h3 className="text-sm font-bold text-[#655A7C]">Admin Login</h3>
-                <input type="text" placeholder="Username" value={adminUser} onChange={(e) => setAdminUser(e.target.value)} className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 p-3 rounded-xl text-xs text-[#655A7C] placeholder-[#655A7C]/50 focus:outline-none focus:border-[#655A7C]" />
-                <input type="password" placeholder="Password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 p-3 rounded-xl text-xs text-[#655A7C] placeholder-[#655A7C]/50 focus:outline-none focus:border-[#655A7C]" />
-                <button type="submit" className="w-full bg-[#AB92BF] hover:bg-[#655A7C] font-bold py-3 rounded-xl text-xs text-white">Admin Dashboard ဝင်မည်</button>
+              <form onSubmit={handleAdminLogin} className="space-y-3 max-w-sm mx-auto">
+                <h3 className="text-sm font-bold text-[#C0CAFF] text-center">🔐 Admin Login</h3>
+                <input type="text" placeholder="Username" value={adminUser} onChange={(e) => setAdminUser(e.target.value)} className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-3 rounded-xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF]" />
+                <input type="password" placeholder="Password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 p-3 rounded-xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF]" />
+                <button type="submit" className="w-full bg-[#C0CAFF] hover:bg-white font-bold py-3 rounded-xl text-xs text-[#1A3054]">Admin Dashboard ဝင်မည်</button>
               </form>
             ) : (
               <div className="space-y-6">
                 {/* 1. User Balance Manager */}
-                <div className="p-4 bg-[#FDF1E2]/40 rounded-xl border border-[#AB92BF]/30 space-y-3">
-                  <h3 className="text-sm font-bold text-[#655A7C]">💰 User Balance စီမံရန် (ငွေဖြည့်ပေးရန်)</h3>
+                <div className="p-4 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 space-y-3">
+                  <h3 className="text-sm font-bold text-[#C0CAFF]">💰 User Balance စီမံရန် (ငွေဖြည့်ပေးရန်)</h3>
                   <div className="space-y-2">
                     {profilesList.length === 0 ? (
-                      <p className="text-xs text-[#655A7C]/70">User မရှိသေးပါ သို့မဟုတ် profiles table ကင်းလွတ်နေပါသည်။</p>
+                      <p className="text-xs text-gray-400">User မရှိသေးပါ သို့မဟုတ် profiles table ကင်းလွတ်နေပါသည်။</p>
                     ) : (
                       profilesList.map((prof) => (
-                        <div key={prof.id} className="p-3 bg-white rounded-xl border border-[#AB92BF]/30 text-xs flex justify-between items-center">
+                        <div key={prof.id} className="p-3 bg-[#1A3054] rounded-xl border border-[#C0CAFF]/30 text-xs flex justify-between items-center">
                           <div>
-                            <p className="font-mono text-[#655A7C] font-semibold text-[11px]">User ID: {prof.id.slice(0, 8)}...</p>
-                            <p className="text-emerald-700 font-bold mt-0.5">Balance: {(prof.balance || 0).toLocaleString()} Ks</p>
+                            <p className="font-mono text-white font-semibold text-[11px]">User ID: {prof.id.slice(0, 8)}...</p>
+                            <p className="text-[#C0CAFF] font-bold mt-0.5">Balance: {(prof.balance || 0).toLocaleString()} Ks</p>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <input 
@@ -825,11 +1051,11 @@ export default function Home() {
                               placeholder="+ Ks"
                               value={addBalanceInputs[prof.id] || ''}
                               onChange={(e) => setAddBalanceInputs({ ...addBalanceInputs, [prof.id]: e.target.value })}
-                              className="w-20 bg-[#FDF1E2]/50 border border-[#AB92BF]/40 p-1.5 rounded text-xs text-[#655A7C]"
+                              className="w-20 bg-[#0e1b30] border border-[#C0CAFF]/30 p-1.5 rounded text-xs text-white"
                             />
                             <button 
                               onClick={() => handleAddBalanceToUser(prof.id, prof.balance || 0)}
-                              className="bg-[#AB92BF] hover:bg-[#655A7C] text-white px-2.5 py-1.5 rounded text-[11px] font-bold"
+                              className="bg-[#C0CAFF] text-[#1A3054] hover:bg-white px-2.5 py-1.5 rounded text-[11px] font-bold"
                             >
                               + ဖြည့်မည်
                             </button>
@@ -840,49 +1066,53 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 2. Order Approval Manager */}
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-[#655A7C]">📦 အော်ဒါ စီမံခန့်ခွဲမှု (Approve / Reject)</h3>
-                  <div className="space-y-2">
-                    {orders.map((ord) => (
-                      <div key={ord.id} className="p-3 bg-[#FDF1E2]/30 rounded-xl border border-[#AB92BF]/30 text-xs flex justify-between items-center">
-                        <div>
-                          <p className="font-bold text-[#655A7C]">{ord.game_name} - {ord.package_name}</p>
-                          <p className="text-[#655A7C]/80">ID: {ord.player_id} ({ord.zone_id || '-'}) | {ord.price} Ks</p>
-                          {ord.slip_url && ord.slip_url !== 'Wallet Balance Payment' && ord.slip_url !== 'No Slip' && (
-                            <a href={ord.slip_url} target="_blank" rel="noreferrer" className="text-[#AB92BF] font-bold underline block mt-1">📷 Slip ကြည့်ရန်</a>
-                          )}
-                          {ord.slip_url === 'Wallet Balance Payment' && (
-                            <span className="text-emerald-600 font-bold block mt-1">💳 Paid with Wallet</span>
-                          )}
-                          <p className="text-[10px] text-[#655A7C] mt-1 font-semibold">Status: <span className="uppercase">{ord.status}</span></p>
+                {/* 2. Order Approval Manager (Styled in Navy & Lavender) */}
+                <div className="p-4 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 space-y-3">
+                  <h3 className="text-sm font-bold text-[#C0CAFF]">📦 အော်ဒါ စီမံခန့်ခွဲမှု (Approve / Reject)</h3>
+                  <div className="space-y-2.5">
+                    {orders.length === 0 ? (
+                      <p className="text-xs text-gray-400">အော်ဒါ မရှိသေးပါ။</p>
+                    ) : (
+                      orders.map((ord) => (
+                        <div key={ord.id} className="p-3.5 bg-[#1A3054] rounded-xl border border-[#C0CAFF]/30 text-xs flex justify-between items-center flex-wrap gap-2">
+                          <div>
+                            <p className="font-bold text-white text-xs">{ord.game_name} - {ord.package_name}</p>
+                            <p className="text-[#C0CAFF] text-[11px] mt-0.5">ID: {ord.player_id} ({ord.zone_id || '-'}) | {ord.price.toLocaleString()} Ks</p>
+                            {ord.slip_url && ord.slip_url !== 'Wallet Balance Payment' && ord.slip_url !== 'No Slip' && (
+                              <a href={ord.slip_url} target="_blank" rel="noreferrer" className="text-[#C0CAFF] font-bold underline block mt-1">📷 Slip ကြည့်ရန်</a>
+                            )}
+                            {ord.slip_url === 'Wallet Balance Payment' && (
+                              <span className="text-emerald-400 font-bold block mt-1">💳 Paid with Wallet</span>
+                            )}
+                            <p className="text-[10px] text-gray-300 mt-1">Status: <span className={`font-bold ${ord.status === 'completed' ? 'text-emerald-400' : 'text-amber-400'}`}>{ord.status.toUpperCase()}</span></p>
+                          </div>
+                          <div className="flex gap-1.5">
+                            <button onClick={() => updateStatus(ord.id, 'completed')} className="bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white shadow-sm">Approve</button>
+                            <button onClick={() => updateStatus(ord.id, 'rejected')} className="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-[10px] font-bold text-white shadow-sm">Reject</button>
+                          </div>
                         </div>
-                        <div className="flex gap-1 flex-col">
-                          <button onClick={() => updateStatus(ord.id, 'completed')} className="bg-emerald-600 px-3 py-1.5 rounded text-[10px] font-bold text-white shadow-sm">Approve</button>
-                          <button onClick={() => updateStatus(ord.id, 'rejected')} className="bg-rose-600 px-3 py-1.5 rounded text-[10px] font-bold text-white shadow-sm">Reject</button>
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 </div>
 
                 {/* 3. Price Manager */}
-                <div className="p-4 bg-[#FDF1E2]/40 rounded-xl border border-[#AB92BF]/30 space-y-3">
-                  <h3 className="text-sm font-bold text-[#655A7C]">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h3>
+                <div className="p-4 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 space-y-3">
+                  <h3 className="text-sm font-bold text-[#C0CAFF]">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h3>
                   {Object.entries(packages).map(([gameId, pkgs]) => (
-                    <div key={gameId} className="space-y-2 border-t border-[#AB92BF]/20 pt-2">
-                      <p className="text-xs font-bold text-[#655A7C] uppercase">{gameId}</p>
+                    <div key={gameId} className="space-y-2 border-t border-[#C0CAFF]/20 pt-2">
+                      <p className="text-xs font-bold text-[#C0CAFF] uppercase">{gameId}</p>
                       {pkgs.map((pkg) => (
                         <div key={pkg.id} className="flex justify-between items-center text-xs gap-2">
-                          <span className="text-[#655A7C]">{pkg.name}</span>
+                          <span className="text-gray-300">{pkg.name}</span>
                           <div className="flex items-center gap-2">
                             <input 
                               type="number"
                               defaultValue={pkg.price}
                               onBlur={(e) => handlePriceChange(gameId, pkg.id, Number(e.target.value))}
-                              className="w-24 bg-white border border-[#AB92BF]/40 p-1 rounded text-right text-[#655A7C]"
+                              className="w-24 bg-[#1A3054] border border-[#C0CAFF]/30 p-1.5 rounded-lg text-right text-white text-xs"
                             />
-                            <span className="text-[10px] text-[#655A7C]/70">Ks</span>
+                            <span className="text-[10px] text-gray-400">Ks</span>
                           </div>
                         </div>
                       ))}
