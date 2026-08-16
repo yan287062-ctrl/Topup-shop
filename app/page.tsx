@@ -1,5 +1,6 @@
-export const dynamic = 'force-dynamic';
 'use client';
+
+export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
@@ -119,11 +120,13 @@ export default function Home() {
   const [selectedGame, setSelectedGame] = useState<typeof GAMES[0] | null>(null);
   
   const [balance, setBalance] = useState(0);
+  const [currentAuthUser, setCurrentAuthUser] = useState<any>(null);
 
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
   const [packages, setPackages] = useState(INITIAL_PACKAGES);
   const [selectedPkg, setSelectedPkg] = useState<{ id: string; name: string; price: number } | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'slip' | 'wallet'>('slip');
   const [slipFile, setSlipFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
@@ -141,7 +144,21 @@ export default function Home() {
 
   useEffect(() => {
     fetchPricesFromDB();
+    fetchUserBalance();
   }, []);
+
+  const fetchUserBalance = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      setCurrentAuthUser(user);
+      const { data } = await supabase
+        .from('profiles')
+        .select('balance')
+        .eq('id', user.id)
+        .single();
+      if (data) setBalance(data.balance || 0);
+    }
+  };
 
   const fetchPricesFromDB = async () => {
     const { data } = await supabase.from('prices').select('*');
@@ -157,30 +174,59 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedGame || !userId || !selectedPkg || !slipFile) {
-      alert('အချက်အလက်များနှင့် Slip ပုံကို အပြည့်အစုံ ဖြည့်သွင်းပေးပါ။');
+    if (!selectedGame || !userId || !selectedPkg) {
+      alert('အချက်အလက်များကို အပြည့်အစုံ ဖြည့်သွင်းပေးပါ။');
       return;
     }
+
+    if (paymentMethod === 'slip' && !slipFile) {
+      alert('ကျေးဇူးပြု၍ ငွေလွှဲစလစ် (Slip) ပုံတင်ပေးပါ။');
+      return;
+    }
+
     setLoading(true);
     setStatusMsg('');
 
     try {
-      let slipUrl = 'No Slip';
+      let slipUrl = 'Wallet Balance Payment';
 
-      const fileExt = slipFile.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const { error: uploadError } = await supabase.storage
-        .from('slips')
-        .upload(fileName, slipFile);
+      // 1. Wallet Balance ဖြင့် ပေးချေခြင်း Logic
+      if (paymentMethod === 'wallet') {
+        if (balance < selectedPkg.price) {
+          alert('Wallet ထဲတွင် လက်ကျန်ငွေ မလုံလောက်ပါ။ ကျေးဇူးပြု၍ ငွေကြိုဖြည့်ပါ။');
+          setLoading(false);
+          return;
+        }
 
-      if (uploadError) throw uploadError;
+        const newBalance = balance - selectedPkg.price;
+        if (currentAuthUser) {
+          const { error: balanceError } = await supabase
+            .from('profiles')
+            .update({ balance: newBalance })
+            .eq('id', currentAuthUser.id);
 
-      const { data: publicURLData } = supabase.storage
-        .from('slips')
-        .getPublicUrl(fileName);
+          if (balanceError) throw balanceError;
+        }
 
-      slipUrl = publicURLData.publicUrl;
+        setBalance(newBalance);
+      } else {
+        // 2. Direct Slip ဖြင့် ပေးချေခြင်း Logic
+        const fileExt = slipFile!.name.split('.').pop();
+        const fileName = `${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('slips')
+          .upload(fileName, slipFile!);
 
+        if (uploadError) throw uploadError;
+
+        const { data: publicURLData } = supabase.storage
+          .from('slips')
+          .getPublicUrl(fileName);
+
+        slipUrl = publicURLData.publicUrl;
+      }
+
+      // Order Insert လုပ်ခြင်း
       const { error } = await supabase.from('orders').insert([
         {
           game_id: selectedGame.id,
@@ -190,28 +236,37 @@ export default function Home() {
           player_id: userId,
           zone_id: zoneId || null,
           slip_url: slipUrl,
-          status: 'pending',
+          status: paymentMethod === 'wallet' ? 'completed' : 'pending',
         },
       ]);
 
       if (error) throw error;
 
-      const caption = `🚨 𝗔𝗱𝗺𝗶𝗻 - အော်ဒါအသစ်ဝင်လာပါပြီ!\n\n` +
+      // Telegram သို့ အကြောင်းကြားစာ ပို့ခြင်း
+      const caption = `🚨 𝗔𝗱𝗺𝗶𝗻 - အော်ဒါအသစ်ဝင်လာပါပြီ! (${paymentMethod === 'wallet' ? '💳 Wallet Payment' : '🧾 Slip Upload'})\n\n` +
         `🎮 ဂိမ်း: ${selectedGame.name}\n` +
         `📦 ပက်ကေ့ဂျ်: ${selectedPkg.name} (${selectedPkg.price.toLocaleString()} Ks)\n` +
         `👤 User ID: ${userId}\n` +
         `🏷️ Zone ID: ${zoneId || '-'}\n` +
         `⏰ အချိန်: ${new Date().toLocaleString()}`;
 
-      const formData = new FormData();
-      formData.append('chat_id', CHAT_ID);
-      formData.append('photo', slipFile);
-      formData.append('caption', caption);
+      if (paymentMethod === 'wallet' || !slipFile) {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: CHAT_ID, text: caption }),
+        });
+      } else {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        formData.append('photo', slipFile);
+        formData.append('caption', caption);
 
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-        method: 'POST',
-        body: formData,
-      });
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+          method: 'POST',
+          body: formData,
+        });
+      }
 
       setStatusMsg('✅ အော်ဒါ အောင်မြင်စွာ တင်ပြီးပါပြီ!');
       setUserId('');
@@ -304,7 +359,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#FDF1E2] text-[#655A7C] p-4 font-sans pb-12">
-      {/* Header section with Logo & Paing Gyi shop */}
       <header className="flex justify-between items-center max-w-3xl mx-auto py-3 border-b border-[#655A7C]/20">
         <div className="flex items-center gap-3">
           {selectedGame && activeTab === 'shop' && (
@@ -327,7 +381,7 @@ export default function Home() {
         
         <div className="flex gap-2">
           <button onClick={() => setActiveTab('shop')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'shop' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Shop</button>
-          <button onClick={() => setActiveTab('wallet')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'wallet' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Wallet</button>
+          <button onClick={() => setActiveTab('wallet')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'wallet' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Wallet ({balance.toLocaleString()} Ks)</button>
           <button onClick={() => setActiveTab('admin')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'admin' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Admin</button>
         </div>
       </header>
@@ -336,10 +390,16 @@ export default function Home() {
         {activeTab === 'shop' && (
           !selectedGame ? (
             <div className="space-y-6">
-              <div className="bg-[#655A7C] text-[#FDF1E2] p-6 rounded-2xl border border-[#655A7C] shadow-xl">
-                <span className="bg-[#AB92BF] text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full">24 HOURS</span>
-                <h2 className="text-xl font-bold mt-2 text-white">ငွေဖြည့်ထားရုံနဲ့ 24 hr စိတ်ကြိုက်</h2>
-                <p className="text-xs text-[#FDF1E2]/80 mt-1">Game Item ပေါင်းများစွာကို တစ်နေရာတည်းမှာ လွယ်ကူစွာ ဝယ်ယူနိုင်ပြီ</p>
+              <div className="bg-[#655A7C] text-[#FDF1E2] p-6 rounded-2xl border border-[#655A7C] shadow-xl flex justify-between items-center">
+                <div>
+                  <span className="bg-[#AB92BF] text-white font-extrabold text-[10px] px-2.5 py-1 rounded-full">24 HOURS</span>
+                  <h2 className="text-xl font-bold mt-2 text-white">ငွေဖြည့်ထားရုံနဲ့ 24 hr စိတ်ကြိုက်</h2>
+                  <p className="text-xs text-[#FDF1E2]/80 mt-1">Game Item ပေါင်းများစွာကို တစ်နေရာတည်းမှာ လွယ်ကူစွာ ဝယ်ယူနိုင်ပြီ</p>
+                </div>
+                <div className="text-right bg-[#AB92BF]/20 p-3 rounded-xl border border-[#AB92BF]/40">
+                  <p className="text-[10px] text-[#FDF1E2]/80">Wallet Balance</p>
+                  <p className="text-lg font-black text-white">{balance.toLocaleString()} Ks</p>
+                </div>
               </div>
 
               <div>
@@ -401,7 +461,7 @@ export default function Home() {
                   <span className="bg-[#AB92BF] text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                   <h3 className="text-sm font-semibold text-[#655A7C]">ပက်ကေ့ဂျ် ရွေးချယ်ပါ</h3>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
                   {(packages[selectedGame.id] || []).map((pkg) => (
                     <div
                       key={pkg.id}
@@ -420,22 +480,63 @@ export default function Home() {
               <div className="bg-white p-5 rounded-2xl border border-[#AB92BF]/30 space-y-3 shadow-md">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-[#AB92BF] text-white w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
-                  <h3 className="text-sm font-semibold text-[#655A7C]">ငွေပေးချေမှုနှင့် Slip ပုံတင်ရန်</h3>
+                  <h3 className="text-sm font-semibold text-[#655A7C]">ငွေပေးချေမှု နည်းလမ်း</h3>
                 </div>
-                <div className="p-3 bg-[#FDF1E2] rounded-xl border border-[#AB92BF]/40 text-xs text-[#655A7C]">
-                  💳 **Pay (U Ye Paing Oo):** 09967241357 (Paing Gyi shop)
+
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('wallet')}
+                    className={`p-3 rounded-xl border text-xs font-bold transition-all text-left ${
+                      paymentMethod === 'wallet'
+                        ? 'border-[#AB92BF] bg-[#AB92BF] text-white shadow-md'
+                        : 'border-[#AB92BF]/30 bg-[#FDF1E2]/40 text-[#655A7C]'
+                    }`}
+                  >
+                    💳 Wallet Balance
+                    <span className="block text-[10px] font-normal opacity-90 mt-0.5">လက်ကျန်: {balance.toLocaleString()} Ks</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('slip')}
+                    className={`p-3 rounded-xl border text-xs font-bold transition-all text-left ${
+                      paymentMethod === 'slip'
+                        ? 'border-[#AB92BF] bg-[#AB92BF] text-white shadow-md'
+                        : 'border-[#AB92BF]/30 bg-[#FDF1E2]/40 text-[#655A7C]'
+                    }`}
+                  >
+                    🧾 Direct Slip Upload
+                    <span className="block text-[10px] font-normal opacity-90 mt-0.5">ငွေလွှဲစလစ် တင်မည်</span>
+                  </button>
                 </div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setSlipFile(e.target.files[0]);
-                    }
-                  }}
-                  className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 rounded-xl p-3 text-xs text-[#655A7C] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#AB92BF] file:text-white hover:file:bg-[#655A7C]"
-                  required
-                />
+
+                {paymentMethod === 'slip' ? (
+                  <>
+                    <div className="p-3 bg-[#FDF1E2] rounded-xl border border-[#AB92BF]/40 text-xs text-[#655A7C]">
+                      💳 **Pay (U Ye Paing Oo):** 09967241357 (Paing Gyi shop)
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setSlipFile(e.target.files[0]);
+                        }
+                      }}
+                      className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 rounded-xl p-3 text-xs text-[#655A7C] file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#AB92BF] file:text-white hover:file:bg-[#655A7C]"
+                      required
+                    />
+                  </>
+                ) : (
+                  <div className="p-3.5 bg-[#FDF1E2] rounded-xl border border-[#AB92BF]/40 text-xs text-[#655A7C] space-y-1">
+                    <p className="font-bold">✨ Wallet Balance ဖြင့် တိုက်ရိုက် ဝယ်ယူမည်</p>
+                    <p className="text-[11px] text-[#655A7C]/80">
+                      ကျသင့်ငွေ: <strong>{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</strong> | 
+                      လက်ကျန်ငွေ: <strong>{balance.toLocaleString()} Ks</strong>
+                    </p>
+                  </div>
+                )}
               </div>
 
               <button
@@ -443,7 +544,7 @@ export default function Home() {
                 disabled={loading}
                 className="w-full bg-[#AB92BF] hover:bg-[#655A7C] text-white font-bold py-3.5 rounded-2xl transition-all disabled:opacity-50 text-sm shadow-md"
               >
-                {loading ? 'အော်ဒါ ပို့နေပါသည်...' : 'ယခု ဝယ်ယူမည်'}
+                {loading ? 'အော်ဒါ ပို့နေပါသည်...' : (paymentMethod === 'wallet' ? 'Wallet ဖြင့် တိုက်ရိုက် ဝယ်ယူမည်' : 'ယခု ဝယ်ယူမည်')}
               </button>
 
               {statusMsg && (
@@ -544,7 +645,6 @@ export default function Home() {
               </form>
             ) : (
               <div className="space-y-6">
-                {/* ဈေးနှုန်းများ ပြင်ဆင်ရန် အပိုင်း */}
                 <div className="p-4 bg-[#FDF1E2]/40 rounded-xl border border-[#AB92BF]/30 space-y-3">
                   <h3 className="text-sm font-bold text-[#655A7C]">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h3>
                   {Object.entries(packages).map(([gameId, pkgs]) => (
@@ -568,7 +668,6 @@ export default function Home() {
                   ))}
                 </div>
 
-                {/* အော်ဒါ စီမံခန့်ခွဲမှု Panel */}
                 <div className="space-y-4">
                   <h3 className="text-sm font-bold text-[#655A7C]">📦 အော်ဒါ စီမံခန့်ခွဲမှု Panel</h3>
                   <div className="space-y-2">
@@ -577,8 +676,11 @@ export default function Home() {
                         <div>
                           <p className="font-bold text-[#655A7C]">{ord.game_name} - {ord.package_name}</p>
                           <p className="text-[#655A7C]/80">ID: {ord.player_id} ({ord.zone_id || '-'}) | {ord.price} Ks</p>
-                          {ord.slip_url && ord.slip_url !== 'No Slip' && (
+                          {ord.slip_url && ord.slip_url !== 'Wallet Balance Payment' && ord.slip_url !== 'No Slip' && (
                             <a href={ord.slip_url} target="_blank" rel="noreferrer" className="text-[#AB92BF] font-bold underline block mt-1">📷 Slip ကြည့်ရန်</a>
+                          )}
+                          {ord.slip_url === 'Wallet Balance Payment' && (
+                            <span className="text-emerald-600 font-bold block mt-1">💳 Paid with Wallet</span>
                           )}
                           <p className="text-[10px] text-[#655A7C] mt-1 font-semibold">Status: {ord.status}</p>
                         </div>
