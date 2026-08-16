@@ -179,12 +179,14 @@ export default function Home() {
       }
     });
 
-    // 🔔 Realtime Notification Listener: Listen to order completions
+    // 🔔 Realtime Notification Listener (Filter by User / Player ID to prevent global alerts)
     const orderSubscription = supabase
       .channel('orders-realtime-notification')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
         if (payload.new && payload.new.status === 'completed') {
-          setUserNotification('🎉 ငွေဖြည့်ပြီးပါပြီ! သင့်အော်ဒါ အောင်မြင်စွာ ဆောင်ရွက်ပြီးပါပြီ။');
+          if (userId && payload.new.player_id === userId) {
+            setUserNotification('🎉 ငွေဖြည့်ပြီးပါပြီ! သင့်အော်ဒါ အောင်မြင်စွာ ဆောင်ရွက်ပြီးပါပြီ။');
+          }
           fetchUserBalance();
           if (isAdminLoggedIn) fetchOrders();
         }
@@ -195,7 +197,7 @@ export default function Home() {
       authListener.subscription.unsubscribe();
       supabase.removeChannel(orderSubscription);
     };
-  }, [isAdminLoggedIn]);
+  }, [isAdminLoggedIn, userId]);
 
   const fetchUserBalance = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -218,7 +220,7 @@ export default function Home() {
         if (!grouped[item.game_id]) grouped[item.game_id] = [];
         grouped[item.game_id].push({ id: item.id, name: item.package_name, price: item.price });
       });
-      setPackages(grouped);
+      setPackages(prev => ({ ...prev, ...grouped }));
     }
   };
 
@@ -693,7 +695,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* AUTH LOGIN TAB (Centered Card) */}
+        {/* AUTH LOGIN TAB */}
         {activeTab === 'login' && (
           <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-2xl max-w-md mx-auto space-y-4 my-8">
             <h2 className="text-lg font-extrabold text-white text-center">
@@ -1017,7 +1019,7 @@ export default function Home() {
           </div>
         )}
 
-        {/* ADMIN TAB (Navy & Lavender Blue Theme Applied) */}
+        {/* ADMIN TAB */}
         {activeTab === 'admin' && (
           <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl">
             {!isAdminLoggedIn ? (
@@ -1063,7 +1065,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 2. Order Approval Manager (Styled in Navy & Lavender) */}
+                {/* 2. Order Approval Manager */}
                 <div className="p-4 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 space-y-3">
                   <h3 className="text-sm font-bold text-[#C0CAFF]">📦 အော်ဒါ စီမံခန့်ခွဲမှု (Approve / Reject)</h3>
                   <div className="space-y-2.5">
