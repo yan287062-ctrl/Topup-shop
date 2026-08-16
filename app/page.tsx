@@ -11,6 +11,7 @@ const CHAT_ID = '1934339791';
 const GAMES = [
   { id: 'mlbb', name: 'Mobile Legends: Bang Bang', image: '/mlbb.jpg' },
   { id: 'pubg', name: 'PUBG Mobile UC', image: '/pubg.jpg' },
+  { id: 'pubg_uc_pack', name: 'PUBG UC PACK', image: '/pubg.jpg' },
   { id: 'telegram', name: 'Telegram Star & Premium', image: '/telegram.jpg' },
   { id: 'heartopia', name: 'Heartopia', image: '/heartopia.jpg' },
 ];
@@ -80,6 +81,24 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'pubg_13', name: 'Royale Pass Upgrade', price: 27885 },
     { id: 'pubg_14', name: 'Royale Pass Upgrade Plus', price: 73906 },
   ],
+  pubg_uc_pack: [
+    { id: 'p_pack_1', name: 'First Purchase Pack', price: 4059 },
+    { id: 'p_pack_2', name: 'Prime (1 Month)', price: 4059 },
+    { id: 'p_pack_3', name: 'Weekly Deal Pack 1', price: 4119 },
+    { id: 'p_pack_4', name: 'Prime (3 Months)', price: 12179 },
+    { id: 'p_pack_5', name: 'Upgradable Firearm Materials Pack', price: 12160 },
+    { id: 'p_pack_6', name: 'Weekly Deal Pack 2', price: 12401 },
+    { id: 'p_pack_7', name: 'Weekly Mythic Emblem Value Pack', price: 12401 },
+    { id: 'p_pack_8', name: 'Mythic Emblem Pack', price: 20247 },
+    { id: 'p_pack_9', name: 'Prime (6 Months)', price: 24358 },
+    { id: 'p_pack_10', name: 'Elite Pass LV1-50', price: 24450 },
+    { id: 'p_pack_11', name: 'Prime Plus (1 Month)', price: 40596 },
+    { id: 'p_pack_12', name: 'Prime (12 Months)', price: 48715 },
+    { id: 'p_pack_13', name: 'Elite Pass LV1-100', price: 49324 },
+    { id: 'p_pack_14', name: 'Prime Plus (3 Months)', price: 121787 },
+    { id: 'p_pack_15', name: 'Prime Plus (6 Months)', price: 239885 },
+    { id: 'p_pack_16', name: 'Prime Plus (12 Months)', price: 484384 },
+  ],
   telegram: [
     { id: 'tg_1', name: '50 Stars', price: 3552 },
     { id: 'tg_2', name: '75 Stars', price: 5306 },
@@ -114,6 +133,13 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 },
   ]
 };
+
+const LIVE_PURCHASES = [
+  { user: 'Ko***Na', item: '55 Diamonds', time: 'လွန်ခဲ့သော 2 မိနစ်က' },
+  { user: 'Kyaw***Oo', item: '60 UC', time: 'လွန်ခဲ့သော 5 မိနစ်က' },
+  { user: 'Su***Mon', item: 'Weekly Pass', time: 'လွန်ခဲ့သော 8 မိနစ်က' },
+  { user: 'Aung***Min', item: '100 Stars', time: 'လွန်ခဲ့သော 12 မိနစ်က' },
+];
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'shop' | 'categories' | 'search' | 'wallet' | 'login' | 'admin' | 'mlbb_check'>('shop');
@@ -532,7 +558,19 @@ export default function Home() {
         </div>
       )}
 
-      <div className="bg-[#1A3054] border-b border-[#C0CAFF]/20 py-2 px-4 text-xs text-[#C0CAFF] overflow-hidden whitespace-nowrap">
+      {/* Chi Chi Game Store Navbar & Style Header */}
+      <div className="bg-[#1A3054] border-b border-[#C0CAFF]/20 py-2.5 px-4 flex justify-between items-center text-xs shadow-md">
+        <div className="flex items-center gap-2 font-bold text-[#C0CAFF]">
+          <span>🌟</span> <span>Paing Gyi Game Store - Official Platform</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="bg-[#0e1b30] px-3 py-1 rounded-full border border-[#C0CAFF]/30 text-white">
+            ⭐ သစ္စာရှိကုမ္ပဏီ / 24/7 အမြန်ဆုံးဝန်ဆောင်မှု
+          </span>
+        </div>
+      </div>
+
+      <div className="bg-[#0e1b30] border-b border-[#C0CAFF]/20 py-2 px-4 text-xs text-[#C0CAFF] overflow-hidden whitespace-nowrap">
         <div className="inline-block animate-pulse">
           📢 ငွေဖြည့်ချိန် ၅ မိနစ်အတွင်း အကောင့်ထဲ ရောက်ပါမည်... Paing Gyi shop မှ ကြိုဆိုပါသည်။ လူကြီးမင်းတို့၏ ဂိမ်းအကောင့်အချက်အလက်များကို မှန်ကန်စွာ ဖြည့်သွင်းပေးပါရန် မေတ္တာရပ်ခံအပ်ပါသည်။ 📢
         </div>
@@ -743,20 +781,35 @@ export default function Home() {
         {activeTab === 'shop' && (
           !selectedGame ? (
             <div className="space-y-6">
-              <div className="bg-[#1A3054] text-white p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl flex justify-between items-center">
-                <div>
-                  <span className="bg-[#C0CAFF] text-[#1A3054] font-extrabold text-[10px] px-2.5 py-1 rounded-full">24 HOURS</span>
-                  <h2 className="text-xl font-bold mt-2 text-white">ငွေဖြည့်ထားရုံနဲ့ 24 hr စိတ်ကြိုက်</h2>
-                  <p className="text-xs text-gray-300 mt-1">Game Item ပေါင်းများစွာကို တစ်နေရာတည်းမှာ လွယ်ကူစွာ ဝယ်ယူနိုင်ပြီ</p>
+              {/* Chi Chi Banner / Announcement Section */}
+              <div className="bg-gradient-to-r from-[#1A3054] to-[#0e1b30] text-white p-6 rounded-2xl border border-[#C0CAFF]/40 shadow-xl flex justify-between items-center relative overflow-hidden">
+                <div className="relative z-10">
+                  <span className="bg-[#C0CAFF] text-[#1A3054] font-extrabold text-[10px] px-2.5 py-1 rounded-full">⭐ VIP GAME STORE</span>
+                  <h2 className="text-xl font-bold mt-2 text-white">ယုံကြည်စိတ်ချရဆုံးနှင့် ဈေးနှုန်းအသက်သာဆုံး</h2>
+                  <p className="text-xs text-[#C0CAFF] mt-1">24 နာရီပတ်လုံး အော်ဒါများကို အလိုအလျောက်နှင့် အမြန်ဆုံး ဖြည့်သွင်းပေးနေပါပြီ။</p>
                 </div>
-                <div className="text-right bg-[#0e1b30] p-3 rounded-xl border border-[#C0CAFF]/20">
-                  <p className="text-[10px] text-gray-400">Wallet Balance</p>
+                <div className="text-right bg-[#0e1b30]/80 backdrop-blur p-3 rounded-xl border border-[#C0CAFF]/30 relative z-10 shrink-0">
+                  <p className="text-[10px] text-gray-300">Wallet Balance</p>
                   <p className="text-lg font-black text-[#C0CAFF]">{balance.toLocaleString()} Ks</p>
                 </div>
               </div>
 
+              {/* Live Purchases Bar / Ticker */}
+              <div className="bg-[#1A3054]/60 border border-[#C0CAFF]/20 p-3 rounded-xl flex items-center justify-between text-xs overflow-x-auto gap-4">
+                <div className="flex items-center gap-2 text-[#C0CAFF] font-bold shrink-0">
+                  <span>🔥 တိုက်ရိုက်ဝယ်ယူမှုများ:</span>
+                </div>
+                <div className="flex items-center gap-6 whitespace-nowrap animate-pulse text-gray-300">
+                  {LIVE_PURCHASES.map((p, i) => (
+                    <span key={i} className="bg-[#0e1b30] px-3 py-1 rounded-lg border border-[#C0CAFF]/20">
+                      👤 <strong className="text-white">{p.user}</strong> ဝယ်ယူခဲ့သည် - <span className="text-[#C0CAFF] font-bold">{p.item}</span> ({p.time})
+                    </span>
+                  ))}
+                </div>
+              </div>
+
               <div>
-                <h3 className="text-base font-bold text-[#C0CAFF] flex items-center gap-2 mb-4">🔥 ယခုခေတ်စားနေသော ဂိမ်းများ</h3>
+                <h3 className="text-base font-bold text-[#C0CAFF] flex items-center gap-2 mb-4">🎮 ရရှိနိုင်သော ဂိမ်းများနှင့် ဝန်ဆောင်မှုများ</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
                   {GAMES.map((game) => (
                     <div
@@ -785,11 +838,14 @@ export default function Home() {
                 </div>
               </div>
 
+              {/* Step 1: User ID / Zone ID Section */}
               <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">1</span>
-                    <h3 className="text-sm font-semibold text-white">အကောင့်အချက်အလက်</h3>
+                    <h3 className="text-sm font-semibold text-white">
+                      {selectedGame.id === 'pubg' || selectedGame.id === 'pubg_uc_pack' ? 'PUBG Mobile ID ဖြည့်သွင်းရန်' : 'အကောင့်အချက်အလက်'}
+                    </h3>
                   </div>
                   {selectedGame.id === 'mlbb' && (
                     <button
@@ -805,19 +861,21 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
-                    placeholder="User ID"
+                    placeholder={selectedGame.id === 'pubg' || selectedGame.id === 'pubg_uc_pack' ? 'PUBG Character ID' : 'User ID'}
                     value={userId}
                     onChange={(e) => setUserId(e.target.value)}
                     className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 rounded-xl p-3 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF]"
                     required
                   />
-                  <input
-                    type="text"
-                    placeholder="Zone ID (optional)"
-                    value={zoneId}
-                    onChange={(e) => setZoneId(e.target.value)}
-                    className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 rounded-xl p-3 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF]"
-                  />
+                  {selectedGame.id !== 'pubg' && selectedGame.id !== 'pubg_uc_pack' && (
+                    <input
+                      type="text"
+                      placeholder="Zone ID (optional)"
+                      value={zoneId}
+                      onChange={(e) => setZoneId(e.target.value)}
+                      className="w-full bg-[#0e1b30] border border-[#C0CAFF]/30 rounded-xl p-3 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF]"
+                    />
+                  )}
                 </div>
 
                 {mlbbCheckResult && selectedGame.id === 'mlbb' && (
@@ -827,27 +885,29 @@ export default function Home() {
                 )}
               </div>
 
+              {/* Step 2: Package Selection Grid Mapping Style */}
               <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
                   <h3 className="text-sm font-semibold text-white">ပက်ကေ့ဂျ် ရွေးချယ်ပါ</h3>
                 </div>
-                <div className="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto pr-1">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-72 overflow-y-auto pr-1">
                   {(packages[selectedGame.id] || []).map((pkg) => (
                     <div
                       key={pkg.id}
                       onClick={() => setSelectedPkg(pkg)}
-                      className={`p-3.5 rounded-xl border cursor-pointer transition-all ${
-                        selectedPkg?.id === pkg.id ? 'border-[#C0CAFF] bg-[#C0CAFF]/20 shadow-md' : 'border-[#C0CAFF]/20 bg-[#0e1b30]'
+                      className={`p-3.5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
+                        selectedPkg?.id === pkg.id ? 'border-[#C0CAFF] bg-[#C0CAFF]/20 shadow-md ring-2 ring-[#C0CAFF]' : 'border-[#C0CAFF]/20 bg-[#0e1b30]'
                       }`}
                     >
                       <p className="text-xs font-semibold text-white">{pkg.name}</p>
-                      <p className="text-xs font-bold text-[#C0CAFF] mt-1">{pkg.price.toLocaleString()} Ks</p>
+                      <p className="text-xs font-bold text-[#C0CAFF] mt-2">{pkg.price.toLocaleString()} Ks</p>
                     </div>
                   ))}
                 </div>
               </div>
 
+              {/* Step 3: Payment Method */}
               <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
