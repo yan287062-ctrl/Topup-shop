@@ -1,7 +1,4 @@
-cat << 'EOF' > app/page.tsx
-'use client';
-
-export const dynamic = 'force-dynamic';
+printf "'use client';\n\nexport const dynamic = 'force-dynamic';\n" > app/page.tsx && cat << 'EOF' >> app/page.tsx
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
