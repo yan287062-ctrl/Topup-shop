@@ -1,4 +1,3 @@
-cat << 'EOF' > app/page.tsx
 'use client';
 
 export const dynamic = 'force-dynamic';
@@ -532,6 +531,12 @@ export default function Home() {
           </button>
         </div>
       )}
+
+      <div className="bg-[#1A3054] border-b border-[#C0CAFF]/20 py-2 px-4 text-xs text-[#C0CAFF] overflow-hidden whitespace-nowrap">
+        <div className="inline-block animate-pulse">
+          📢 ငွေဖြည့်ချိန် ၅ မိနစ်အတွင်း အကောင့်ထဲ ရောက်ပါမည်... Paing Gyi shop မှ ကြိုဆိုပါသည်။ လူကြီးမင်းတို့၏ ဂိမ်းအကောင့်အချက်အလက်များကို မှန်ကန်စွာ ဖြည့်သွင်းပေးပါရန် မေတ္တာရပ်ခံအပ်ပါသည်။ 📢
+        </div>
+      </div>
 
       <header className="bg-[#1A3054] border-b border-[#C0CAFF]/20 sticky top-0 z-40 shadow-lg">
         <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-2">
@@ -1103,4 +1108,3 @@ export default function Home() {
     </div>
   );
 }
-EOF
