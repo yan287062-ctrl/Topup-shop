@@ -1,4 +1,7 @@
-printf "'use client';\n\nexport const dynamic = 'force-dynamic';\n" > app/page.tsx && cat << 'EOF' >> app/page.tsx
+cat << 'EOF' > app/page.tsx
+'use client';
+
+export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
@@ -179,7 +182,6 @@ export default function Home() {
       }
     });
 
-    // 🔔 Realtime Notification Listener (Filter by User / Player ID to prevent global alerts)
     const orderSubscription = supabase
       .channel('orders-realtime-notification')
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
@@ -237,7 +239,6 @@ export default function Home() {
     setCheckingMlbb(true);
     setMlbbCheckResult(null);
 
-    // MLBB ID Check Simulation
     setTimeout(() => {
       setCheckingMlbb(false);
       setMlbbCheckResult({ name: `Verified_Gamer_${id} (${zone})` });
@@ -519,7 +520,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0e1b30] text-white font-sans pb-12 relative">
-      {/* 🔔 REALTIME USER NOTIFICATION POPUP */}
       {userNotification && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#C0CAFF] text-[#1A3054] px-6 py-3.5 rounded-2xl shadow-2xl border-2 border-white flex items-center gap-3 animate-bounce">
           <span className="text-xl">🔔</span>
@@ -533,14 +533,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* 📢 1. ANNOUNCEMENT BAR */}
-      <div className="bg-[#1A3054] border-b border-[#C0CAFF]/20 py-2 px-4 text-xs text-[#C0CAFF] overflow-hidden whitespace-nowrap">
-        <div className="inline-block animate-pulse">
-          📢 ငွေဖြည့်ချိန် ၅ မိနစ်အတွင်း အကောင့်ထဲ ရောက်ပါမည်... Paing Gyi shop မှ ကြိုဆိုပါသည်။ လူကြီးမင်းတို့၏ ဂိမ်းအကောင့်အချက်အလက်များကို မှန်ကန်စွာ ဖြည့်သွင်းပေးပါရန် မေတ္တာရပ်ခံအပ်ပါသည်။ 📢
-        </div>
-      </div>
-
-      {/* 🧭 2. HEADER NAVIGATION */}
       <header className="bg-[#1A3054] border-b border-[#C0CAFF]/20 sticky top-0 z-40 shadow-lg">
         <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-2">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setActiveTab('shop'); setSelectedGame(null); }}>
@@ -580,10 +572,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 📄 MAIN CONTENT BODY */}
       <div className="max-w-3xl mx-auto mt-6 px-4">
-        
-        {/* MLBB USER ID CHECKER TAB */}
         {activeTab === 'mlbb_check' && (
           <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl max-w-md mx-auto space-y-4">
             <div className="text-center">
@@ -640,7 +629,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* ORDER SEARCH TAB */}
         {activeTab === 'search' && (
           <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl max-w-md mx-auto space-y-4">
             <h2 className="text-lg font-extrabold text-white text-center">🔎 အော်ဒါအခြေအနေ ရှာဖွေမည်</h2>
@@ -674,7 +662,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* CATEGORIES TAB */}
         {activeTab === 'categories' && (
           <div className="space-y-4">
             <h2 className="text-base font-bold text-[#C0CAFF]">🎮 ဂိမ်းအမျိုးအစားများ</h2>
@@ -695,7 +682,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* AUTH LOGIN TAB */}
         {activeTab === 'login' && (
           <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-2xl max-w-md mx-auto space-y-4 my-8">
             <h2 className="text-lg font-extrabold text-white text-center">
@@ -749,7 +735,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* SHOP TAB */}
         {activeTab === 'shop' && (
           !selectedGame ? (
             <div className="space-y-6">
@@ -795,7 +780,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Step 1: User Account */}
               <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
@@ -838,7 +822,6 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Step 2: Select Package */}
               <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">2</span>
@@ -860,7 +843,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Step 3: Payment Method */}
               <div className="bg-[#1A3054] p-5 rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-md">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold">3</span>
@@ -940,7 +922,6 @@ export default function Home() {
           )
         )}
 
-        {/* WALLET TAB */}
         {activeTab === 'wallet' && (
           <div className="space-y-6">
             <div className="bg-[#1A3054] text-white p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl">
@@ -1019,7 +1000,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* ADMIN TAB */}
         {activeTab === 'admin' && (
           <div className="bg-[#1A3054] p-6 rounded-2xl border border-[#C0CAFF]/30 shadow-xl">
             {!isAdminLoggedIn ? (
@@ -1031,7 +1011,6 @@ export default function Home() {
               </form>
             ) : (
               <div className="space-y-6">
-                {/* 1. User Balance Manager */}
                 <div className="p-4 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 space-y-3">
                   <h3 className="text-sm font-bold text-[#C0CAFF]">💰 User Balance စီမံရန် (ငွေဖြည့်ပေးရန်)</h3>
                   <div className="space-y-2">
@@ -1065,7 +1044,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 2. Order Approval Manager */}
                 <div className="p-4 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 space-y-3">
                   <h3 className="text-sm font-bold text-[#C0CAFF]">📦 အော်ဒါ စီမံခန့်ခွဲမှု (Approve / Reject)</h3>
                   <div className="space-y-2.5">
@@ -1095,7 +1073,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* 3. Price Manager */}
                 <div className="p-4 bg-[#0e1b30] rounded-xl border border-[#C0CAFF]/30 space-y-3">
                   <h3 className="text-sm font-bold text-[#C0CAFF]">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h3>
                   {Object.entries(packages).map(([gameId, pkgs]) => (
