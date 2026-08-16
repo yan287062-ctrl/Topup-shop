@@ -117,11 +117,18 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
 };
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'shop' | 'wallet' | 'admin'>('shop');
+  const [activeTab, setActiveTab] = useState<'shop' | 'wallet' | 'login' | 'admin'>('shop');
   const [selectedGame, setSelectedGame] = useState<typeof GAMES[0] | null>(null);
   
   const [balance, setBalance] = useState(0);
   const [currentAuthUser, setCurrentAuthUser] = useState<any>(null);
+
+  // Auth States
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authMsg, setAuthMsg] = useState('');
 
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
@@ -149,6 +156,20 @@ export default function Home() {
   useEffect(() => {
     fetchPricesFromDB();
     fetchUserBalance();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setCurrentAuthUser(session.user);
+        fetchUserBalance();
+      } else {
+        setCurrentAuthUser(null);
+        setBalance(0);
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   const fetchUserBalance = async () => {
@@ -176,6 +197,45 @@ export default function Home() {
     }
   };
 
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthMsg('');
+
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email: authEmail,
+          password: authPassword,
+        });
+        if (error) throw error;
+        setAuthMsg('✅ အကောင့်သစ် အောင်မြင်စွာ ဖွင့်ပြီးပါပြီ!');
+        if (data.user) setCurrentAuthUser(data.user);
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: authEmail,
+          password: authPassword,
+        });
+        if (error) throw error;
+        setAuthMsg('✅ Login အောင်မြင်စွာ ဝင်ပြီးပါပြီ!');
+        if (data.user) setCurrentAuthUser(data.user);
+      }
+      fetchUserBalance();
+      setTimeout(() => setActiveTab('shop'), 1000);
+    } catch (err: any) {
+      setAuthMsg('❌ အမှား ဖြစ်ပွားပါသည်: ' + (err.message || 'Error occurred'));
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setCurrentAuthUser(null);
+    setBalance(0);
+    alert('Logged out successful');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedGame || !userId || !selectedPkg) {
@@ -195,6 +255,13 @@ export default function Home() {
       let slipUrl = 'Wallet Balance Payment';
 
       if (paymentMethod === 'wallet') {
+        if (!currentAuthUser) {
+          alert('Wallet ဖြင့် ဝယ်ယူရန် အရင်ဆုံး Login ဝင်ပေးပါ');
+          setActiveTab('login');
+          setLoading(false);
+          return;
+        }
+
         if (balance < selectedPkg.price) {
           alert('Wallet ထဲတွင် လက်ကျန်ငွေ မလုံလောက်ပါ။ ကျေးဇူးပြု၍ ငွေကြိုဖြည့်ပါ။');
           setLoading(false);
@@ -202,14 +269,12 @@ export default function Home() {
         }
 
         const newBalance = balance - selectedPkg.price;
-        if (currentAuthUser) {
-          const { error: balanceError } = await supabase
-            .from('profiles')
-            .update({ balance: newBalance })
-            .eq('id', currentAuthUser.id);
+        const { error: balanceError } = await supabase
+          .from('profiles')
+          .update({ balance: newBalance })
+          .eq('id', currentAuthUser.id);
 
-          if (balanceError) throw balanceError;
-        }
+        if (balanceError) throw balanceError;
 
         setBalance(newBalance);
       } else {
@@ -282,6 +347,11 @@ export default function Home() {
 
   const handleTopupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentAuthUser) {
+      alert('ငွေဖြည့်ရန် အရင်ဆုံး Login ဝင်ပေးပါ');
+      setActiveTab('login');
+      return;
+    }
     if (!topupAmount || !topupSlip) {
       alert('ပမာဏနှင့် ငွေလွှဲစလစ်ပုံ ထည့်သွင်းပေးပါ။');
       return;
@@ -293,7 +363,8 @@ export default function Home() {
       await supabase.storage.from('slips').upload(fileName, topupSlip);
 
       const caption = `💰 𝗔𝗱𝗺𝗶𝗻 - ငွေဖြည့်တောင်းဆိုမှု အသစ်!\n\n` +
-        `👤 User Auth ID: ${currentAuthUser ? currentAuthUser.id : 'Guest'}\n` +
+        `👤 User Auth ID: ${currentAuthUser.id}\n` +
+        `📧 Email: ${currentAuthUser.email}\n` +
         `💵 ပမာဏ: ${Number(topupAmount).toLocaleString()} Ks\n` +
         `📝 မှတ်ချက်: ${topupNote || '-'}\n` +
         `⏰ အချိန်: ${new Date().toLocaleString()}`;
@@ -409,14 +480,74 @@ export default function Home() {
           </h1>
         </div>
         
-        <div className="flex gap-2">
-          <button onClick={() => setActiveTab('shop')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'shop' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Shop</button>
-          <button onClick={() => setActiveTab('wallet')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'wallet' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Wallet ({balance.toLocaleString()} Ks)</button>
-          <button onClick={() => setActiveTab('admin')} className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'admin' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Admin</button>
+        <div className="flex gap-1.5 flex-wrap justify-end">
+          <button onClick={() => setActiveTab('shop')} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'shop' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Shop</button>
+          <button onClick={() => setActiveTab('wallet')} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'wallet' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Wallet ({balance.toLocaleString()} Ks)</button>
+          
+          {currentAuthUser ? (
+            <button onClick={handleLogout} className="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-rose-500 text-white border border-rose-600">Logout</button>
+          ) : (
+            <button onClick={() => setActiveTab('login')} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'login' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Login</button>
+          )}
+
+          <button onClick={() => setActiveTab('admin')} className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all ${activeTab === 'admin' ? 'bg-[#AB92BF] text-white' : 'bg-white text-[#655A7C] border border-[#AB92BF]/30'}`}>Admin</button>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto mt-6">
+        {activeTab === 'login' && (
+          <div className="bg-white p-6 rounded-2xl border border-[#AB92BF]/30 shadow-md max-w-md mx-auto space-y-4">
+            <h2 className="text-lg font-extrabold text-[#655A7C] text-center">
+              {isSignUp ? 'အကောင့်သစ် ပြုလုပ်ရန်' : 'Login ဝင်ရောက်ရန်'}
+            </h2>
+            <form onSubmit={handleAuthSubmit} className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-[#655A7C] block mb-1">Email</label>
+                <input
+                  type="email"
+                  placeholder="example@gmail.com"
+                  value={authEmail}
+                  onChange={(e) => setAuthEmail(e.target.value)}
+                  className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 p-3 rounded-xl text-xs text-[#655A7C] focus:outline-none focus:border-[#655A7C]"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[#655A7C] block mb-1">Password</label>
+                <input
+                  type="password"
+                  placeholder="••••••••"
+                  value={authPassword}
+                  onChange={(e) => setAuthPassword(e.target.value)}
+                  className="w-full bg-[#FDF1E2]/40 border border-[#AB92BF]/40 p-3 rounded-xl text-xs text-[#655A7C] focus:outline-none focus:border-[#655A7C]"
+                  required
+                />
+              </div>
+
+              {authMsg && (
+                <p className="text-xs text-center font-bold text-[#655A7C] mt-2">{authMsg}</p>
+              )}
+
+              <button
+                type="submit"
+                disabled={authLoading}
+                className="w-full bg-[#AB92BF] hover:bg-[#655A7C] text-white font-bold py-3 rounded-xl transition-all text-xs shadow-md mt-2"
+              >
+                {authLoading ? 'လုပ်ဆောင်နေပါသည်...' : (isSignUp ? 'အကောင့်သစ် ဖွင့်မည်' : 'Login ဝင်မည်')}
+              </button>
+            </form>
+
+            <div className="text-center pt-2 border-t border-[#AB92BF]/20">
+              <button
+                onClick={() => { setIsSignUp(!isSignUp); setAuthMsg(''); }}
+                className="text-xs text-[#AB92BF] font-bold underline"
+              >
+                {isSignUp ? 'အကောင့်ရှိပြီးသားလား? Login ဝင်ပါ' : 'အကောင့်မရှိသေးဘူးလား? အကောင့်သစ်ဖွင့်ပါ'}
+              </button>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'shop' && (
           !selectedGame ? (
             <div className="space-y-6">
