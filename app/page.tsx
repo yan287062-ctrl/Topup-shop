@@ -137,10 +137,13 @@ export default function Home() {
   const [topupNote, setTopupNote] = useState('');
   const [topupLoading, setTopupLoading] = useState(false);
 
+  // Admin states
   const [adminUser, setAdminUser] = useState('');
   const [adminPass, setAdminPass] = useState('');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [orders, setOrders] = useState<any[]>([]);
+  const [profilesList, setProfilesList] = useState<any[]>([]);
+  const [addBalanceInputs, setAddBalanceInputs] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchPricesFromDB();
@@ -190,7 +193,6 @@ export default function Home() {
     try {
       let slipUrl = 'Wallet Balance Payment';
 
-      // 1. Wallet Balance ဖြင့် ပေးချေခြင်း Logic
       if (paymentMethod === 'wallet') {
         if (balance < selectedPkg.price) {
           alert('Wallet ထဲတွင် လက်ကျန်ငွေ မလုံလောက်ပါ။ ကျေးဇူးပြု၍ ငွေကြိုဖြည့်ပါ။');
@@ -210,7 +212,6 @@ export default function Home() {
 
         setBalance(newBalance);
       } else {
-        // 2. Direct Slip ဖြင့် ပေးချေခြင်း Logic
         const fileExt = slipFile!.name.split('.').pop();
         const fileName = `${Date.now()}.${fileExt}`;
         const { error: uploadError } = await supabase.storage
@@ -226,7 +227,6 @@ export default function Home() {
         slipUrl = publicURLData.publicUrl;
       }
 
-      // Order Insert လုပ်ခြင်း
       const { error } = await supabase.from('orders').insert([
         {
           game_id: selectedGame.id,
@@ -242,7 +242,6 @@ export default function Home() {
 
       if (error) throw error;
 
-      // Telegram သို့ အကြောင်းကြားစာ ပို့ခြင်း
       const caption = `🚨 𝗔𝗱𝗺𝗶𝗻 - အော်ဒါအသစ်ဝင်လာပါပြီ! (${paymentMethod === 'wallet' ? '💳 Wallet Payment' : '🧾 Slip Upload'})\n\n` +
         `🎮 ဂိမ်း: ${selectedGame.name}\n` +
         `📦 ပက်ကေ့ဂျ်: ${selectedPkg.name} (${selectedPkg.price.toLocaleString()} Ks)\n` +
@@ -293,6 +292,7 @@ export default function Home() {
       await supabase.storage.from('slips').upload(fileName, topupSlip);
 
       const caption = `💰 𝗔𝗱𝗺𝗶𝗻 - ငွေဖြည့်တောင်းဆိုမှု အသစ်!\n\n` +
+        `👤 User Auth ID: ${currentAuthUser ? currentAuthUser.id : 'Guest'}\n` +
         `💵 ပမာဏ: ${Number(topupAmount).toLocaleString()} Ks\n` +
         `📝 မှတ်ချက်: ${topupNote || '-'}\n` +
         `⏰ အချိန်: ${new Date().toLocaleString()}`;
@@ -307,7 +307,7 @@ export default function Home() {
         body: formData,
       });
 
-      alert('✅ ငွေဖြည့်တောင်းဆိုချက် ပို့ပြီးပါပြီ!');
+      alert('✅ ငွေဖြည့်တောင်းဆိုချက် ပို့ပြီးပါပြီ! Admin မှ စစ်ဆေးပြီး Wallet Balance ထည့်ပေးပါမည်။');
       setTopupAmount('');
       setTopupSlip(null);
       setTopupNote('');
@@ -323,6 +323,7 @@ export default function Home() {
     if (adminUser === 'admin' && adminPass === 'admin12345') {
       setIsAdminLoggedIn(true);
       fetchOrders();
+      fetchProfiles();
     } else {
       alert('Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။');
     }
@@ -333,9 +334,37 @@ export default function Home() {
     if (data) setOrders(data);
   };
 
+  const fetchProfiles = async () => {
+    const { data } = await supabase.from('profiles').select('*');
+    if (data) setProfilesList(data);
+  };
+
   const updateStatus = async (id: string, status: string) => {
     await supabase.from('orders').update({ status }).eq('id', id);
     fetchOrders();
+  };
+
+  const handleAddBalanceToUser = async (profileId: string, currentBal: number) => {
+    const amountStr = addBalanceInputs[profileId];
+    if (!amountStr || isNaN(Number(amountStr)) || Number(amountStr) <= 0) {
+      alert('ဖြည့်လိုသော ပမာဏကို မှန်ကန်စွာ ရိုက်ထည့်ပါ');
+      return;
+    }
+
+    const newBal = (currentBal || 0) + Number(amountStr);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ balance: newBal })
+      .eq('id', profileId);
+
+    if (error) {
+      alert('Balance ဖြည့်ရာတွင် အမှားဖြစ်ပါသည်: ' + error.message);
+    } else {
+      alert(`✅ User ထံသို့ Balance ${Number(amountStr).toLocaleString()} Ks ထည့်ပေးလိုက်ပါပြီ!`);
+      setAddBalanceInputs(prev => ({ ...prev, [profileId]: '' }));
+      fetchProfiles();
+      fetchUserBalance();
+    }
   };
 
   const handlePriceChange = async (gameId: string, pkgId: string, newPrice: number) => {
@@ -645,6 +674,67 @@ export default function Home() {
               </form>
             ) : (
               <div className="space-y-6">
+                {/* 1. User Balance Manager */}
+                <div className="p-4 bg-[#FDF1E2]/40 rounded-xl border border-[#AB92BF]/30 space-y-3">
+                  <h3 className="text-sm font-bold text-[#655A7C]">💰 User Balance စီမံရန် (ငွေဖြည့်ပေးရန်)</h3>
+                  <div className="space-y-2">
+                    {profilesList.length === 0 ? (
+                      <p className="text-xs text-[#655A7C]/70">User မရှိသေးပါ သို့မဟုတ် profiles table ကင်းလွတ်နေပါသည်။</p>
+                    ) : (
+                      profilesList.map((prof) => (
+                        <div key={prof.id} className="p-3 bg-white rounded-xl border border-[#AB92BF]/30 text-xs flex justify-between items-center">
+                          <div>
+                            <p className="font-mono text-[#655A7C] font-semibold text-[11px]">User ID: {prof.id.slice(0, 8)}...</p>
+                            <p className="text-emerald-700 font-bold mt-0.5">Balance: {(prof.balance || 0).toLocaleString()} Ks</p>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <input 
+                              type="number"
+                              placeholder="+ Ks"
+                              value={addBalanceInputs[prof.id] || ''}
+                              onChange={(e) => setAddBalanceInputs({ ...addBalanceInputs, [prof.id]: e.target.value })}
+                              className="w-20 bg-[#FDF1E2]/50 border border-[#AB92BF]/40 p-1.5 rounded text-xs text-[#655A7C]"
+                            />
+                            <button 
+                              onClick={() => handleAddBalanceToUser(prof.id, prof.balance || 0)}
+                              className="bg-[#AB92BF] hover:bg-[#655A7C] text-white px-2.5 py-1.5 rounded text-[11px] font-bold"
+                            >
+                              + ဖြည့်မည်
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Order Approval Manager */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-bold text-[#655A7C]">📦 အော်ဒါ စီမံခန့်ခွဲမှု (Approve / Reject)</h3>
+                  <div className="space-y-2">
+                    {orders.map((ord) => (
+                      <div key={ord.id} className="p-3 bg-[#FDF1E2]/30 rounded-xl border border-[#AB92BF]/30 text-xs flex justify-between items-center">
+                        <div>
+                          <p className="font-bold text-[#655A7C]">{ord.game_name} - {ord.package_name}</p>
+                          <p className="text-[#655A7C]/80">ID: {ord.player_id} ({ord.zone_id || '-'}) | {ord.price} Ks</p>
+                          {ord.slip_url && ord.slip_url !== 'Wallet Balance Payment' && ord.slip_url !== 'No Slip' && (
+                            <a href={ord.slip_url} target="_blank" rel="noreferrer" className="text-[#AB92BF] font-bold underline block mt-1">📷 Slip ကြည့်ရန်</a>
+                          )}
+                          {ord.slip_url === 'Wallet Balance Payment' && (
+                            <span className="text-emerald-600 font-bold block mt-1">💳 Paid with Wallet</span>
+                          )}
+                          <p className="text-[10px] text-[#655A7C] mt-1 font-semibold">Status: <span className="uppercase">{ord.status}</span></p>
+                        </div>
+                        <div className="flex gap-1 flex-col">
+                          <button onClick={() => updateStatus(ord.id, 'completed')} className="bg-emerald-600 px-3 py-1.5 rounded text-[10px] font-bold text-white shadow-sm">Approve</button>
+                          <button onClick={() => updateStatus(ord.id, 'rejected')} className="bg-rose-600 px-3 py-1.5 rounded text-[10px] font-bold text-white shadow-sm">Reject</button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Price Manager */}
                 <div className="p-4 bg-[#FDF1E2]/40 rounded-xl border border-[#AB92BF]/30 space-y-3">
                   <h3 className="text-sm font-bold text-[#655A7C]">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h3>
                   {Object.entries(packages).map(([gameId, pkgs]) => (
@@ -666,31 +756,6 @@ export default function Home() {
                       ))}
                     </div>
                   ))}
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-[#655A7C]">📦 အော်ဒါ စီမံခန့်ခွဲမှု Panel</h3>
-                  <div className="space-y-2">
-                    {orders.map((ord) => (
-                      <div key={ord.id} className="p-3 bg-[#FDF1E2]/30 rounded-xl border border-[#AB92BF]/30 text-xs flex justify-between items-center">
-                        <div>
-                          <p className="font-bold text-[#655A7C]">{ord.game_name} - {ord.package_name}</p>
-                          <p className="text-[#655A7C]/80">ID: {ord.player_id} ({ord.zone_id || '-'}) | {ord.price} Ks</p>
-                          {ord.slip_url && ord.slip_url !== 'Wallet Balance Payment' && ord.slip_url !== 'No Slip' && (
-                            <a href={ord.slip_url} target="_blank" rel="noreferrer" className="text-[#AB92BF] font-bold underline block mt-1">📷 Slip ကြည့်ရန်</a>
-                          )}
-                          {ord.slip_url === 'Wallet Balance Payment' && (
-                            <span className="text-emerald-600 font-bold block mt-1">💳 Paid with Wallet</span>
-                          )}
-                          <p className="text-[10px] text-[#655A7C] mt-1 font-semibold">Status: {ord.status}</p>
-                        </div>
-                        <div className="flex gap-1 flex-col">
-                          <button onClick={() => updateStatus(ord.id, 'completed')} className="bg-emerald-600 px-2 py-1 rounded text-[10px] font-bold text-white">Approve</button>
-                          <button onClick={() => updateStatus(ord.id, 'rejected')} className="bg-rose-600 px-2 py-1 rounded text-[10px] font-bold text-white">Reject</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
             )}
