@@ -142,7 +142,7 @@ const LIVE_PURCHASES = [
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'shop' | 'categories' | 'search' | 'wallet' | 'login' | 'admin' | 'mlbb_check'>('shop');
+  const [activeTab, setActiveTab] = useState<'shop' | 'categories' | 'search' | 'wallet' | 'login' | 'mlbb_check'>('shop');
   const [selectedGame, setSelectedGame] = useState<typeof GAMES[0] | null>(null);
   
   const [balance, setBalance] = useState(0);
@@ -179,13 +179,6 @@ export default function Home() {
   const [topupNote, setTopupNote] = useState('');
   const [topupLoading, setTopupLoading] = useState(false);
 
-  const [adminUser, setAdminUser] = useState('');
-  const [adminPass, setAdminPass] = useState('');
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [orders, setOrders] = useState<any[]>([]);
-  const [profilesList, setProfilesList] = useState<any[]>([]);
-  const [addBalanceInputs, setAddBalanceInputs] = useState<Record<string, string>>({});
-
   useEffect(() => {
     fetchPricesFromDB();
     fetchUserBalance();
@@ -208,7 +201,6 @@ export default function Home() {
             setUserNotification('🎉 ငွေဖြည့်ပြီးပါပြီ! သင့်အော်ဒါ အောင်မြင်စွာ ဆောင်ရွက်ပြီးပါပြီ။');
           }
           fetchUserBalance();
-          if (isAdminLoggedIn) fetchOrders();
         }
       })
       .subscribe();
@@ -217,7 +209,7 @@ export default function Home() {
       authListener.subscription.unsubscribe();
       supabase.removeChannel(orderSubscription);
     };
-  }, [isAdminLoggedIn, userId]);
+  }, [userId]);
 
   const fetchUserBalance = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -290,7 +282,7 @@ export default function Home() {
       setTimeout(() => setActiveTab('shop'), 1000);
     } catch (err: any) {
       setAuthMsg('❌ အမှား ဖြစ်ပွားပါသည်: ' + (err.message || 'Error occurred'));
-    } finally {
+    } fontally {
       setAuthLoading(false);
     }
   };
@@ -465,77 +457,6 @@ export default function Home() {
     }
   };
 
-  const handleAdminLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (adminUser === 'admin' && adminPass === 'admin12345') {
-      setIsAdminLoggedIn(true);
-      fetchOrders();
-      fetchProfiles();
-    } else {
-      alert('Username သို့မဟုတ် Password မှားယွင်းနေပါသည်။');
-    }
-  };
-
-  const fetchOrders = async () => {
-    const { data } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
-    if (data) setOrders(data);
-  };
-
-  const fetchProfiles = async () => {
-    const { data } = await supabase.from('profiles').select('*');
-    if (data) setProfilesList(data);
-  };
-
-  const updateStatus = async (id: string, status: string) => {
-    await supabase.from('orders').update({ status }).eq('id', id);
-    fetchOrders();
-    if (status === 'completed') {
-      alert('✅ အော်ဒါကို Approve ပြုလုပ်လိုက်ပါပြီ။ User ထံ Noti ပို့ပြီးဖြစ်ပါသည်။');
-    }
-  };
-
-  const handleAddBalanceToUser = async (profileId: string, currentBal: number) => {
-    const amountStr = addBalanceInputs[profileId];
-    if (!amountStr || isNaN(Number(amountStr)) || Number(amountStr) <= 0) {
-      alert('ဖြည့်လိုသော ပမာဏကို မှန်ကန်စွာ ရိုက်ထည့်ပါ');
-      return;
-    }
-
-    const newBal = (currentBal || 0) + Number(amountStr);
-    const { error } = await supabase
-      .from('profiles')
-      .update({ balance: newBal })
-      .eq('id', profileId);
-
-    if (error) {
-      alert('Balance ဖြည့်ရာတွင် အမှားဖြစ်ပါသည်: ' + error.message);
-    } else {
-      alert(`✅ User ထံသို့ Balance ${Number(amountStr).toLocaleString()} Ks ထည့်ပေးလိုက်ပါပြီ!`);
-      setAddBalanceInputs(prev => ({ ...prev, [profileId]: '' }));
-      fetchProfiles();
-      fetchUserBalance();
-    }
-  };
-
-  const handlePriceChange = async (gameId: string, pkgId: string, newPrice: number) => {
-    const { error } = await supabase
-      .from('prices')
-      .update({ price: newPrice })
-      .eq('game_id', gameId)
-      .eq('id', pkgId);
-
-    if (error) {
-      alert('ဈေးနှုန်းပြင်ရန် အမှားဖြစ်နေသည်: ' + error.message);
-    } else {
-      setPackages(prev => {
-        const gamePkgs = prev[gameId] || [];
-        const updated = gamePkgs.map(p => p.id === pkgId ? { ...p, price: newPrice } : p);
-        return { ...prev, [gameId]: updated };
-      });
-      alert('ဈေးနှုန်း အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ');
-    }
-  };
-
   return (
     <div className="min-h-screen bg-[#0e1b30] text-white font-sans pb-12 relative overflow-hidden">
       {/* Background Glow Accents (Liquid Glass Feel) */}
@@ -606,8 +527,6 @@ export default function Home() {
             ) : (
               <button onClick={() => setActiveTab('login')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'login' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>ဝင်ရောက်မည်</button>
             )}
-
-            <button onClick={() => setActiveTab('admin')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'admin' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>Admin</button>
           </div>
         </div>
       </header>
@@ -1059,106 +978,6 @@ export default function Home() {
                 {topupLoading ? 'ပို့ဆောင်နေပါသည်...' : 'တောင်းဆိုချက်တင်မည်'}
               </button>
             </form>
-          </div>
-        )}
-
-        {activeTab === 'admin' && (
-          <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-6 rounded-3xl border border-[#C0CAFF]/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-            {!isAdminLoggedIn ? (
-              <form onSubmit={handleAdminLogin} className="space-y-3 max-w-sm mx-auto">
-                <h3 className="text-sm font-bold text-[#C0CAFF] text-center drop-shadow">🔐 Admin Login</h3>
-                <input type="text" placeholder="Username" value={adminUser} onChange={(e) => setAdminUser(e.target.value)} className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-3 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner" />
-                <input type="password" placeholder="Password" value={adminPass} onChange={(e) => setAdminPass(e.target.value)} className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-3 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner" />
-                <button type="submit" className="w-full bg-[#C0CAFF] hover:bg-white font-bold py-3 rounded-2xl text-xs text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.4)]">Admin Dashboard ဝင်မည်</button>
-              </form>
-            ) : (
-              <div className="space-y-6">
-                <div className="p-4 bg-[#0e1b30]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-inner">
-                  <h3 className="text-sm font-bold text-[#C0CAFF]">💰 User Balance စီမံရန် (ငွေဖြည့်ပေးရန်)</h3>
-                  <div className="space-y-2">
-                    {profilesList.length === 0 ? (
-                      <p className="text-xs text-gray-400">User မရှိသေးပါ သို့မဟုတ် profiles table ကင်းလွတ်နေပါသည်။</p>
-                    ) : (
-                      profilesList.map((prof) => (
-                        <div key={prof.id} className="p-3 bg-[#1A3054]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 text-xs flex justify-between items-center shadow-inner">
-                          <div>
-                            <p className="font-mono text-white font-semibold text-[11px]">User ID: {prof.id.slice(0, 8)}...</p>
-                            <p className="text-[#C0CAFF] font-bold mt-0.5">Balance: {(prof.balance || 0).toLocaleString()} Ks</p>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <input 
-                              type="number"
-                              placeholder="+ Ks"
-                              value={addBalanceInputs[prof.id] || ''}
-                              onChange={(e) => setAddBalanceInputs({ ...addBalanceInputs, [prof.id]: e.target.value })}
-                              className="w-20 bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-1.5 rounded-xl text-xs text-white shadow-inner"
-                            />
-                            <button 
-                              onClick={() => handleAddBalanceToUser(prof.id, prof.balance || 0)}
-                              className="bg-[#C0CAFF] text-[#1A3054] hover:bg-white px-2.5 py-1.5 rounded-xl text-[11px] font-bold shadow-inner"
-                            >
-                              + ဖြည့်မည်
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-4 bg-[#0e1b30]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-inner">
-                  <h3 className="text-sm font-bold text-[#C0CAFF]">📦 အော်ဒါ စီမံခန့်ခွဲမှု (Approve / Reject)</h3>
-                  <div className="space-y-2.5">
-                    {orders.length === 0 ? (
-                      <p className="text-xs text-gray-400">အော်ဒါ မရှိသေးပါ။</p>
-                    ) : (
-                      orders.map((ord) => (
-                        <div key={ord.id} className="p-3.5 bg-[#1A3054]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 text-xs flex justify-between items-center flex-wrap gap-2 shadow-inner">
-                          <div>
-                            <p className="font-bold text-white text-xs">{ord.game_name} - {ord.package_name}</p>
-                            <p className="text-[#C0CAFF] text-[11px] mt-0.5">ID: {ord.player_id} ({ord.zone_id || '-'}) | {ord.price.toLocaleString()} Ks</p>
-                            {ord.slip_url && ord.slip_url !== 'Wallet Balance Payment' && ord.slip_url !== 'No Slip' && (
-                              <a href={ord.slip_url} target="_blank" rel="noreferrer" className="text-[#C0CAFF] font-bold underline block mt-1">📷 Slip ကြည့်ရန်</a>
-                            )}
-                            {ord.slip_url === 'Wallet Balance Payment' && (
-                              <span className="text-emerald-400 font-bold block mt-1">💳 Paid with Wallet</span>
-                            )}
-                            <p className="text-[10px] text-gray-300 mt-1">Status: <span className={`font-bold ${ord.status === 'completed' ? 'text-emerald-400' : 'text-amber-400'}`}>{ord.status.toUpperCase()}</span></p>
-                          </div>
-                          <div className="flex gap-1.5">
-                            <button onClick={() => updateStatus(ord.id, 'completed')} className="bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 rounded-xl text-[10px] font-bold text-white shadow-sm">Approve</button>
-                            <button onClick={() => updateStatus(ord.id, 'rejected')} className="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-xl text-[10px] font-bold text-white shadow-sm">Reject</button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-4 bg-[#0e1b30]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 space-y-3 shadow-inner">
-                  <h3 className="text-sm font-bold text-[#C0CAFF]">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h3>
-                  {Object.entries(packages).map(([gameId, pkgs]) => (
-                    <div key={gameId} className="space-y-2 border-t border-[#C0CAFF]/20 pt-2">
-                      <p className="text-xs font-bold text-[#C0CAFF] uppercase">{gameId}</p>
-                      {pkgs.map((pkg) => (
-                        <div key={pkg.id} className="flex justify-between items-center text-xs gap-2">
-                          <span className="text-gray-300">{pkg.name}</span>
-                          <div className="flex items-center gap-2">
-                            <input 
-                              type="number"
-                              defaultValue={pkg.price}
-                              onBlur={(e) => handlePriceChange(gameId, pkg.id, Number(e.target.value))}
-                              className="w-24 bg-[#1A3054]/80 backdrop-blur border border-[#C0CAFF]/30 p-1.5 rounded-xl text-right text-white text-xs shadow-inner"
-                            />
-                            <span className="text-[10px] text-gray-400">Ks</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
