@@ -203,21 +203,27 @@ export default function AdminPage() {
   };
 
   const handlePriceChange = async (gameId: string, pkgId: string, newPrice: number) => {
-    const { error } = await supabase
-      .from('prices')
-      .update({ price: newPrice })
-      .eq('game_id', gameId)
-      .eq('id', pkgId);
+    try {
+      const currentPkg = packages[gameId]?.find(p => p.id === pkgId);
+      const { error } = await supabase
+        .from('prices')
+        .upsert({
+          id: pkgId,
+          game_id: gameId,
+          package_name: currentPkg?.name || pkgId,
+          price: newPrice,
+        });
 
-    if (error) {
-      alert('ဈေးနှုန်းပြင်ရန် အမှားဖြစ်နေသည်: ' + error.message);
-    } else {
+      if (error) throw error;
+
       setPackages(prev => {
         const gamePkgs = prev[gameId] || [];
         const updated = gamePkgs.map(p => p.id === pkgId ? { ...p, price: newPrice } : p);
         return { ...prev, [gameId]: updated };
       });
-      alert('ဈေးနှုန်း အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ');
+      alert('✅ ဈေးနှုန်း အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ');
+    } catch (err: any) {
+      alert('ဈေးနှုန်းပြင်ရန် အမှားဖြစ်နေသည်: ' + (err.message || err));
     }
   };
 
