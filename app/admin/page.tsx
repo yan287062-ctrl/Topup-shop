@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase'; // သင့် supabase path အတိုင်း ထားပါ
+import { supabase } from '../../lib/supabase';
 
 const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number }[]> = {
   mlbb: [
