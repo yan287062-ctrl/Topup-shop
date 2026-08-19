@@ -135,16 +135,16 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
 };
 
 const LIVE_PURCHASES = [
-  { user: 'Ko***Na', item: '55 Diamonds', time: 'လွန်ခဲ့သော 2 မိနစ်က' },
-  { user: 'Kyaw***Oo', item: '60 UC', time: 'လွန်ခဲ့သော 5 မိနစ်က' },
-  { user: 'Su***Mon', item: 'Weekly Pass', time: 'လွန်ခဲ့သော 8 မိနစ်က' },
-  { user: 'Aung***Min', item: '100 Stars', time: 'လွန်ခဲ့သော 12 မိနစ်က' },
+  { user: 'KoNa', item: '55 Diamonds', time: 'လွန်ခဲ့သော 2 မိနစ်က' },
+  { user: 'KyawOo', item: '60 UC', time: 'လွန်ခဲ့သော 5 မိနစ်က' },
+  { user: 'SuMon', item: 'Weekly Pass', time: 'လွန်ခဲ့သော 8 မိနစ်က' },
+  { user: 'AungMin', item: '100 Stars', time: 'လွန်ခဲ့သော 12 မိနစ်က' },
 ];
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'shop' | 'categories' | 'search' | 'wallet' | 'login' | 'mlbb_check'>('shop');
   const [selectedGame, setSelectedGame] = useState<typeof GAMES[0] | null>(null);
-  
+
   const [balance, setBalance] = useState(0);
   const [currentAuthUser, setCurrentAuthUser] = useState<any>(null);
 
@@ -245,10 +245,8 @@ export default function Home() {
       setMlbbCheckResult({ error: 'User ID နှင့် Zone ID ရိုက်ထည့်ပါ' });
       return;
     }
-
     setCheckingMlbb(true);
     setMlbbCheckResult(null);
-
     setTimeout(() => {
       setCheckingMlbb(false);
       setMlbbCheckResult({ name: `Verified_Gamer_${id} (${zone})` });
@@ -282,7 +280,7 @@ export default function Home() {
       setTimeout(() => setActiveTab('shop'), 1000);
     } catch (err: any) {
       setAuthMsg('❌ အမှား ဖြစ်ပွားပါသည်: ' + (err.message || 'Error occurred'));
-    } fontally {
+    } finally {
       setAuthLoading(false);
     }
   };
@@ -305,13 +303,10 @@ export default function Home() {
       alert('ကျေးဇူးပြု၍ ငွေလွှဲစလစ် (Slip) ပုံတင်ပေးပါ။');
       return;
     }
-
     setLoading(true);
     setStatusMsg('');
-
     try {
       let slipUrl = 'Wallet Balance Payment';
-
       if (paymentMethod === 'wallet') {
         if (!currentAuthUser) {
           alert('Wallet ဖြင့် ဝယ်ယူရန် အရင်ဆုံး Login ဝင်ပေးပါ');
@@ -319,21 +314,17 @@ export default function Home() {
           setLoading(false);
           return;
         }
-
         if (balance < selectedPkg.price) {
           alert('Wallet ထဲတွင် လက်ကျန်ငွေ မလုံလောက်ပါ။ ကျေးဇူးပြု၍ ငွေကြိုဖြည့်ပါ။');
           setLoading(false);
           return;
         }
-
         const newBalance = balance - selectedPkg.price;
         const { error: balanceError } = await supabase
           .from('profiles')
           .update({ balance: newBalance })
           .eq('id', currentAuthUser.id);
-
         if (balanceError) throw balanceError;
-
         setBalance(newBalance);
       } else {
         const fileExt = slipFile!.name.split('.').pop();
@@ -341,13 +332,10 @@ export default function Home() {
         const { error: uploadError } = await supabase.storage
           .from('slips')
           .upload(fileName, slipFile!);
-
         if (uploadError) throw uploadError;
-
         const { data: publicURLData } = supabase.storage
           .from('slips')
           .getPublicUrl(fileName);
-
         slipUrl = publicURLData.publicUrl;
       }
 
@@ -363,7 +351,6 @@ export default function Home() {
           status: paymentMethod === 'wallet' ? 'completed' : 'pending',
         },
       ]);
-
       if (error) throw error;
 
       const caption = `🚨 𝗔𝗱𝗺𝗶𝗻 - အော်ဒါအသစ်ဝင်လာပါပြီ! (${paymentMethod === 'wallet' ? '💳 Wallet Payment' : '🧾 Slip Upload'})\n\n` +
@@ -384,13 +371,11 @@ export default function Home() {
         formData.append('chat_id', CHAT_ID);
         formData.append('photo', slipFile);
         formData.append('caption', caption);
-
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
           method: 'POST',
           body: formData,
         });
       }
-
       setStatusMsg('✅ အော်ဒါ အောင်မြင်စွာ တင်ပြီးပါပြီ!');
       setUserId('');
       setZoneId('');
@@ -440,12 +425,10 @@ export default function Home() {
       formData.append('chat_id', CHAT_ID);
       formData.append('photo', topupSlip);
       formData.append('caption', caption);
-
       await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
         method: 'POST',
         body: formData,
       });
-
       alert('✅ ငွေဖြည့်တောင်းဆိုချက် ပို့ပြီးပါပြီ! Admin မှ စစ်ဆေးပြီး Wallet Balance ထည့်ပေးပါမည်။');
       setTopupAmount('');
       setTopupSlip(null);
@@ -458,16 +441,15 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0e1b30] text-white font-sans pb-12 relative overflow-hidden">
-      {/* Background Glow Accents (Liquid Glass Feel) */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[120px] pointer-events-none"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-[#C0CAFF]/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12 relative overflow-hidden">
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#1A3054] rounded-full blur-[120px] pointer-events-none opacity-50" />
+      <div className="absolute top-1/2 right-10 w-80 h-80 bg-[#C0CAFF] rounded-full blur-[150px] pointer-events-none opacity-10" />
 
       {userNotification && (
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#C0CAFF]/90 backdrop-blur-md text-[#1A3054] px-6 py-3.5 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] border border-white/40 flex items-center gap-3 animate-bounce">
           <span className="text-xl">🔔</span>
           <span className="font-extrabold text-xs">{userNotification}</span>
-          <button 
+          <button
             onClick={() => setUserNotification(null)}
             className="ml-2 font-bold bg-[#1A3054] text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center"
           >
@@ -476,10 +458,10 @@ export default function Home() {
         </div>
       )}
 
-      {/* Navbar & Header with Liquid Glassmorphism */}
       <div className="bg-[#1A3054]/80 backdrop-blur-xl border-b border-[#C0CAFF]/20 py-2.5 px-4 flex justify-between items-center text-xs shadow-lg">
         <div className="flex items-center gap-2 font-bold text-[#C0CAFF] drop-shadow">
-          <span>🌟</span> <span>Paing Gyi Game Store - Official Platform</span>
+          <span>🌟</span>
+          <span>Paing Gyi Game Store - Official Platform</span>
         </div>
         <div className="flex items-center gap-3">
           <span className="bg-[#0e1b30]/60 backdrop-blur px-3 py-1 rounded-full border border-[#C0CAFF]/30 text-white shadow-inner">
@@ -498,30 +480,28 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-2">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setActiveTab('shop'); setSelectedGame(null); }}>
             {selectedGame && activeTab === 'shop' && (
-              <button 
-                onClick={(e) => { e.stopPropagation(); setSelectedGame(null); setStatusMsg(''); }}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedGame(null);
+                  setStatusMsg('');
+                }}
                 className="text-[#C0CAFF] text-xs font-bold bg-[#0e1b30]/60 backdrop-blur hover:bg-[#C0CAFF] hover:text-[#1A3054] px-3 py-1.5 rounded-2xl border border-[#C0CAFF]/40 transition-all shadow-inner"
               >
                 ← နောက်သို့
               </button>
             )}
-            <img 
-              src="/logo.jpg" 
-              alt="Paing Gyi shop Logo" 
-              className="w-10 h-10 object-cover rounded-2xl border-2 border-[#C0CAFF]/80 shadow-[0_0_15px_rgba(192,202,255,0.4)]" 
-            />
+            <img src="/logo.jpg" alt="Paing Gyi shop Logo" className="w-10 h-10 object-cover rounded-2xl border-2 border-[#C0CAFF]/80 shadow-[0_0_15px_rgba(192,202,255,0.4)]" />
             <h1 className="text-lg font-bold tracking-wide text-white drop-shadow">
               Paing Gyi <span className="text-[#C0CAFF]">shop</span>
             </h1>
           </div>
-          
           <div className="flex gap-1.5 flex-wrap justify-end">
             <button onClick={() => { setActiveTab('shop'); setSelectedGame(null); }} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'shop' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>ပင်မစာမျက်နှာ</button>
             <button onClick={() => setActiveTab('categories')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'categories' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>အမျိုးအစားများ</button>
             <button onClick={() => setActiveTab('search')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'search' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>အော်ဒါရှာမည်</button>
             <button onClick={() => setActiveTab('mlbb_check')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'mlbb_check' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>MLBB စစ်ဆေးမည်</button>
             <button onClick={() => setActiveTab('wallet')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'wallet' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>Wallet ({balance.toLocaleString()} Ks)</button>
-            
             {currentAuthUser ? (
               <button onClick={handleLogout} className="px-3 py-1.5 rounded-2xl text-xs font-bold bg-rose-600/80 backdrop-blur text-white border border-rose-700 shadow-inner">Logout</button>
             ) : (
@@ -539,7 +519,6 @@ export default function Home() {
               <h2 className="text-lg font-bold text-white mt-1 drop-shadow">MLBB User ID စစ်ဆေးရန်</h2>
               <p className="text-xs text-[#C0CAFF]">In-Game Name မှန်မမှန် အလိုအလျောက် စစ်ဆေးပေးပါသည်။</p>
             </div>
-
             <form onSubmit={handleMlbbCheck} className="space-y-3">
               <div>
                 <label className="text-xs text-gray-300 font-semibold block mb-1">User ID</label>
@@ -552,7 +531,6 @@ export default function Home() {
                   required
                 />
               </div>
-
               <div>
                 <label className="text-xs text-gray-300 font-semibold block mb-1">Zone ID</label>
                 <input
@@ -564,7 +542,6 @@ export default function Home() {
                   required
                 />
               </div>
-
               <button
                 type="submit"
                 disabled={checkingMlbb}
@@ -573,7 +550,6 @@ export default function Home() {
                 {checkingMlbb ? 'စစ်ဆေးနေပါသည်...' : 'စစ်ဆေးမည်'}
               </button>
             </form>
-
             {mlbbCheckResult && (
               <div className="p-3.5 rounded-2xl border bg-[#0e1b30]/80 backdrop-blur border-[#C0CAFF]/40 text-center text-xs font-semibold shadow-inner">
                 {mlbbCheckResult.name ? (
@@ -608,13 +584,14 @@ export default function Home() {
                 {searching ? 'ရှာဖွေနေပါသည်...' : 'အော်ဒါရှာမည်'}
               </button>
             </form>
-
             <div className="space-y-2 mt-4">
               {searchResults.map((res) => (
                 <div key={res.id} className="p-3 bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/20 rounded-2xl text-xs shadow-inner">
                   <p className="font-bold text-white">{res.game_name} - {res.package_name}</p>
                   <p className="text-[#C0CAFF] mt-1">ကျသင့်ငွေ: {res.price.toLocaleString()} Ks</p>
-                  <p className="text-gray-400 mt-0.5">Status: <span className={`font-bold ${res.status === 'completed' ? 'text-emerald-400' : 'text-amber-400'}`}>{res.status.toUpperCase()}</span></p>
+                  <p className="text-gray-400 mt-0.5">
+                    Status: <span className={`font-bold ${res.status === 'completed' ? 'text-emerald-400' : 'text-amber-400'}`}>{res.status.toUpperCase()}</span>
+                  </p>
                 </div>
               ))}
             </div>
@@ -669,11 +646,9 @@ export default function Home() {
                   required
                 />
               </div>
-
               {authMsg && (
                 <p className="text-xs text-center font-bold text-[#C0CAFF] mt-2">{authMsg}</p>
               )}
-
               <button
                 type="submit"
                 disabled={authLoading}
@@ -682,7 +657,6 @@ export default function Home() {
                 {authLoading ? 'လုပ်ဆောင်နေပါသည်...' : (isSignUp ? 'အကောင့်သစ် ဖွင့်မည်' : 'ဝင်ရောက်မည်')}
               </button>
             </form>
-
             <div className="text-center pt-2 border-t border-[#C0CAFF]/20">
               <button
                 onClick={() => { setIsSignUp(!isSignUp); setAuthMsg(''); }}
@@ -697,7 +671,6 @@ export default function Home() {
         {activeTab === 'shop' && (
           !selectedGame ? (
             <div className="space-y-6">
-              {/* Banner with Glassmorphism */}
               <div className="bg-gradient-to-r from-[#1A3054]/80 to-[#0e1b30]/80 backdrop-blur-2xl text-white p-6 rounded-3xl border border-[#C0CAFF]/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center relative overflow-hidden">
                 <div className="relative z-10">
                   <span className="bg-[#C0CAFF] text-[#1A3054] font-extrabold text-[10px] px-2.5 py-1 rounded-full shadow-inner">⭐ VIP GAME STORE</span>
@@ -710,7 +683,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Live Purchases Bar */}
               <div className="bg-[#1A3054]/40 backdrop-blur-xl border border-[#C0CAFF]/20 p-3 rounded-2xl flex items-center justify-between text-xs overflow-x-auto gap-4 shadow-inner">
                 <div className="flex items-center gap-2 text-[#C0CAFF] font-bold shrink-0">
                   <span>🔥 တိုက်ရိုက်ဝယ်ယူမှုများ:</span>
@@ -773,7 +745,6 @@ export default function Home() {
                     </button>
                   )}
                 </div>
-
                 <div className="grid grid-cols-2 gap-3">
                   <input
                     type="text"
@@ -793,7 +764,6 @@ export default function Home() {
                     />
                   )}
                 </div>
-
                 {mlbbCheckResult && selectedGame.id === 'mlbb' && (
                   <div className="p-2.5 rounded-2xl bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 text-xs text-center text-[#C0CAFF] shadow-inner">
                     {mlbbCheckResult.name ? `✅ ${mlbbCheckResult.name}` : `⚠️ ${mlbbCheckResult.error}`}
@@ -813,7 +783,9 @@ export default function Home() {
                       key={pkg.id}
                       onClick={() => setSelectedPkg(pkg)}
                       className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between shadow-inner ${
-                        selectedPkg?.id === pkg.id ? 'border-[#C0CAFF] bg-[#C0CAFF]/20 backdrop-blur shadow-[0_0_15px_rgba(192,202,255,0.3)] ring-2 ring-[#C0CAFF]' : 'border-[#C0CAFF]/20 bg-[#0e1b30]/80 backdrop-blur'
+                        selectedPkg?.id === pkg.id
+                          ? 'border-[#C0CAFF] bg-[#C0CAFF]/20 backdrop-blur shadow-[0_0_15px_rgba(192,202,255,0.3)] ring-2 ring-[#C0CAFF]'
+                          : 'border-[#C0CAFF]/20 bg-[#0e1b30]/80 backdrop-blur'
                       }`}
                     >
                       <p className="text-xs font-semibold text-white">{pkg.name}</p>
@@ -829,7 +801,6 @@ export default function Home() {
                   <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shadow-inner">3</span>
                   <h3 className="text-sm font-semibold text-white">ငွေပေးချေမှု နည်းလမ်း</h3>
                 </div>
-
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <button
                     type="button"
@@ -843,7 +814,6 @@ export default function Home() {
                     💳 Wallet Balance
                     <span className="block text-[10px] font-normal opacity-90 mt-0.5">လက်ကျန်: {balance.toLocaleString()} Ks</span>
                   </button>
-
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('slip')}
@@ -861,7 +831,7 @@ export default function Home() {
                 {paymentMethod === 'slip' ? (
                   <>
                     <div className="p-3 bg-[#0e1b30]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 text-xs text-[#C0CAFF] shadow-inner">
-                      💳 **Pay (U Ye Paing Oo):** 09967241357 (Paing Gyi shop)
+                      💳 <strong>Pay (U Ye Paing Oo):</strong> 09967241357 (Paing Gyi shop)
                     </div>
                     <input
                       type="file"
@@ -879,8 +849,7 @@ export default function Home() {
                   <div className="p-3.5 bg-[#0e1b30]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 text-xs text-[#C0CAFF] space-y-1 shadow-inner">
                     <p className="font-bold">✨ Wallet Balance ဖြင့် တိုက်ရိုက် ဝယ်ယူမည်</p>
                     <p className="text-[11px] text-gray-300">
-                      ကျသင့်ငွေ: <strong>{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</strong> | 
-                      လက်ကျန်ငွေ: <strong>{balance.toLocaleString()} Ks</strong>
+                      ကျသင့်ငွေ: <strong>{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</strong> | လက်ကျန်ငွေ: <strong>{balance.toLocaleString()} Ks</strong>
                     </p>
                   </div>
                 )}
@@ -912,7 +881,6 @@ export default function Home() {
 
             <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-5 rounded-3xl border border-[#C0CAFF]/30 space-y-3.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
               <h3 className="text-sm font-bold text-[#C0CAFF] flex items-center gap-2 drop-shadow">💳 ငွေလွှဲပေးချေမှု</h3>
-              
               {[
                 { name: 'Wave', num: '09967241357', owner: 'U Ye Paing Oo', image: '/wave.jpg' },
                 { name: 'K pay', num: '09967241357', owner: 'U Ye Paing Oo', image: '/kpay.jpg' },
@@ -939,18 +907,17 @@ export default function Home() {
 
             <form onSubmit={handleTopupSubmit} className="bg-[#1A3054]/60 backdrop-blur-2xl p-6 rounded-3xl border border-[#C0CAFF]/30 space-y-4 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
               <h3 className="text-sm font-bold text-[#C0CAFF] drop-shadow">ငွေဖြည့်တောင်းဆိုရန်</h3>
-              <input 
-                type="number" 
-                placeholder="ပမာဏ (Ks) - ဥပမာ 10000" 
+              <input
+                type="number"
+                placeholder="ပမာဏ (Ks) - ဥပမာ 10000"
                 value={topupAmount}
                 onChange={(e) => setTopupAmount(e.target.value)}
-                className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-4 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner" 
+                className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-4 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
                 required
               />
-              
               <div className="border-2 border-dashed border-[#C0CAFF]/30 p-6 rounded-2xl text-center cursor-pointer bg-[#0e1b30]/80 backdrop-blur shadow-inner">
-                <input 
-                  type="file" 
+                <input
+                  type="file"
                   accept="image/*"
                   onChange={(e) => {
                     if (e.target.files && e.target.files[0]) {
@@ -962,15 +929,13 @@ export default function Home() {
                 />
                 <p className="text-[10px] text-gray-400 mt-2">ငွေလွှဲစလစ်ပုံ တင်ပါ (Max 5MB)</p>
               </div>
-
-              <textarea 
-                placeholder="မှတ်ချက် (ရွေးချယ်ရန်) - မိမိပြောလိုသည့် မှတ်ချက်များ..." 
+              <textarea
+                placeholder="မှတ်ချက် (ရွေးချယ်ရန်) - မိမိပြောလိုသည့် မှတ်ချက်များ..."
                 value={topupNote}
                 onChange={(e) => setTopupNote(e.target.value)}
-                className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-4 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] h-24 shadow-inner" 
+                className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-4 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] h-24 shadow-inner"
               />
-              
-              <button 
+              <button
                 type="submit"
                 disabled={topupLoading}
                 className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3.5 rounded-2xl transition-all text-sm disabled:opacity-50 shadow-[0_0_20px_rgba(192,202,255,0.4)]"
