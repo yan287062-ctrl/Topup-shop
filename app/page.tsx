@@ -157,6 +157,31 @@ export default function Home() {
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
   const [packages, setPackages] = useState(INITIAL_PACKAGES);
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const res = await fetch('/api/prices', { cache: 'no-store' });
+        const result = await res.json();
+        if (result.data && result.data.length > 0) {
+          setPackages(prev => {
+            const updated = JSON.parse(JSON.stringify(prev));
+            result.data.forEach((item: any) => {
+              if (updated[item.game_id]) {
+                updated[item.game_id] = updated[item.game_id].map((p: any) =>
+                  p.id === item.id ? { ...p, price: item.price } : p
+                );
+              }
+            });
+            return updated;
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load prices', err);
+      }
+    };
+    fetchPrices();
+  }, []);
+
   const [selectedPkg, setSelectedPkg] = useState<{ id: string; name: string; price: number } | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'slip' | 'wallet'>('slip');
   const [slipFile, setSlipFile] = useState<File | null>(null);
