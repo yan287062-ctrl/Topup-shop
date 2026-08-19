@@ -130,6 +130,33 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [addBalanceInputs, setAddBalanceInputs] = useState<Record<string, string>>({});
 
+  // Database က ဈေးနှုန်းတွေကို အလိုအလျောက် ဆွဲတင်ခြင်း
+  const loadPrices = async () => {
+    try {
+      const res = await fetch('/api/prices', { cache: 'no-store' });
+      const result = await res.json();
+      if (result.data && result.data.length > 0) {
+        setPackages(prev => {
+          const updated = JSON.parse(JSON.stringify(prev));
+          result.data.forEach((item: any) => {
+            if (updated[item.game_id]) {
+              updated[item.game_id] = updated[item.game_id].map((p: any) => 
+                p.id === item.id ? { ...p, price: item.price } : p
+              );
+            }
+          });
+          return updated;
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    loadPrices();
+  }, []);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === 'painggyi123') {
@@ -192,7 +219,6 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-[#0a1220] text-gray-100 p-6 space-y-8 max-w-6xl mx-auto">
-      {/* Header */}
       <div className="flex justify-between items-center bg-[#111e33] p-4 rounded-xl border border-blue-900/40">
         <h1 className="text-xl font-bold text-blue-400">Paing Gyi Shop Admin Control</h1>
         <button onClick={() => setIsAdmin(false)} className="bg-red-600/80 hover:bg-red-600 text-xs px-3 py-1.5 rounded-lg text-white font-medium">
@@ -200,7 +226,6 @@ export default function AdminPage() {
         </button>
       </div>
 
-      {/* User Balance Management */}
       <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-4">
         <h2 className="text-lg font-bold text-yellow-400">💰 User Balance စီမံရန် (ငွေဖြည့်ပေးရန်)</h2>
         <div className="text-xs text-gray-400">
@@ -231,7 +256,6 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Voucher Management */}
       <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-4">
         <h2 className="text-lg font-bold text-yellow-400">📦 ဘောက်ချာ စီမံခန့်ခွဲမှု (Approve / Reject)</h2>
         <div className="text-xs text-gray-400">
@@ -254,7 +278,6 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Game Price Management */}
       <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-6">
         <h2 className="text-lg font-bold text-yellow-400">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h2>
         
