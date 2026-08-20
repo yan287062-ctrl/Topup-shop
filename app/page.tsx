@@ -428,8 +428,8 @@ export default function Home() {
         {/* Navbar */}
         <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111e33]/90 backdrop-blur-md p-4 rounded-2xl border border-blue-900/50">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setSelectedGame(null); setActiveTab('shop'); }}>
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30 border border-blue-400/40">
-              <span className="text-sm font-black">PG</span>
+            <div className="w-11 h-11 rounded-full overflow-hidden bg-[#0a1220] border-2 border-blue-400/60 p-0.5 flex items-center justify-center shadow-lg shadow-blue-500/30 flex-shrink-0">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
             <div>
               <h1 className="font-bold text-white text-base">Paing Gyi <span className="text-blue-400">shop</span></h1>
@@ -721,10 +721,7 @@ export default function Home() {
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-full blur opacity-80 group-hover:opacity-100 transition duration-300"></div>
                   <div className="relative w-20 h-20 rounded-full bg-[#0a1220] border-2 border-white/40 p-1 flex items-center justify-center shadow-2xl overflow-hidden">
-                    <img src="/logo.png" alt="Shop Logo" className="w-full h-full object-cover rounded-full"  />
-                    <div className="w-full h-full rounded-full bg-blue-600 flex items-center justify-center font-black text-xl text-white shadow-inner">
-                      PG
-                    </div>
+                    <img src="/logo.png" alt="Shop Logo" className="w-full h-full object-cover rounded-full" />
                   </div>
                 </div>
               </div>
