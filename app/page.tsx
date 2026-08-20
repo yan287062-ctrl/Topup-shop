@@ -514,444 +514,102 @@ export default function Home() {
             {currentAuthUser ? (
               <button onClick={handleLogout} className="px-3 py-1.5 rounded-2xl text-xs font-bold bg-rose-600/80 backdrop-blur text-white border border-rose-700 shadow-inner">Logout</button>
             ) : (
-              <button onClick={() => setActiveTab('login')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'login' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>ဝင်ရောက်မည်</button>
-            )}
-          </div>
-        </div>
-      </header>
+              <button onClick={() => setActiveTab('login')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'login' && (
+          <div className="relative max-w-md mx-auto my-6 p-2">
+            {/* Background Ambient Glows */}
+            <div className="absolute -top-6 -left-6 w-48 h-48 bg-purple-600/30 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-blue-600/30 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="max-w-3xl mx-auto mt-6 px-4 relative z-10">
-        {activeTab === 'mlbb_check' && (
-          <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-6 rounded-3xl border border-[#C0CAFF]/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] max-w-md mx-auto space-y-4">
-            <div className="text-center">
-              <span className="text-3xl drop-shadow">🎮</span>
-              <h2 className="text-lg font-bold text-white mt-1 drop-shadow">MLBB User ID စစ်ဆေးရန်</h2>
-              <p className="text-xs text-[#C0CAFF]">In-Game Name မှန်မမှန် အလိုအလျောက် စစ်ဆေးပေးပါသည်။</p>
-            </div>
-            <form onSubmit={handleMlbbCheck} className="space-y-3">
-              <div>
-                <label className="text-xs text-gray-300 font-semibold block mb-1">User ID</label>
-                <input
-                  type="text"
-                  placeholder="ဥပမာ - 12345678"
-                  value={checkMlbbId}
-                  onChange={(e) => setCheckMlbbId(e.target.value)}
-                  className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-3 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-xs text-gray-300 font-semibold block mb-1">Zone ID</label>
-                <input
-                  type="text"
-                  placeholder="ဥပမာ - 1234"
-                  value={checkMlbbZone}
-                  onChange={(e) => setCheckMlbbZone(e.target.value)}
-                  className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-3 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={checkingMlbb}
-                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3 rounded-2xl transition shadow-[0_0_20px_rgba(192,202,255,0.4)] text-xs"
-              >
-                {checkingMlbb ? 'စစ်ဆေးနေပါသည်...' : 'စစ်ဆေးမည်'}
-              </button>
-            </form>
-            {mlbbCheckResult && (
-              <div className="p-3.5 rounded-2xl border bg-[#0e1b30]/80 backdrop-blur border-[#C0CAFF]/40 text-center text-xs font-semibold shadow-inner">
-                {mlbbCheckResult.name ? (
-                  <p className="text-[#C0CAFF]">
-                    ✅ အကောင့်အမည်: <span className="text-white font-bold">{mlbbCheckResult.name}</span>
-                  </p>
-                ) : (
-                  <p className="text-rose-400">⚠️ {mlbbCheckResult.error}</p>
-                )}
-              </div>
-            )}
-          </div>
-        )}
-
-        {activeTab === 'search' && (
-          <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-6 rounded-3xl border border-[#C0CAFF]/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] max-w-md mx-auto space-y-4">
-            <h2 className="text-lg font-extrabold text-white text-center drop-shadow">🔎 အော်ဒါအခြေအနေ ရှာဖွေမည်</h2>
-            <form onSubmit={handleSearchOrder} className="space-y-3">
-              <input
-                type="text"
-                placeholder="ဂိမ်း User ID ရိုက်ထည့်ပါ..."
-                value={searchOrderId}
-                onChange={(e) => setSearchOrderId(e.target.value)}
-                className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-3 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
-                required
-              />
-              <button
-                type="submit"
-                disabled={searching}
-                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3 rounded-2xl transition shadow-[0_0_20px_rgba(192,202,255,0.4)] text-xs"
-              >
-                {searching ? 'ရှာဖွေနေပါသည်...' : 'အော်ဒါရှာမည်'}
-              </button>
-            </form>
-            <div className="space-y-2 mt-4">
-              {searchResults.map((res) => (
-                <div key={res.id} className="p-3 bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/20 rounded-2xl text-xs shadow-inner">
-                  <p className="font-bold text-white">{res.game_name} - {res.package_name}</p>
-                  <p className="text-[#C0CAFF] mt-1">ကျသင့်ငွေ: {res.price.toLocaleString()} Ks</p>
-                  <p className="text-gray-400 mt-0.5">
-                    Status: <span className={`font-bold ${res.status === 'completed' ? 'text-emerald-400' : 'text-amber-400'}`}>{res.status.toUpperCase()}</span>
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'categories' && (
-          <div className="space-y-4">
-            <h2 className="text-base font-bold text-[#C0CAFF] drop-shadow">🎮 ဂိမ်းအမျိုးအစားများ</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-              {GAMES.map((game) => (
-                <div
-                  key={game.id}
-                  onClick={() => { setSelectedGame(game); setActiveTab('shop'); }}
-                  className="bg-[#1A3054]/60 backdrop-blur-xl border border-[#C0CAFF]/20 hover:border-[#C0CAFF] rounded-3xl p-4 cursor-pointer text-center flex flex-col items-center justify-center space-y-3 group shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] transition-all hover:scale-105"
-                >
-                  <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#C0CAFF]/40 group-hover:border-[#C0CAFF] bg-[#0e1b30] shadow-inner">
-                    <img src={game.image} alt={game.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                  </div>
-                  <p className="text-xs font-semibold text-white group-hover:text-[#C0CAFF] px-1">{game.name}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'login' && (
-          <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-6 rounded-3xl border border-[#C0CAFF]/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] max-w-md mx-auto space-y-4 my-8">
-            <h2 className="text-lg font-extrabold text-white text-center drop-shadow">
-              {isSignUp ? 'အကောင့်သစ် ပြုလုပ်ရန်' : 'အကောင့်သို့ ဝင်ရောက်မည်'}
-            </h2>
-            <form onSubmit={handleAuthSubmit} className="space-y-3">
-              <div>
-                <label className="text-xs font-bold text-gray-300 block mb-1">Email</label>
-                <input
-                  type="email"
-                  placeholder="example@gmail.com"
-                  value={authEmail}
-                  onChange={(e) => setAuthEmail(e.target.value)}
-                  className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-3 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-gray-300 block mb-1">Password</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={authPassword}
-                  onChange={(e) => setAuthPassword(e.target.value)}
-                  className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-3 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
-                  required
-                />
-              </div>
-              {authMsg && (
-                <p className="text-xs text-center font-bold text-[#C0CAFF] mt-2">{authMsg}</p>
-              )}
-              <button
-                type="submit"
-                disabled={authLoading}
-                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3 rounded-2xl transition-all text-xs shadow-[0_0_20px_rgba(192,202,255,0.4)] mt-2"
-              >
-                {authLoading ? 'လုပ်ဆောင်နေပါသည်...' : (isSignUp ? 'အကောင့်သစ် ဖွင့်မည်' : 'ဝင်ရောက်မည်')}
-              </button>
-            </form>
-            <div className="text-center pt-2 border-t border-[#C0CAFF]/20">
-              <button
-                onClick={() => { setIsSignUp(!isSignUp); setAuthMsg(''); }}
-                className="text-xs text-[#C0CAFF] font-bold underline"
-              >
-                {isSignUp ? 'အကောင့်ရှိပြီးသားလား? Login ဝင်ပါ' : 'အကောင့်မရှိသေးဘူးလား? အကောင့်သစ်ဖွင့်ပါ'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'shop' && (
-          !selectedGame ? (
-            <div className="space-y-6">
-              <div className="bg-gradient-to-r from-[#1A3054]/80 to-[#0e1b30]/80 backdrop-blur-2xl text-white p-6 rounded-3xl border border-[#C0CAFF]/40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] flex justify-between items-center relative overflow-hidden">
-                <div className="relative z-10">
-                  <span className="bg-[#C0CAFF] text-[#1A3054] font-extrabold text-[10px] px-2.5 py-1 rounded-full shadow-inner">⭐ VIP GAME STORE</span>
-                  <h2 className="text-xl font-bold mt-2 text-white drop-shadow">ယုံကြည်စိတ်ချရဆုံးနှင့် ဈေးနှုန်းအသက်သာဆုံး</h2>
-                  <p className="text-xs text-[#C0CAFF] mt-1">24 နာရီပတ်လုံး အော်ဒါများကို အလိုအလျောက်နှင့် အမြန်ဆုံး ဖြည့်သွင်းပေးနေပါပြီ။</p>
-                </div>
-                <div className="text-right bg-[#0e1b30]/80 backdrop-blur p-3 rounded-2xl border border-[#C0CAFF]/30 relative z-10 shrink-0 shadow-inner">
-                  <p className="text-[10px] text-gray-300">Wallet Balance</p>
-                  <p className="text-lg font-black text-[#C0CAFF] drop-shadow">{balance.toLocaleString()} Ks</p>
-                </div>
-              </div>
-
-              <div className="bg-[#1A3054]/40 backdrop-blur-xl border border-[#C0CAFF]/20 p-3 rounded-2xl flex items-center justify-between text-xs overflow-x-auto gap-4 shadow-inner">
-                <div className="flex items-center gap-2 text-[#C0CAFF] font-bold shrink-0">
-                  <span>🔥 တိုက်ရိုက်ဝယ်ယူမှုများ:</span>
-                </div>
-                <div className="flex items-center gap-6 whitespace-nowrap animate-pulse text-gray-300">
-                  {LIVE_PURCHASES.map((p, i) => (
-                    <span key={i} className="bg-[#0e1b30]/80 backdrop-blur px-3 py-1 rounded-xl border border-[#C0CAFF]/20 shadow-inner">
-                      👤 <strong className="text-white">{p.user}</strong> ဝယ်ယူခဲ့သည် - <span className="text-[#C0CAFF] font-bold">{p.item}</span> ({p.time})
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-base font-bold text-[#C0CAFF] flex items-center gap-2 mb-4 drop-shadow">🎮 ရရှိနိုင်သော ဂိမ်းများနှင့် ဝန်ဆောင်မှုများ</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-                  {GAMES.map((game) => (
-                    <div
-                      key={game.id}
-                      onClick={() => setSelectedGame(game)}
-                      className="bg-[#1A3054]/60 backdrop-blur-xl border border-[#C0CAFF]/20 hover:border-[#C0CAFF] rounded-3xl p-4 cursor-pointer text-center flex flex-col items-center justify-center space-y-3 group shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] transition-all hover:scale-105"
-                    >
-                      <div className="w-20 h-20 rounded-2xl overflow-hidden border-2 border-[#C0CAFF]/40 group-hover:border-[#C0CAFF] bg-[#0e1b30] shadow-inner">
-                        <img src={game.image} alt={game.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-                      </div>
-                      <p className="text-xs font-semibold text-white group-hover:text-[#C0CAFF] px-1">{game.name}</p>
+            {/* Glassmorphism Card */}
+            <div className="relative backdrop-blur-xl bg-white/[0.07] border border-white/20 p-8 rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] space-y-6">
+              
+              {/* Shop Logo Badge */}
+              <div className="flex justify-center">
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-full blur opacity-80 group-hover:opacity-100 transition duration-300"></div>
+                  <div className="relative w-20 h-20 rounded-full bg-[#0a1220] border-2 border-white/40 p-2 flex items-center justify-center shadow-2xl">
+                    <div className="w-full h-full rounded-full bg-blue-600 flex items-center justify-center font-black text-xl text-white shadow-inner">
+                      PG
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-4 rounded-3xl border border-[#C0CAFF]/30 flex items-center gap-3.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-                <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#C0CAFF]/40 shrink-0 bg-[#0e1b30] shadow-inner">
-                  <img src={selectedGame.image} alt={selectedGame.name} className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <h2 className="text-base font-bold text-white drop-shadow">{selectedGame.name}</h2>
-                  <p className="text-xs text-[#C0CAFF]">ဂိမ်း ID ဖြည့်သွင်းပြီး စိန်/UC များ ဝယ်ယူပါ</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Step 1 */}
-              <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-5 rounded-3xl border border-[#C0CAFF]/30 space-y-3 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shadow-inner">1</span>
-                    <h3 className="text-sm font-semibold text-white">
-                      {selectedGame.id === 'pubg' || selectedGame.id === 'pubg_uc_pack' ? 'PUBG Mobile ID ဖြည့်သွင်းရန်' : 'အကောင့်အချက်အလက်'}
-                    </h3>
+              {/* Title */}
+              <div className="text-center space-y-1.5">
+                <h2 className="text-2xl font-extrabold text-white tracking-wide">
+                  {isSignUp ? 'Create Account' : 'Welcome Back!'}
+                </h2>
+                <p className="text-xs text-gray-300 font-light">
+                  {isSignUp ? 'Paing Gyi Shop တွင် အကောင့်အသစ်ပြုလုပ်ပါ' : 'Login to continue to your account'}
+                </p>
+              </div>
+
+              {/* Auth Form */}
+              <form onSubmit={handleAuthSubmit} className="space-y-4">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                    </svg>
                   </div>
-                  {selectedGame.id === 'mlbb' && (
-                    <button
-                      type="button"
-                      onClick={(e) => handleMlbbCheck(e, userId, zoneId)}
-                      className="text-[11px] bg-[#C0CAFF]/20 text-[#C0CAFF] border border-[#C0CAFF]/40 px-2.5 py-1 rounded-xl hover:bg-[#C0CAFF] hover:text-[#1A3054] transition shadow-inner"
-                    >
-                      🔍 ID စစ်မည်
-                    </button>
-                  )}
-                </div>
-                <div className="grid grid-cols-2 gap-3">
                   <input
-                    type="text"
-                    placeholder={selectedGame.id === 'pubg' || selectedGame.id === 'pubg_uc_pack' ? 'PUBG Character ID' : 'User ID'}
-                    value={userId}
-                    onChange={(e) => setUserId(e.target.value)}
-                    className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 rounded-2xl p-3 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
+                    type="email"
+                    placeholder="Email Address"
+                    value={authEmail}
+                    onChange={e => setAuthEmail(e.target.value)}
+                    className="w-full bg-white/[0.08] border border-white/15 focus:border-blue-400 focus:bg-white/[0.14] text-white text-xs rounded-2xl pl-12 pr-4 py-3.5 outline-none transition-all placeholder:text-gray-400 shadow-inner"
                     required
                   />
-                  {selectedGame.id !== 'pubg' && selectedGame.id !== 'pubg_uc_pack' && (
-                    <input
-                      type="text"
-                      placeholder="Zone ID (optional)"
-                      value={zoneId}
-                      onChange={(e) => setZoneId(e.target.value)}
-                      className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 rounded-2xl p-3 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
-                    />
-                  )}
                 </div>
-                {mlbbCheckResult && selectedGame.id === 'mlbb' && (
-                  <div className="p-2.5 rounded-2xl bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 text-xs text-center text-[#C0CAFF] shadow-inner">
-                    {mlbbCheckResult.name ? `✅ ${mlbbCheckResult.name}` : `⚠️ ${mlbbCheckResult.error}`}
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={authPassword}
+                    onChange={e => setAuthPassword(e.target.value)}
+                    className="w-full bg-white/[0.08] border border-white/15 focus:border-blue-400 focus:bg-white/[0.14] text-white text-xs rounded-2xl pl-12 pr-4 py-3.5 outline-none transition-all placeholder:text-gray-400 shadow-inner"
+                    required
+                  />
+                </div>
+
+                {authMsg && (
+                  <div className={`p-3 rounded-xl text-xs text-center font-medium ${authMsg.includes('✅') ? 'bg-green-500/20 border border-green-500/30 text-green-300' : 'bg-red-500/20 border border-red-500/30 text-red-300'}`}>
+                    {authMsg}
                   </div>
                 )}
-              </div>
 
-              {/* Step 2 */}
-              <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-5 rounded-3xl border border-[#C0CAFF]/30 space-y-3 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shadow-inner">2</span>
-                  <h3 className="text-sm font-semibold text-white">ပက်ကေ့ဂျ် ရွေးချယ်ပါ</h3>
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-72 overflow-y-auto pr-1">
-                  {(packages[selectedGame.id] || []).map((pkg) => (
-                    <div
-                      key={pkg.id}
-                      onClick={() => setSelectedPkg(pkg)}
-                      className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between shadow-inner ${
-                        selectedPkg?.id === pkg.id
-                          ? 'border-[#C0CAFF] bg-[#C0CAFF]/20 backdrop-blur shadow-[0_0_15px_rgba(192,202,255,0.3)] ring-2 ring-[#C0CAFF]'
-                          : 'border-[#C0CAFF]/20 bg-[#0e1b30]/80 backdrop-blur'
-                      }`}
-                    >
-                      <p className="text-xs font-semibold text-white">{pkg.name}</p>
-                      <p className="text-xs font-bold text-[#C0CAFF] mt-2">{pkg.price.toLocaleString()} Ks</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full relative group overflow-hidden rounded-2xl p-[1px] font-semibold text-white shadow-xl transition-all active:scale-95 disabled:opacity-50 mt-3"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 transition-all duration-300 group-hover:brightness-110"></div>
+                  <div className="relative px-6 py-3.5 rounded-2xl bg-transparent flex items-center justify-center gap-2 text-sm tracking-wider font-bold">
+                    {authLoading ? 'လုပ်ဆောင်နေပါသည်...' : (isSignUp ? 'Sign Up' : 'Login')}
+                  </div>
+                </button>
+              </form>
 
-              {/* Step 3 */}
-              <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-5 rounded-3xl border border-[#C0CAFF]/30 space-y-3 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="bg-[#C0CAFF] text-[#1A3054] w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold shadow-inner">3</span>
-                  <h3 className="text-sm font-semibold text-white">ငွေပေးချေမှု နည်းလမ်း</h3>
-                </div>
-                <div className="grid grid-cols-2 gap-3 mb-3">
+              <div className="pt-2 text-center">
+                <p className="text-xs text-gray-300">
+                  {isSignUp ? 'အကောင့်ရှိပြီးသားလား? ' : "Don't have an account? "}
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod('wallet')}
-                    className={`p-3 rounded-2xl border text-xs font-bold transition-all text-left shadow-inner ${
-                      paymentMethod === 'wallet'
-                        ? 'border-[#C0CAFF] bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.4)]'
-                        : 'border-[#C0CAFF]/30 bg-[#0e1b30]/80 backdrop-blur text-gray-300'
-                    }`}
+                    onClick={() => { setIsSignUp(!isSignUp); setAuthMsg(''); }}
+                    className="text-blue-400 hover:text-pink-400 font-bold underline transition-colors"
                   >
-                    💳 Wallet Balance
-                    <span className="block text-[10px] font-normal opacity-90 mt-0.5">လက်ကျန်: {balance.toLocaleString()} Ks</span>
+                    {isSignUp ? 'Login ဝင်ပါ' : 'Sign up'}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('slip')}
-                    className={`p-3 rounded-2xl border text-xs font-bold transition-all text-left shadow-inner ${
-                      paymentMethod === 'slip'
-                        ? 'border-[#C0CAFF] bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.4)]'
-                        : 'border-[#C0CAFF]/30 bg-[#0e1b30]/80 backdrop-blur text-gray-300'
-                    }`}
-                  >
-                    🧾 Direct Slip Upload
-                    <span className="block text-[10px] font-normal opacity-90 mt-0.5">ငွေလွှဲစလစ် တင်မည်</span>
-                  </button>
-                </div>
-
-                {paymentMethod === 'slip' ? (
-                  <>
-                    <div className="p-3 bg-[#0e1b30]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 text-xs text-[#C0CAFF] shadow-inner">
-                      💳 <strong>Pay (U Ye Paing Oo):</strong> 09967241357 (Paing Gyi shop)
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          setSlipFile(e.target.files[0]);
-                        }
-                      }}
-                      className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 rounded-2xl p-3 text-xs text-white file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#C0CAFF] file:text-[#1A3054] shadow-inner"
-                      required
-                    />
-                  </>
-                ) : (
-                  <div className="p-3.5 bg-[#0e1b30]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/30 text-xs text-[#C0CAFF] space-y-1 shadow-inner">
-                    <p className="font-bold">✨ Wallet Balance ဖြင့် တိုက်ရိုက် ဝယ်ယူမည်</p>
-                    <p className="text-[11px] text-gray-300">
-                      ကျသင့်ငွေ: <strong>{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</strong> | လက်ကျန်ငွေ: <strong>{balance.toLocaleString()} Ks</strong>
-                    </p>
-                  </div>
-                )}
+                </p>
               </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3.5 rounded-3xl transition-all disabled:opacity-50 text-sm shadow-[0_0_25px_rgba(192,202,255,0.4)]"
-              >
-                {loading ? 'အော်ဒါ ပို့နေပါသည်...' : (paymentMethod === 'wallet' ? 'Wallet ဖြင့် တိုက်ရိုက် ဝယ်ယူမည်' : 'ယခု ဝယ်ယူမည်')}
-              </button>
-
-              {statusMsg && (
-                <div className="p-3 text-center text-xs rounded-2xl bg-[#1A3054]/80 backdrop-blur border border-[#C0CAFF] text-[#C0CAFF] font-semibold shadow-inner">
-                  {statusMsg}
-                </div>
-              )}
-            </form>
-          )
-        )}
-
-        {activeTab === 'wallet' && (
-          <div className="space-y-6">
-            <div className="bg-[#1A3054]/60 backdrop-blur-2xl text-white p-6 rounded-3xl border border-[#C0CAFF]/30 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-              <h3 className="text-sm text-gray-300">လက်ရှိလက်ကျန်ငွေ</h3>
-              <p className="text-3xl font-extrabold text-[#C0CAFF] mt-1 drop-shadow">{balance.toLocaleString()} Ks</p>
             </div>
-
-            <div className="bg-[#1A3054]/60 backdrop-blur-2xl p-5 rounded-3xl border border-[#C0CAFF]/30 space-y-3.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-              <h3 className="text-sm font-bold text-[#C0CAFF] flex items-center gap-2 drop-shadow">💳 ငွေလွှဲပေးချေမှု</h3>
-              {[
-                { name: 'Wave', num: '09967241357', owner: 'U Ye Paing Oo', image: '/wave.jpg' },
-                { name: 'K pay', num: '09967241357', owner: 'U Ye Paing Oo', image: '/kpay.jpg' },
-                { name: 'AYA PAY', num: '09967241357', owner: 'U Ye Paing Oo', image: '/ayapay.jpg' },
-                { name: 'UAB Pay', num: '09967241357', owner: 'U Ye Paing Oo', image: '/uabpay.jpg' },
-              ].map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center p-3.5 bg-[#0e1b30]/80 backdrop-blur rounded-2xl border border-[#C0CAFF]/20 hover:border-[#C0CAFF] transition-all shadow-inner">
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-xl overflow-hidden bg-[#1A3054] border border-[#C0CAFF]/30 shrink-0 flex items-center justify-center shadow-inner">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold text-white">{item.name}</p>
-                      <p className="text-[11px] text-gray-400 font-medium">{item.owner}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs font-mono font-bold text-[#C0CAFF]">{item.num}</p>
-                    <span className="text-[10px] text-[#1A3054] bg-[#C0CAFF] px-2 py-0.5 rounded-xl font-bold shadow-inner">ငွေလွှဲရန်</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <form onSubmit={handleTopupSubmit} className="bg-[#1A3054]/60 backdrop-blur-2xl p-6 rounded-3xl border border-[#C0CAFF]/30 space-y-4 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
-              <h3 className="text-sm font-bold text-[#C0CAFF] drop-shadow">ငွေဖြည့်တောင်းဆိုရန်</h3>
-              <input
-                type="number"
-                placeholder="ပမာဏ (Ks) - ဥပမာ 10000"
-                value={topupAmount}
-                onChange={(e) => setTopupAmount(e.target.value)}
-                className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-4 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] shadow-inner"
-                required
-              />
-              <div className="border-2 border-dashed border-[#C0CAFF]/30 p-6 rounded-2xl text-center cursor-pointer bg-[#0e1b30]/80 backdrop-blur shadow-inner">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      setTopupSlip(e.target.files[0]);
-                    }
-                  }}
-                  className="w-full text-xs text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#C0CAFF] file:text-[#1A3054]"
-                  required
-                />
-                <p className="text-[10px] text-gray-400 mt-2">ငွေလွှဲစလစ်ပုံ တင်ပါ (Max 5MB)</p>
-              </div>
-              <textarea
-                placeholder="မှတ်ချက် (ရွေးချယ်ရန်) - မိမိပြောလိုသည့် မှတ်ချက်များ..."
-                value={topupNote}
-                onChange={(e) => setTopupNote(e.target.value)}
-                className="w-full bg-[#0e1b30]/80 backdrop-blur border border-[#C0CAFF]/30 p-4 rounded-2xl text-xs text-white placeholder-gray-400 focus:outline-none focus:border-[#C0CAFF] h-24 shadow-inner"
-              />
-              <button
-                type="submit"
-                disabled={topupLoading}
-                className="w-full bg-[#C0CAFF] hover:bg-white text-[#1A3054] font-bold py-3.5 rounded-2xl transition-all text-sm disabled:opacity-50 shadow-[0_0_20px_rgba(192,202,255,0.4)]"
-              >
-                {topupLoading ? 'ပို့ဆောင်နေပါသည်...' : 'တောင်းဆိုချက်တင်မည်'}
-              </button>
-            </form>
           </div>
         )}
       </div>
