@@ -127,31 +127,31 @@ const GAMES = [
     id: 'mlbb', 
     name: 'Mobile Legends: Bang Bang', 
     category: 'Game Topup', 
-    image: 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/thumb/e/e0/Mobile_Legends_Bang_Bang_logo.svg/512px-Mobile_Legends_Bang_Bang_logo.svg.png' 
+    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='g1' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%231e3a8a'/><stop offset='100%' stop-color='%233b82f6'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='url(%23g1)'/><path d='M50 15 L75 28 V52 C75 68 50 85 50 85 C50 85 25 68 25 52 V28 Z' fill='%23fbbf24'/><path d='M50 23 L68 33 V50 C68 62 50 73 50 73 C50 73 32 62 32 50 V33 Z' fill='%230f172a'/><text x='50' y='54' font-family='Arial, sans-serif' font-weight='900' font-size='18' fill='%23fbbf24' text-anchor='middle'>MLBB</text></svg>" 
   },
   { 
     id: 'pubg', 
     name: 'PUBG Mobile', 
     category: 'Game Topup', 
-    image: 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PUBG_Mobile_Logo.svg/512px-PUBG_Mobile_Logo.svg.png' 
+    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='gp' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23f59e0b'/><stop offset='100%' stop-color='%23d97706'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='%23111827'/><rect x='8' y='8' width='84' height='84' rx='18' fill='url(%23gp)'/><path d='M25 32 H75 V68 H25 Z' fill='%23111827'/><text x='50' y='57' font-family='Impact, Arial Black, sans-serif' font-size='22' fill='%23ffffff' text-anchor='middle' letter-spacing='1'>PUBG</text></svg>" 
   },
   { 
     id: 'pubg_uc_pack', 
     name: 'PUBG UC Pack & Pass', 
     category: 'Game Topup', 
-    image: 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PUBG_Mobile_Logo.svg/512px-PUBG_Mobile_Logo.svg.png' 
+    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='guc' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23f59e0b'/><stop offset='100%' stop-color='%23b45309'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='%230f172a'/><circle cx='50' cy='50' r='36' fill='url(%23guc)'/><circle cx='50' cy='50' r='28' fill='%230f172a'/><text x='50' y='59' font-family='Impact, sans-serif' font-size='25' fill='%23fbbf24' text-anchor='middle'>UC</text></svg>" 
   },
   { 
     id: 'telegram', 
     name: 'Telegram Stars & Premium', 
     category: 'Social App', 
-    image: 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/512px-Telegram_logo.svg.png' 
+    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='gt' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%232AABEE'/><stop offset='100%' stop-color='%23229ED9'/></linearGradient></defs><circle cx='50' cy='50' r='48' fill='url(%23gt)'/><path d='M24 49 L74 30 C76 29 78 31 77 34 L69 72 C68 75 64 76 61 74 L49 64 L43 70 C42 71 40 70 40 68 L41 57 L64 36 C65 35 64 34 63 35 L34 54 L24 51 C22 50 22 47 24 49 Z' fill='%23ffffff'/></svg>" 
   },
   { 
     id: 'heartopia', 
     name: 'Heartopia', 
     category: 'Game Topup', 
-    image: 'https://images.weserv.nl/?url=cdn-icons-png.flaticon.com/512/833/833472.png' 
+    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='gh' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23ec4899'/><stop offset='100%' stop-color='%23f43f5e'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='%231f132b'/><path d='M50 78 C50 78 20 58 20 38 C20 26 30 18 40 22 C45 24 48 29 50 32 C52 29 55 24 60 22 C70 18 80 26 80 38 C80 58 50 78 50 78 Z' fill='url(%23gh)'/></svg>" 
   }
 ];
 
@@ -462,7 +462,7 @@ export default function Home() {
                 >
                   <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-950/80 border border-blue-800/50 flex-shrink-0 flex items-center justify-center p-1 group-hover:border-blue-400 transition-colors">
                     {game.image ? (
-                      <img src={game.image} alt={game.name} className="w-full h-full object-contain rounded-xl" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
+                      <img src={game.image} alt={game.name} className="w-full h-full object-contain rounded-xl"  />
                     ) : (
                       <span className="text-2xl">🎮</span>
                     )}
@@ -487,7 +487,7 @@ export default function Home() {
             <div className="bg-[#111e33] p-4 rounded-2xl border border-blue-900/40 flex items-center gap-4">
               <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-950/80 border border-blue-800/50 flex-shrink-0 flex items-center justify-center p-1">
                 {selectedGame.image ? (
-                  <img src={selectedGame.image} alt={selectedGame.name} className="w-full h-full object-contain rounded-xl" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
+                  <img src={selectedGame.image} alt={selectedGame.name} className="w-full h-full object-contain rounded-xl"  />
                 ) : (
                   <span className="text-2xl">🎮</span>
                 )}
@@ -721,7 +721,7 @@ export default function Home() {
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-full blur opacity-80 group-hover:opacity-100 transition duration-300"></div>
                   <div className="relative w-20 h-20 rounded-full bg-[#0a1220] border-2 border-white/40 p-1 flex items-center justify-center shadow-2xl overflow-hidden">
-                    <img src="/logo.png" alt="Shop Logo" className="w-full h-full object-cover rounded-full" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
+                    <img src="/logo.png" alt="Shop Logo" className="w-full h-full object-cover rounded-full"  />
                     <div className="w-full h-full rounded-full bg-blue-600 flex items-center justify-center font-black text-xl text-white shadow-inner">
                       PG
                     </div>
