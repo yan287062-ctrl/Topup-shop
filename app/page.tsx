@@ -127,19 +127,19 @@ const GAMES = [
     id: 'mlbb', 
     name: 'Mobile Legends: Bang Bang', 
     category: 'Game Topup', 
-    image: 'https://images.seeklogo.com/logo-png/43/1/mobile-legends-bang-bang-logo-png_seeklogo-437508.png' 
+    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/Mobile_Legends_Bang_Bang_logo.svg/512px-Mobile_Legends_Bang_Bang_logo.svg.png' 
   },
   { 
     id: 'pubg', 
     name: 'PUBG Mobile', 
     category: 'Game Topup', 
-    image: 'https://seeklogo.com/images/P/pubg-mobile-logo-6699D48DB4-seeklogo.com.png' 
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PUBG_Mobile_Logo.svg/512px-PUBG_Mobile_Logo.svg.png' 
   },
   { 
     id: 'pubg_uc_pack', 
     name: 'PUBG UC Pack & Pass', 
     category: 'Game Topup', 
-    image: 'https://seeklogo.com/images/P/pubg-mobile-logo-6699D48DB4-seeklogo.com.png' 
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PUBG_Mobile_Logo.svg/512px-PUBG_Mobile_Logo.svg.png' 
   },
   { 
     id: 'telegram', 
@@ -151,7 +151,7 @@ const GAMES = [
     id: 'heartopia', 
     name: 'Heartopia', 
     category: 'Game Topup', 
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0mZ2E-L4N4_N_E-K2x_kG7l5q8' 
+    image: 'https://cdn-icons-png.flaticon.com/512/833/833472.png' 
   }
 ];
 
