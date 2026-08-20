@@ -105,6 +105,12 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'tg_15', name: '6 months premium', price: 75241 },
     { id: 'tg_16', name: '12 months premium', price: 136412 }
   ],
+    smile_coin: [
+    { id: 'sc_1', name: 'SC 300', price: 26500 },
+    { id: 'sc_2', name: 'SC 1k', price: 82500 },
+    { id: 'sc_3', name: 'SC 5k', price: 412500 },
+    { id: 'sc_4', name: 'SC 10k', price: 820000 }
+  ],
   heartopia: [
     { id: 'heart_1', name: '20 Heart Diamond', price: 2588 },
     { id: 'heart_2', name: '60 Heart Diamond', price: 4895 },
