@@ -262,22 +262,74 @@ export default function AdminPage() {
     }
   };
 
-  if (!isAdmin) {
+  if (!isAdmin && !isLoggedIn && typeof isAdmin !== 'undefined') {
     return (
-      <div className="min-h-screen bg-[#0a1220] flex items-center justify-center p-4">
-        <form onSubmit={handleLogin} className="bg-[#111e33] border border-blue-900/50 p-6 rounded-2xl max-w-sm w-full space-y-4">
-          <h2 className="text-xl font-bold text-center text-white">Admin Control Login</h2>
-          <input
-            type="password"
-            placeholder="Admin Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-white outline-none focus:border-blue-500"
-          />
-          <button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition">
-            Login
-          </button>
-        </form>
+      <div className="min-h-screen bg-[#0a1220] flex items-center justify-center p-4 relative overflow-hidden font-sans">
+        {/* Background Ambient Glows */}
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-600/25 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-blue-600/25 rounded-full blur-[100px] pointer-events-none" />
+
+        <div className="relative max-w-md w-full my-6 p-2">
+          {/* Glassmorphism Card */}
+          <div className="relative backdrop-blur-2xl bg-white/[0.06] border border-white/20 p-8 rounded-[2.5rem] shadow-[0_12px_40px_0_rgba(0,0,0,0.5)] space-y-6">
+            
+            {/* Shop Logo Badge */}
+            <div className="flex justify-center">
+              <div className="relative group">
+                <div className="absolute -inset-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-full blur opacity-80 group-hover:opacity-100 transition duration-300"></div>
+                <div className="relative w-20 h-20 rounded-full bg-[#0a1220] border-2 border-white/40 p-1 flex items-center justify-center shadow-2xl overflow-hidden">
+                  <img src="/logo.png" alt="Admin Logo" className="w-full h-full object-cover rounded-full" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
+                  <span className="text-xl font-black text-white">PG</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Title */}
+            <div className="text-center space-y-1.5">
+              <h2 className="text-2xl font-extrabold text-white tracking-wide">
+                Admin Portal
+              </h2>
+              <p className="text-xs text-gray-300 font-light">
+                Paing Gyi Shop Management Panel
+              </p>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={typeof handleLogin === 'function' ? handleLogin : (e) => { e.preventDefault(); }} className="space-y-4">
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  placeholder="Admin Password / Secret Key"
+                  value={typeof password !== 'undefined' ? password : (typeof adminPass !== 'undefined' ? adminPass : '')}
+                  onChange={typeof setPassword === 'function' ? (e) => setPassword(e.target.value) : (typeof setAdminPass === 'function' ? (e) => setAdminPass(e.target.value) : undefined)}
+                  className="w-full bg-white/[0.08] border border-white/15 focus:border-blue-400 focus:bg-white/[0.14] text-white text-xs rounded-2xl pl-12 pr-4 py-3.5 outline-none transition-all placeholder:text-gray-400 shadow-inner"
+                  required
+                />
+              </div>
+
+              {typeof error !== 'undefined' && error && (
+                <div className="p-3 rounded-xl text-xs text-center font-medium bg-red-500/20 border border-red-500/30 text-red-300">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                className="w-full relative group overflow-hidden rounded-2xl p-[1px] font-semibold text-white shadow-xl transition-all active:scale-95 mt-2"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 transition-all duration-300 group-hover:brightness-110"></div>
+                <div className="relative px-6 py-3.5 rounded-2xl bg-transparent flex items-center justify-center gap-2 text-sm tracking-wider font-bold">
+                  🔐 Login to Admin
+                </div>
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     );
   }
