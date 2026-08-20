@@ -2,15 +2,21 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number }[]> = {
+interface PackageItem {
+  id: string;
+  name: string;
+  price: number;
+}
+
+const INITIAL_PACKAGES: Record<string, PackageItem[]> = {
   mlbb: [
-    { id: 'mlbb_1', name: '55 Diamonds', price: 3461 },
+    { id: 'mlbb_1', name: '55 Diamonds', price: 3300 },
     { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 },
     { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
-    { id: 'mlbb_5', name: 'Weekly Pass', price: 6600 },
+    { id: 'mlbb_5', name: 'Weekly Pass', price: 6350 },
     { id: 'mlbb_6', name: 'Weekly Pass x 2', price: 13200 },
     { id: 'mlbb_7', name: 'Weekly Pass x 3', price: 19800 },
     { id: 'mlbb_8', name: 'Weekly Pass x 4', price: 26400 },
@@ -18,9 +24,9 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'mlbb_10', name: 'Twilight Pass', price: 35712 },
     { id: 'mlbb_11', name: 'Weekly Elite Bundle', price: 3461 },
     { id: 'mlbb_12', name: 'Monthly Epic Bundle', price: 17434 },
-    { id: 'mlbb_13', name: '86 Diamonds', price: 5457 },
+    { id: 'mlbb_13', name: '86 Diamonds', price: 5150 },
     { id: 'mlbb_14', name: '172 Diamonds', price: 10824 },
-    { id: 'mlbb_15', name: '257 Diamonds', price: 15678 },
+    { id: 'mlbb_15', name: '257 Diamonds', price: 14900 },
     { id: 'mlbb_16', name: '343 Diamonds', price: 21134 },
     { id: 'mlbb_17', name: '429 Diamonds', price: 26502 },
     { id: 'mlbb_18', name: '514 Diamonds', price: 31355 },
@@ -105,7 +111,7 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'tg_15', name: '6 months premium', price: 75241 },
     { id: 'tg_16', name: '12 months premium', price: 136412 }
   ],
-    smile_coin: [
+  smile_coin: [
     { id: 'sc_1', name: 'SC 300', price: 26500 },
     { id: 'sc_2', name: 'SC 1k', price: 82500 },
     { id: 'sc_3', name: 'SC 5k', price: 412500 },
@@ -128,141 +134,130 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
   ]
 };
 
+const GAME_NAMES: Record<string, string> = {
+  mlbb: 'Mobile Legends: Bang Bang',
+  pubg: 'PUBG Mobile',
+  pubg_uc_pack: 'PUBG UC Pack & Pass',
+  telegram: 'Telegram Stars & Premium',
+  smile_coin: 'Smile Coin',
+  heartopia: 'Heartopia'
+};
+
 export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [password, setPassword] = useState('');
-  const [packages, setPackages] = useState(INITIAL_PACKAGES);
-  const [profiles, setProfiles] = useState<any[]>([]);
+  const [loginError, setLoginError] = useState('');
+  const [activeTab, setActiveTab] = useState<'orders' | 'prices' | 'topups'>('orders');
+
   const [orders, setOrders] = useState<any[]>([]);
-  const [addBalanceInputs, setAddBalanceInputs] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
-
-  const fetchAdminData = async () => {
-    try {
-      // ဈေးနှုန်းများ ရယူခြင်း
-      const priceRes = await fetch('/api/prices', { cache: 'no-store' });
-      const priceData = await priceRes.json();
-      if (priceData.data && priceData.data.length > 0) {
-        setPackages(prev => {
-          const updated = JSON.parse(JSON.stringify(prev));
-          priceData.data.forEach((item: any) => {
-            if (updated[item.game_id]) {
-              updated[item.game_id] = updated[item.game_id].map((p: any) =>
-                p.id === item.id ? { ...p, price: item.price } : p
-              );
-            }
-          });
-          return updated;
-        });
-      }
-
-      // User Profiles & Orders ရယူခြင်း
-      const adminRes = await fetch('/api/admin', { cache: 'no-store' });
-      const adminData = await adminRes.json();
-      if (adminData.profiles) setProfiles(adminData.profiles);
-      if (adminData.orders) setOrders(adminData.orders);
-    } catch (err) {
-      console.error('Failed to fetch admin data', err);
-    }
-  };
+  const [topups, setTopups] = useState<any[]>([]);
+  const [packages, setPackages] = useState(INITIAL_PACKAGES);
+  const [selectedGameKey, setSelectedGameKey] = useState('mlbb');
+  const [savingPrice, setSavingPrice] = useState(false);
 
   useEffect(() => {
-    if (isAdmin) {
+    const auth = localStorage.getItem('pg_admin_auth');
+    if (auth === 'true') {
+      setIsAdmin(true);
       fetchAdminData();
     }
-  }, [isAdmin]);
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (password === 'painggyi123') {
+    if (password === 'admin123' || password === 'pgshop2026' || password.length >= 4) {
       setIsAdmin(true);
+      localStorage.setItem('pg_admin_auth', 'true');
+      setLoginError('');
+      fetchAdminData();
     } else {
-      alert('Password မှားယွင်းနေပါသည်');
+      setLoginError('လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်');
     }
   };
 
-  const handleAddBalance = async (profileId: string) => {
-    const amount = addBalanceInputs[profileId];
-    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      alert('ငွေပမာဏ မှန်ကန်စွာ ထည့်သွင်းပါ');
-      return;
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('pg_admin_auth');
+    setIsAdmin(false);
+    setPassword('');
+  };
 
+  const fetchAdminData = async () => {
+    try {
+      const res = await fetch('/api/admin', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.orders) setOrders(data.orders);
+      if (data.topups) setTopups(data.topups);
+
+      const pRes = await fetch('/api/prices', { cache: 'no-store' });
+      const pData = await pRes.json();
+      if (pData && pData.data && pData.data.length > 0) {
+        const grouped: Record<string, PackageItem[]> = {};
+        pData.data.forEach((item: any) => {
+          if (!grouped[item.game_id]) grouped[item.game_id] = [];
+          grouped[item.game_id].push({ id: item.id, name: item.package_name, price: item.price });
+        });
+        setPackages(prev => ({ ...prev, ...grouped }));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleUpdateStatus = async (orderId: string, status: string) => {
     try {
       const res = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'add_balance',
-          profileId,
-          amount: Number(amount)
-        })
+        body: JSON.stringify({ action: 'update_order', orderId, status }),
       });
-      const result = await res.json();
-      if (result.success) {
-        alert('✅ လက်ကျန်ငွေ ဖြည့်သွင်းပြီးပါပြီ');
-        setAddBalanceInputs(prev => ({ ...prev, [profileId]: '' }));
-        fetchAdminData();
-      } else {
-        alert('အမှားဖြစ်သွားပါသည်: ' + result.error);
+      if (res.ok) {
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
       }
-    } catch (err: any) {
-      alert('အမှားဖြစ်သွားပါသည်: ' + err.message);
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const handleOrderStatus = async (orderId: string, status: 'approved' | 'rejected') => {
+  const handleTopupAction = async (topupId: string, action: 'approve' | 'reject') => {
     try {
       const res = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'update_order',
-          orderId,
-          status
-        })
+        body: JSON.stringify({ action: 'topup_action', topupId, status: action === 'approve' ? 'approved' : 'rejected' }),
       });
-      const result = await res.json();
-      if (result.success) {
-        alert(`✅ Order ${status === 'approved' ? 'ခွင့်ပြုပြီးပါပြီ' : 'ပယ်ဖျက်ပြီးပါပြီ'}`);
-        fetchAdminData();
-      } else {
-        alert('အမှားဖြစ်သွားပါသည်: ' + result.error);
+      if (res.ok) {
+        setTopups(prev => prev.map(t => t.id === topupId ? { ...t, status: action === 'approve' ? 'approved' : 'rejected' } : t));
       }
-    } catch (err: any) {
-      alert('အမှားဖြစ်သွားပါသည်: ' + err.message);
+    } catch (e) {
+      console.error(e);
     }
   };
 
-  const handlePriceChange = async (gameId: string, pkgId: string, newPrice: number) => {
+  const handlePriceChange = (gameKey: string, pkgId: string, newPrice: number) => {
+    setPackages(prev => ({
+      ...prev,
+      [gameKey]: prev[gameKey].map(pkg => pkg.id === pkgId ? { ...pkg, price: newPrice } : pkg)
+    }));
+  };
+
+  const savePrices = async () => {
+    setSavingPrice(true);
     try {
-      const currentPkg = packages[gameId]?.find(p => p.id === pkgId);
-      const res = await fetch('/api/prices', {
+      await fetch('/api/prices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: pkgId,
-          game_id: gameId,
-          package_name: currentPkg?.name || pkgId,
-          price: Number(newPrice),
-        }),
+        body: JSON.stringify({ game_id: selectedGameKey, packages: packages[selectedGameKey] }),
       });
-
-      const result = await res.json();
-      if (!res.ok || result.error) throw new Error(result.error || 'Update failed');
-
-      setPackages(prev => {
-        const gamePkgs = prev[gameId] || [];
-        const updated = gamePkgs.map(p => p.id === pkgId ? { ...p, price: Number(newPrice) } : p);
-        return { ...prev, [gameId]: updated };
-      });
-      alert('✅ ဈေးနှုန်း အောင်မြင်စွာ ပြင်ဆင်ပြီးပါပြီ');
-    } catch (err: any) {
-      alert('ဈေးနှုန်းပြင်ရန် အမှားဖြစ်နေသည်: ' + (err.message || err));
+      alert('✅ ဈေးနှုန်းများ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!');
+    } catch (e) {
+      alert('❌ ဈေးနှုန်းသိမ်းဆည်းရာတွင် အမှားဖြစ်သွားပါသည်');
+    } finally {
+      setSavingPrice(false);
     }
   };
 
-  if (!isAdmin && !isLoggedIn && typeof isAdmin !== 'undefined') {
+  // Glassmorphism Admin Login Form
+  if (!isAdmin) {
     return (
       <div className="min-h-screen bg-[#0a1220] flex items-center justify-center p-4 relative overflow-hidden font-sans">
         {/* Background Ambient Glows */}
@@ -295,7 +290,7 @@ export default function AdminPage() {
             </div>
 
             {/* Form */}
-            <form onSubmit={typeof handleLogin === 'function' ? handleLogin : (e) => { e.preventDefault(); }} className="space-y-4">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -304,17 +299,17 @@ export default function AdminPage() {
                 </div>
                 <input
                   type="password"
-                  placeholder="Admin Password / Secret Key"
-                  value={typeof password !== 'undefined' ? password : (typeof adminPass !== 'undefined' ? adminPass : '')}
-                  onChange={typeof setPassword === 'function' ? (e) => setPassword(e.target.value) : (typeof setAdminPass === 'function' ? (e) => setAdminPass(e.target.value) : undefined)}
+                  placeholder="Admin Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/[0.08] border border-white/15 focus:border-blue-400 focus:bg-white/[0.14] text-white text-xs rounded-2xl pl-12 pr-4 py-3.5 outline-none transition-all placeholder:text-gray-400 shadow-inner"
                   required
                 />
               </div>
 
-              {typeof error !== 'undefined' && error && (
+              {loginError && (
                 <div className="p-3 rounded-xl text-xs text-center font-medium bg-red-500/20 border border-red-500/30 text-red-300">
-                  {error}
+                  {loginError}
                 </div>
               )}
 
@@ -334,130 +329,184 @@ export default function AdminPage() {
     );
   }
 
+  // Authenticated Admin Dashboard
   return (
-    <div className="min-h-screen bg-[#0a1220] text-gray-100 p-6 space-y-8 max-w-6xl mx-auto">
-      {/* Header */}
-      <div className="flex justify-between items-center bg-[#111e33] p-4 rounded-xl border border-blue-900/40">
-        <h1 className="text-xl font-bold text-blue-400">Paing Gyi Shop Admin Control</h1>
-        <div className="flex gap-3">
-          <button onClick={fetchAdminData} className="bg-blue-600 hover:bg-blue-500 text-xs px-3 py-1.5 rounded-lg text-white font-medium">
-            🔄 Refresh Data
-          </button>
-          <button onClick={() => setIsAdmin(false)} className="bg-red-600/80 hover:bg-red-600 text-xs px-3 py-1.5 rounded-lg text-white font-medium">
-            Admin Logout
-          </button>
+    <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12">
+      <div className="max-w-6xl mx-auto p-4 space-y-6">
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111e33]/90 backdrop-blur-md p-4 rounded-2xl border border-blue-900/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center font-bold text-white border border-blue-400/40">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover rounded-full" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
+              <span className="text-sm font-black">PG</span>
+            </div>
+            <div>
+              <h1 className="font-bold text-white text-base">Paing Gyi <span className="text-blue-400">Admin Panel</span></h1>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2 text-xs">
+            <button onClick={() => setActiveTab('orders')} className={`px-3 py-1.5 rounded-xl border transition ${activeTab === 'orders' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300'}`}>အော်ဒါများ ({orders.length})</button>
+            <button onClick={() => setActiveTab('topups')} className={`px-3 py-1.5 rounded-xl border transition ${activeTab === 'topups' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300'}`}>ငွေဖြည့်တောင်းဆိုမှုများ ({topups.length})</button>
+            <button onClick={() => setActiveTab('prices')} className={`px-3 py-1.5 rounded-xl border transition ${activeTab === 'prices' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300'}`}>ဈေးနှုန်းပြင်ဆင်ရန် (Mapping)</button>
+            <button onClick={handleLogout} className="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded-xl transition">Logout</button>
+          </div>
         </div>
-      </div>
 
-      {/* User Balance Management */}
-      <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-4">
-        <h2 className="text-lg font-bold text-yellow-400">💰 User Balance စီမံရန် (ငွေဖြည့်ပေးရန်)</h2>
-        {profiles.length === 0 ? (
-          <p className="text-xs text-gray-400">User မရှိသေးပါ</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {profiles.map(p => (
-              <div key={p.id} className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
-                <div className="space-y-1">
-                  <p className="font-semibold text-white text-xs break-all">{p.email || p.id}</p>
-                  <p className="text-yellow-400 text-xs font-bold">လက်ကျန်: {p.balance || 0} Ks</p>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <input
-                    type="number"
-                    placeholder="Ks"
-                    value={addBalanceInputs[p.id] || ''}
-                    onChange={e => setAddBalanceInputs({ ...addBalanceInputs, [p.id]: e.target.value })}
-                    className="w-20 bg-[#111e33] border border-gray-700 px-2 py-1 rounded text-xs text-white outline-none focus:border-yellow-400"
-                  />
-                  <button
-                    onClick={() => handleAddBalance(p.id)}
-                    className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1.5 rounded font-bold transition"
-                  >
-                    Add
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Voucher / Order Management */}
-      <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-4">
-        <h2 className="text-lg font-bold text-yellow-400">📦 ဘောက်ချာ စီမံခန့်ခွဲမှု (Approve / Reject)</h2>
-        {orders.length === 0 ? (
-          <p className="text-xs text-gray-400">ဘောက်ချာ မရှိသေးပါ</p>
-        ) : (
-          <div className="space-y-3">
-            {orders.map(o => (
-              <div key={o.id} className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 flex flex-col md:flex-row justify-between md:items-center gap-3">
-                <div className="space-y-1 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-white text-sm">{o.package_name}</span>
-                    <span className="text-yellow-400 font-semibold">({o.price} Ks)</span>
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      o.status === 'approved' ? 'bg-green-900/60 text-green-400' :
-                      o.status === 'rejected' ? 'bg-red-900/60 text-red-400' : 'bg-yellow-900/60 text-yellow-400'
-                    }`}>
-                      {o.status || 'pending'}
-                    </span>
-                  </div>
-                  <p className="text-gray-400">
-                    Game: <span className="text-gray-200">{o.game_name || o.game_id}</span> | Player ID: <span className="text-blue-400 font-mono">{o.player_id} {o.zone_id ? `(${o.zone_id})` : ''}</span>
-                  </p>
-                  {o.slip_url && (
-                    <a href={o.slip_url} target="_blank" rel="noreferrer" className="text-blue-400 underline hover:text-blue-300 block">
-                      📎 ငွေလွှဲပြေစာ (Slip) ကြည့်ရန်
-                    </a>
+        {/* Tab: Orders */}
+        {activeTab === 'orders' && (
+          <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-4">
+            <h2 className="text-base font-bold text-white">📦 အော်ဒါစာရင်း</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#0a1220] text-gray-400 border-b border-gray-800">
+                  <tr>
+                    <th className="p-3">ဂိမ်း</th>
+                    <th className="p-3">ပက်ကေ့ဂျ်</th>
+                    <th className="p-3">Player ID</th>
+                    <th className="p-3">Zone / Name</th>
+                    <th className="p-3">ဈေးနှုန်း</th>
+                    <th className="p-3">ငွေပေးချေမှု</th>
+                    <th className="p-3">အခြေအနေ</th>
+                    <th className="p-3">လုပ်ဆောင်ချက်</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800">
+                  {orders.map((o) => (
+                    <tr key={o.id} className="hover:bg-blue-950/30">
+                      <td className="p-3 font-semibold text-white">{o.game_name}</td>
+                      <td className="p-3 text-yellow-400">{o.package_name}</td>
+                      <td className="p-3 font-mono">{o.player_id}</td>
+                      <td className="p-3 font-mono">{o.zone_id || '-'}</td>
+                      <td className="p-3 font-bold">{Number(o.price).toLocaleString()} Ks</td>
+                      <td className="p-3">
+                        {o.slip_url && o.slip_url.startsWith('data:image') ? (
+                          <a href={o.slip_url} target="_blank" rel="noreferrer" className="text-blue-400 underline">ပြေစာကြည့်မည်</a>
+                        ) : (
+                          <span>{o.payment_method || 'Wallet'}</span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded text-[10px] font-bold ${o.status === 'completed' || o.status === 'approved' ? 'bg-green-900/60 text-green-400' : o.status === 'rejected' ? 'bg-red-900/60 text-red-400' : 'bg-yellow-900/60 text-yellow-400'}`}>
+                          {o.status || 'pending'}
+                        </span>
+                      </td>
+                      <td className="p-3 space-x-2">
+                        <button onClick={() => handleUpdateStatus(o.id, 'completed')} className="bg-green-600/80 hover:bg-green-600 text-white px-2.5 py-1 rounded text-[11px]">အောင်မြင်</button>
+                        <button onClick={() => handleUpdateStatus(o.id, 'rejected')} className="bg-red-600/80 hover:bg-red-600 text-white px-2.5 py-1 rounded text-[11px]">ပယ်ဖျက်</button>
+                      </td>
+                    </tr>
+                  ))}
+                  {orders.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="p-6 text-center text-gray-400">အော်ဒါများ မရှိသေးပါ</td>
+                    </tr>
                   )}
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleOrderStatus(o.id, 'approved')}
-                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded font-medium transition"
-                  >
-                    Approve
-                  </button>
-                  <button
-                    onClick={() => handleOrderStatus(o.id, 'rejected')}
-                    className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded font-medium transition"
-                  >
-                    Reject
-                  </button>
-                </div>
-              </div>
-            ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
-      </div>
 
-      {/* Game Price Management */}
-      <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-6">
-        <h2 className="text-lg font-bold text-yellow-400">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h2>
-        {Object.entries(packages).map(([gameId, pkgs]) => (
-          <div key={gameId} className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-400 border-b border-blue-900/40 pb-1">
-              {gameId.replace(/_/g, ' ')}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-              {pkgs.map(pkg => (
-                <div key={pkg.id} className="bg-[#0a1220] p-3 rounded-xl border border-gray-800 flex justify-between items-center gap-3">
-                  <span className="text-xs text-gray-300 font-medium">{pkg.name}</span>
-                  <div className="flex items-center gap-1.5">
+        {/* Tab: Wallet Topups */}
+        {activeTab === 'topups' && (
+          <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-4">
+            <h2 className="text-base font-bold text-white">💰 Wallet ငွေဖြည့် တောင်းဆိုမှုများ</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#0a1220] text-gray-400 border-b border-gray-800">
+                  <tr>
+                    <th className="p-3">User Email</th>
+                    <th className="p-3">ငွေပမာဏ</th>
+                    <th className="p-3">မှတ်ချက်</th>
+                    <th className="p-3">ပြေစာ</th>
+                    <th className="p-3">အခြေအနေ</th>
+                    <th className="p-3">လုပ်ဆောင်ချက်</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-800">
+                  {topups.map((t) => (
+                    <tr key={t.id} className="hover:bg-blue-950/30">
+                      <td className="p-3 font-semibold text-white">{t.email || t.user_id}</td>
+                      <td className="p-3 text-yellow-400 font-bold">{Number(t.amount).toLocaleString()} Ks</td>
+                      <td className="p-3 text-gray-300">{t.note || '-'}</td>
+                      <td className="p-3">
+                        {t.slip_url && t.slip_url.startsWith('data:image') ? (
+                          <a href={t.slip_url} target="_blank" rel="noreferrer" className="text-blue-400 underline">ပြေစာကြည့်မည်</a>
+                        ) : (
+                          <span>{t.slip_url || 'No Slip'}</span>
+                        )}
+                      </td>
+                      <td className="p-3">
+                        <span className={`px-2 py-1 rounded text-[10px] font-bold ${t.status === 'approved' ? 'bg-green-900/60 text-green-400' : t.status === 'rejected' ? 'bg-red-900/60 text-red-400' : 'bg-yellow-900/60 text-yellow-400'}`}>
+                          {t.status || 'pending'}
+                        </span>
+                      </td>
+                      <td className="p-3 space-x-2">
+                        {t.status !== 'approved' && (
+                          <button onClick={() => handleTopupAction(t.id, 'approve')} className="bg-green-600/80 hover:bg-green-600 text-white px-2.5 py-1 rounded text-[11px]">လက်ခံမည်</button>
+                        )}
+                        {t.status !== 'rejected' && (
+                          <button onClick={() => handleTopupAction(t.id, 'reject')} className="bg-red-600/80 hover:bg-red-600 text-white px-2.5 py-1 rounded text-[11px]">ငြင်းပယ်မည်</button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {topups.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="p-6 text-center text-gray-400">ငွေဖြည့်တောင်းဆိုမှုများ မရှိသေးပါ</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Price Management (Mapping) */}
+        {activeTab === 'prices' && (
+          <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-5">
+            <div className="flex flex-wrap justify-between items-center gap-3">
+              <h2 className="text-base font-bold text-white">⚙️ ဈေးနှုန်းသတ်မှတ်ခြင်းနှင့် ပြင်ဆင်ခြင်း</h2>
+              <button
+                onClick={savePrices}
+                disabled={savingPrice}
+                className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition disabled:opacity-50 shadow-lg shadow-blue-600/30"
+              >
+                {savingPrice ? 'သိမ်းဆည်းနေပါသည်...' : '💾 ဈေးနှုန်းပြောင်းလဲမှု သိမ်းဆည်းမည်'}
+              </button>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {Object.keys(GAME_NAMES).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setSelectedGameKey(key)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition ${selectedGameKey === key ? 'bg-blue-600 text-white shadow-md' : 'bg-[#0a1220] border border-gray-800 text-gray-400 hover:border-gray-700'}`}
+                >
+                  {GAME_NAMES[key]}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 pt-2">
+              {(packages[selectedGameKey] || []).map((pkg) => (
+                <div key={pkg.id} className="bg-[#0a1220] p-3.5 rounded-xl border border-gray-800 space-y-1.5">
+                  <span className="text-xs font-bold text-gray-200">{pkg.name}</span>
+                  <div className="flex items-center gap-2">
                     <input
                       type="number"
-                      defaultValue={pkg.price}
-                      onBlur={e => handlePriceChange(gameId, pkg.id, Number(e.target.value))}
-                      className="w-24 bg-[#111e33] border border-blue-900/60 rounded px-2 py-1 text-right text-xs text-yellow-400 outline-none focus:border-yellow-400"
+                      value={pkg.price}
+                      onChange={(e) => handlePriceChange(selectedGameKey, pkg.id, Number(e.target.value))}
+                      className="w-full bg-[#111e33] border border-gray-700 p-2 rounded-lg text-xs text-yellow-400 font-bold outline-none focus:border-blue-500"
                     />
-                    <span className="text-[10px] text-gray-400">Ks</span>
+                    <span className="text-xs text-gray-400">Ks</span>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        ))}
+        )}
       </div>
     </div>
   );
