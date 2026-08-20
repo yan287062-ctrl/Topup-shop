@@ -105,6 +105,12 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'tg_15', name: '6 months premium', price: 75241 },
     { id: 'tg_16', name: '12 months premium', price: 136412 }
   ],
+    smile_coin: [
+    { id: 'sc_1', name: 'SC 300', price: 26500 },
+    { id: 'sc_2', name: 'SC 1k', price: 82500 },
+    { id: 'sc_3', name: 'SC 5k', price: 412500 },
+    { id: 'sc_4', name: 'SC 10k', price: 820000 }
+  ],
   heartopia: [
     { id: 'heart_1', name: '20 Heart Diamond', price: 2588 },
     { id: 'heart_2', name: '60 Heart Diamond', price: 4895 },
@@ -146,6 +152,12 @@ const GAMES = [
     name: 'Telegram Stars & Premium', 
     category: 'Social App', 
     image: '/games/telegram.png' 
+  },
+    { 
+    id: 'smile_coin', 
+    name: 'Smile Coin', 
+    category: 'Game Currency', 
+    image: '/games/smile_coin.png' 
   },
   { 
     id: 'heartopia', 
@@ -526,22 +538,35 @@ export default function Home() {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <input
-                  type="text"
-                  placeholder="User ID"
-                  value={userId}
-                  onChange={e => setUserId(e.target.value)}
-                  className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Zone ID (optional)"
-                  value={zoneId}
-                  onChange={e => setZoneId(e.target.value)}
-                  className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
-                />
-              </div>
+              {selectedGame.id === 'smile_coin' ? (
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Telegram name ထည့်ရန် (ဥပမာ - @username သို့မဟုတ် နာမည်)"
+                    value={userId}
+                    onChange={e => setUserId(e.target.value)}
+                    className="w-full bg-[#0a1220] border border-blue-500/50 p-3.5 rounded-xl text-xs text-white outline-none focus:border-blue-400 placeholder:text-gray-400 shadow-inner"
+                    required
+                  />
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    placeholder="User ID"
+                    value={userId}
+                    onChange={e => setUserId(e.target.value)}
+                    className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Zone ID (optional)"
+                    value={zoneId}
+                    onChange={e => setZoneId(e.target.value)}
+                    className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+                  />
+                </div>
+              )}
 
               {mlbbCheckResult && (
                 <div className={'p-3 rounded-xl text-xs font-semibold ' + (mlbbCheckResult.error ? 'bg-red-900/40 text-red-400 border border-red-800' : 'bg-green-900/40 text-green-300 border border-green-800')}>
