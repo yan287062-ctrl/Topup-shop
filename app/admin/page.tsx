@@ -129,18 +129,19 @@ export default function AdminPage() {
   const [profiles, setProfiles] = useState<any[]>([]);
   const [orders, setOrders] = useState<any[]>([]);
   const [addBalanceInputs, setAddBalanceInputs] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(false);
 
-  // Database က ဈေးနှုန်းတွေကို အလိုအလျောက် ဆွဲတင်ခြင်း
-  const loadPrices = async () => {
+  const fetchAdminData = async () => {
     try {
-      const res = await fetch('/api/prices', { cache: 'no-store' });
-      const result = await res.json();
-      if (result.data && result.data.length > 0) {
+      // ဈေးနှုန်းများ ရယူခြင်း
+      const priceRes = await fetch('/api/prices', { cache: 'no-store' });
+      const priceData = await priceRes.json();
+      if (priceData.data && priceData.data.length > 0) {
         setPackages(prev => {
           const updated = JSON.parse(JSON.stringify(prev));
-          result.data.forEach((item: any) => {
+          priceData.data.forEach((item: any) => {
             if (updated[item.game_id]) {
-              updated[item.game_id] = updated[item.game_id].map((p: any) => 
+              updated[item.game_id] = updated[item.game_id].map((p: any) =>
                 p.id === item.id ? { ...p, price: item.price } : p
               );
             }
@@ -148,14 +149,22 @@ export default function AdminPage() {
           return updated;
         });
       }
+
+      // User Profiles & Orders ရယူခြင်း
+      const adminRes = await fetch('/api/admin', { cache: 'no-store' });
+      const adminData = await adminRes.json();
+      if (adminData.profiles) setProfiles(adminData.profiles);
+      if (adminData.orders) setOrders(adminData.orders);
     } catch (err) {
-      console.error(err);
+      console.error('Failed to fetch admin data', err);
     }
   };
 
   useEffect(() => {
-    loadPrices();
-  }, []);
+    if (isAdmin) {
+      fetchAdminData();
+    }
+  }, [isAdmin]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,10 +175,62 @@ export default function AdminPage() {
     }
   };
 
+  const handleAddBalance = async (profileId: string) => {
+    const amount = addBalanceInputs[profileId];
+    if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+      alert('ငွေပမာဏ မှန်ကန်စွာ ထည့်သွင်းပါ');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'add_balance',
+          profileId,
+          amount: Number(amount)
+        })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert('✅ လက်ကျန်ငွေ ဖြည့်သွင်းပြီးပါပြီ');
+        setAddBalanceInputs(prev => ({ ...prev, [profileId]: '' }));
+        fetchAdminData();
+      } else {
+        alert('အမှားဖြစ်သွားပါသည်: ' + result.error);
+      }
+    } catch (err: any) {
+      alert('အမှားဖြစ်သွားပါသည်: ' + err.message);
+    }
+  };
+
+  const handleOrderStatus = async (orderId: string, status: 'approved' | 'rejected') => {
+    try {
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_order',
+          orderId,
+          status
+        })
+      });
+      const result = await res.json();
+      if (result.success) {
+        alert(`✅ Order ${status === 'approved' ? 'ခွင့်ပြုပြီးပါပြီ' : 'ပယ်ဖျက်ပြီးပါပြီ'}`);
+        fetchAdminData();
+      } else {
+        alert('အမှားဖြစ်သွားပါသည်: ' + result.error);
+      }
+    } catch (err: any) {
+      alert('အမှားဖြစ်သွားပါသည်: ' + err.message);
+    }
+  };
+
   const handlePriceChange = async (gameId: string, pkgId: string, newPrice: number) => {
     try {
       const currentPkg = packages[gameId]?.find(p => p.id === pkgId);
-      
       const res = await fetch('/api/prices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -182,9 +243,7 @@ export default function AdminPage() {
       });
 
       const result = await res.json();
-      if (!res.ok || result.error) {
-        throw new Error(result.error || 'Update failed');
-      }
+      if (!res.ok || result.error) throw new Error(result.error || 'Update failed');
 
       setPackages(prev => {
         const gamePkgs = prev[gameId] || [];
@@ -219,68 +278,105 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-[#0a1220] text-gray-100 p-6 space-y-8 max-w-6xl mx-auto">
+      {/* Header */}
       <div className="flex justify-between items-center bg-[#111e33] p-4 rounded-xl border border-blue-900/40">
         <h1 className="text-xl font-bold text-blue-400">Paing Gyi Shop Admin Control</h1>
-        <button onClick={() => setIsAdmin(false)} className="bg-red-600/80 hover:bg-red-600 text-xs px-3 py-1.5 rounded-lg text-white font-medium">
-          Admin Logout
-        </button>
+        <div className="flex gap-3">
+          <button onClick={fetchAdminData} className="bg-blue-600 hover:bg-blue-500 text-xs px-3 py-1.5 rounded-lg text-white font-medium">
+            🔄 Refresh Data
+          </button>
+          <button onClick={() => setIsAdmin(false)} className="bg-red-600/80 hover:bg-red-600 text-xs px-3 py-1.5 rounded-lg text-white font-medium">
+            Admin Logout
+          </button>
+        </div>
       </div>
 
+      {/* User Balance Management */}
       <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-4">
         <h2 className="text-lg font-bold text-yellow-400">💰 User Balance စီမံရန် (ငွေဖြည့်ပေးရန်)</h2>
-        <div className="text-xs text-gray-400">
-          {profiles.length === 0 ? 'User မရှိသေးပါ' : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {profiles.map(p => (
-                <div key={p.id} className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold text-white">{p.email || p.id}</p>
-                    <p className="text-yellow-500 text-xs mt-1">လက်ကျန်: {p.balance || 0} Ks</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      placeholder="Amount"
-                      value={addBalanceInputs[p.id] || ''}
-                      onChange={e => setAddBalanceInputs({ ...addBalanceInputs, [p.id]: e.target.value })}
-                      className="w-24 bg-[#111e33] border border-gray-700 px-2 py-1 rounded text-xs text-white"
-                    />
-                    <button className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1 rounded font-bold">
-                      Add
-                    </button>
-                  </div>
+        {profiles.length === 0 ? (
+          <p className="text-xs text-gray-400">User မရှိသေးပါ</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {profiles.map(p => (
+              <div key={p.id} className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
+                <div className="space-y-1">
+                  <p className="font-semibold text-white text-xs break-all">{p.email || p.id}</p>
+                  <p className="text-yellow-400 text-xs font-bold">လက်ကျန်: {p.balance || 0} Ks</p>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="number"
+                    placeholder="Ks"
+                    value={addBalanceInputs[p.id] || ''}
+                    onChange={e => setAddBalanceInputs({ ...addBalanceInputs, [p.id]: e.target.value })}
+                    className="w-20 bg-[#111e33] border border-gray-700 px-2 py-1 rounded text-xs text-white outline-none focus:border-yellow-400"
+                  />
+                  <button
+                    onClick={() => handleAddBalance(p.id)}
+                    className="bg-green-600 hover:bg-green-500 text-white text-xs px-3 py-1.5 rounded font-bold transition"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* Voucher / Order Management */}
       <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-4">
         <h2 className="text-lg font-bold text-yellow-400">📦 ဘောက်ချာ စီမံခန့်ခွဲမှု (Approve / Reject)</h2>
-        <div className="text-xs text-gray-400">
-          {orders.length === 0 ? 'ဘောက်ချာ မရှိသေးပါ' : (
-            <div className="space-y-3">
-              {orders.map(o => (
-                <div key={o.id} className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
-                  <div>
-                    <p className="font-semibold text-white">{o.package_name} ({o.price} Ks)</p>
-                    <p className="text-gray-400 text-xs">Game: {o.game_id} | Status: <span className="text-yellow-400">{o.status}</span></p>
+        {orders.length === 0 ? (
+          <p className="text-xs text-gray-400">ဘောက်ချာ မရှိသေးပါ</p>
+        ) : (
+          <div className="space-y-3">
+            {orders.map(o => (
+              <div key={o.id} className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 flex flex-col md:flex-row justify-between md:items-center gap-3">
+                <div className="space-y-1 text-xs">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-white text-sm">{o.package_name}</span>
+                    <span className="text-yellow-400 font-semibold">({o.price} Ks)</span>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      o.status === 'approved' ? 'bg-green-900/60 text-green-400' :
+                      o.status === 'rejected' ? 'bg-red-900/60 text-red-400' : 'bg-yellow-900/60 text-yellow-400'
+                    }`}>
+                      {o.status || 'pending'}
+                    </span>
                   </div>
-                  <div className="flex gap-2">
-                    <button className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded font-medium">Approve</button>
-                    <button className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded font-medium">Reject</button>
-                  </div>
+                  <p className="text-gray-400">
+                    Game: <span className="text-gray-200">{o.game_name || o.game_id}</span> | Player ID: <span className="text-blue-400 font-mono">{o.player_id} {o.zone_id ? `(${o.zone_id})` : ''}</span>
+                  </p>
+                  {o.slip_url && (
+                    <a href={o.slip_url} target="_blank" rel="noreferrer" className="text-blue-400 underline hover:text-blue-300 block">
+                      📎 ငွေလွှဲပြေစာ (Slip) ကြည့်ရန်
+                    </a>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleOrderStatus(o.id, 'approved')}
+                    className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded font-medium transition"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleOrderStatus(o.id, 'rejected')}
+                    className="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1.5 rounded font-medium transition"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
+      {/* Game Price Management */}
       <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/30 space-y-6">
         <h2 className="text-lg font-bold text-yellow-400">⚙️ ဂိမ်းပစ္စည်းဈေးနှုန်းများ ပြင်ဆင်ရန်</h2>
-        
         {Object.entries(packages).map(([gameId, pkgs]) => (
           <div key={gameId} className="space-y-3">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-blue-400 border-b border-blue-900/40 pb-1">
