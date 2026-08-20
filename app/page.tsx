@@ -196,7 +196,7 @@ export default function Home() {
 
   const [checkMlbbId, setCheckMlbbId] = useState('');
   const [checkMlbbZone, setCheckMlbbZone] = useState('');
-  const [mlbbCheckResult, setMlbbCheckResult] = useState<{ name?: string; error?: string } | null>(null);
+  const [mlbbCheckResult, setMlbbCheckResult] = useState<any>(null);
   const [checkingMlbb, setCheckingMlbb] = useState(false);
 
   const [topupAmount, setTopupAmount] = useState('');
@@ -279,12 +279,11 @@ export default function Home() {
       const result = await res.json();
 
       if (res.ok && result.success) {
-        setMlbbCheckResult({ 
-          name: `${result.name} (Zone: ${zone})`,
-          bonus: '✨ 2x Double Bonus ရရှိနိုင်ပါသည်'
+        setMlbbCheckResult({
+          name: `${result.name} (${zone}) - ✨ 2x Bonus ရရှိနိုင်`
         });
       } else {
-        setMlbbCheckResult({ error: result.error || 'အကောင့် အချက်အလက် ရှာမတွေ့ပါ' });
+        setMlbbCheckResult({ error: result.error || 'အကောင့် ရှာမတွေ့ပါ' });
       }
     } catch (err) {
       setMlbbCheckResult({ error: 'စစ်ဆေးမှု မအောင်မြင်ပါ' });
