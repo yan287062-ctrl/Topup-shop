@@ -127,31 +127,31 @@ const GAMES = [
     id: 'mlbb', 
     name: 'Mobile Legends: Bang Bang', 
     category: 'Game Topup', 
-    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='g1' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%231e3a8a'/><stop offset='100%' stop-color='%233b82f6'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='url(%23g1)'/><path d='M50 15 L75 28 V52 C75 68 50 85 50 85 C50 85 25 68 25 52 V28 Z' fill='%23fbbf24'/><path d='M50 23 L68 33 V50 C68 62 50 73 50 73 C50 73 32 62 32 50 V33 Z' fill='%230f172a'/><text x='50' y='54' font-family='Arial, sans-serif' font-weight='900' font-size='18' fill='%23fbbf24' text-anchor='middle'>MLBB</text></svg>" 
+    image: 'https://play-lh.googleusercontent.com/492G-Z-p3_mQhV6F5_GZqTqgC_B0l9MhY9yYj7X8K-qJ4mN2e6R7vT1uF8pA3s2x4w=w240-h480' 
   },
   { 
     id: 'pubg', 
     name: 'PUBG Mobile', 
     category: 'Game Topup', 
-    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='gp' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23f59e0b'/><stop offset='100%' stop-color='%23d97706'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='%23111827'/><rect x='8' y='8' width='84' height='84' rx='18' fill='url(%23gp)'/><path d='M25 32 H75 V68 H25 Z' fill='%23111827'/><text x='50' y='57' font-family='Impact, Arial Black, sans-serif' font-size='22' fill='%23ffffff' text-anchor='middle' letter-spacing='1'>PUBG</text></svg>" 
+    image: 'https://play-lh.googleusercontent.com/JRd05PYGvhD-BeRRgahUdznDREduvYA600ZiMfioTxxn-hfTGnMrL-CinWdr462pgPU=w240-h480' 
   },
   { 
     id: 'pubg_uc_pack', 
     name: 'PUBG UC Pack & Pass', 
     category: 'Game Topup', 
-    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='guc' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23f59e0b'/><stop offset='100%' stop-color='%23b45309'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='%230f172a'/><circle cx='50' cy='50' r='36' fill='url(%23guc)'/><circle cx='50' cy='50' r='28' fill='%230f172a'/><text x='50' y='59' font-family='Impact, sans-serif' font-size='25' fill='%23fbbf24' text-anchor='middle'>UC</text></svg>" 
+    image: 'https://play-lh.googleusercontent.com/JRd05PYGvhD-BeRRgahUdznDREduvYA600ZiMfioTxxn-hfTGnMrL-CinWdr462pgPU=w240-h480' 
   },
   { 
     id: 'telegram', 
     name: 'Telegram Stars & Premium', 
     category: 'Social App', 
-    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='gt' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%232AABEE'/><stop offset='100%' stop-color='%23229ED9'/></linearGradient></defs><circle cx='50' cy='50' r='48' fill='url(%23gt)'/><path d='M24 49 L74 30 C76 29 78 31 77 34 L69 72 C68 75 64 76 61 74 L49 64 L43 70 C42 71 40 70 40 68 L41 57 L64 36 C65 35 64 34 63 35 L34 54 L24 51 C22 50 22 47 24 49 Z' fill='%23ffffff'/></svg>" 
+    image: 'https://img.freepik.com/premium-vector/star-vector-icon-isolated-black-background_1292685-485.jpg' 
   },
   { 
     id: 'heartopia', 
     name: 'Heartopia', 
     category: 'Game Topup', 
-    image: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' width='100' height='100'><defs><linearGradient id='gh' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23ec4899'/><stop offset='100%' stop-color='%23f43f5e'/></linearGradient></defs><rect width='100' height='100' rx='24' fill='%231f132b'/><path d='M50 78 C50 78 20 58 20 38 C20 26 30 18 40 22 C45 24 48 29 50 32 C52 29 55 24 60 22 C70 18 80 26 80 38 C80 58 50 78 50 78 Z' fill='url(%23gh)'/></svg>" 
+    image: 'https://img.tapimg.net/market/images/8c34f8e5f1d1f0bb0cfcb274092b7c4a.png' 
   }
 ];
 
