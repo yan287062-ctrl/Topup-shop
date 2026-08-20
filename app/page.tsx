@@ -284,27 +284,34 @@ export default function Home() {
     setAuthMsg('');
 
     try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: authEmail,
+          password: authPassword,
+          action: isSignUp ? 'signup' : 'login'
+        })
+      });
+
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        throw new Error(result.error || 'လုပ်ဆောင်မှု မအောင်မြင်ပါ');
+      }
+
       if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
-          email: authEmail,
-          password: authPassword,
-        });
-        if (error) throw error;
         setAuthMsg('✅ အကောင့်သစ် အောင်မြင်စွာ ဖွင့်ပြီးပါပြီ!');
-        if (data.user) setCurrentAuthUser(data.user);
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: authEmail,
-          password: authPassword,
-        });
-        if (error) throw error;
         setAuthMsg('✅ Login အောင်မြင်စွာ ဝင်ပြီးပါပြီ!');
-        if (data.user) setCurrentAuthUser(data.user);
+      }
+
+      if (result.data?.user) {
+        setCurrentAuthUser(result.data.user);
       }
       fetchUserBalance();
       setTimeout(() => setActiveTab('shop'), 1000);
     } catch (err: any) {
-      setAuthMsg('❌ အမှား ဖြစ်ပွားပါသည်: ' + (err.message || 'Error occurred'));
+      setAuthMsg('❌ အမှား ဖြစ်ပွားပါသည်: ' + (err.message || err));
     } finally {
       setAuthLoading(false);
     }
