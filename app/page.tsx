@@ -278,6 +278,7 @@ export default function Home() {
     }, 800);
   };
 
+
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
@@ -290,8 +291,8 @@ export default function Home() {
         body: JSON.stringify({
           email: authEmail,
           password: authPassword,
-          action: isSignUp ? 'signup' : 'login'
-        })
+          action: isSignUp ? 'signup' : 'login',
+        }),
       });
 
       const result = await res.json();
@@ -308,7 +309,7 @@ export default function Home() {
       if (result.data?.user) {
         setCurrentAuthUser(result.data.user);
       }
-      fetchUserBalance();
+      fetchUserBalance(result.data?.user || currentAuthUser);
       setTimeout(() => setActiveTab('shop'), 1000);
     } catch (err: any) {
       setAuthMsg('❌ အမှား ဖြစ်ပွားပါသည်: ' + (err.message || err));
@@ -350,8 +351,8 @@ export default function Home() {
           zone_id: zoneId,
           payment_method: paymentMethod,
           user_id: currentAuthUser?.id,
-          slip_url: paymentMethod === 'wallet' ? 'Wallet Payment' : 'Direct Slip Upload'
-        })
+          slip_url: paymentMethod === 'wallet' ? 'Wallet Payment' : 'Direct Slip Upload',
+        }),
       });
 
       const result = await res.json();
@@ -359,7 +360,6 @@ export default function Home() {
         throw new Error(result.error || 'အော်ဒါတင်ခြင်း မအောင်မြင်ပါ');
       }
 
-      // Telegram Bot သို့ Alert ပို့ခြင်း
       const caption = `🚨 Admin - အော်ဒါအသစ်ဝင်လာပါပြီ! (${paymentMethod === 'wallet' ? '💳 Wallet Payment' : '🧾 Slip Upload'})\n\n` +
         `🎮 ဂိမ်း: ${selectedGame.name}\n` +
         `📦 ပက်ကေ့ဂျ်: ${selectedPkg.name} (${selectedPkg.price.toLocaleString()} Ks)\n` +
@@ -386,6 +386,7 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
 
   const handleSearchOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -418,8 +419,8 @@ export default function Home() {
           email: currentAuthUser.email,
           amount: Number(topupAmount),
           note: topupNote,
-          slipUrl: 'Slip Uploaded'
-        })
+          slipUrl: 'Slip Uploaded',
+        }),
       });
       const result = await res.json();
       if (result.success) {
@@ -435,7 +436,6 @@ export default function Home() {
       setTopupLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12 relative overflow-hidden">
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#1A3054] rounded-full blur-[120px] pointer-events-none opacity-50" />
