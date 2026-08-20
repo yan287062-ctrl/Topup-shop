@@ -123,11 +123,36 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
 };
 
 const GAMES = [
-  { id: 'mlbb', name: 'Mobile Legends: Bang Bang', category: 'Game Topup' },
-  { id: 'pubg', name: 'PUBG Mobile', category: 'Game Topup' },
-  { id: 'pubg_uc_pack', name: 'PUBG UC Pack & Pass', category: 'Game Topup' },
-  { id: 'telegram', name: 'Telegram Stars & Premium', category: 'Social App' },
-  { id: 'heartopia', name: 'Heartopia', category: 'Game Topup' }
+  { 
+    id: 'mlbb', 
+    name: 'Mobile Legends: Bang Bang', 
+    category: 'Game Topup', 
+    image: 'https://images.seeklogo.com/logo-png/43/1/mobile-legends-bang-bang-logo-png_seeklogo-437508.png' 
+  },
+  { 
+    id: 'pubg', 
+    name: 'PUBG Mobile', 
+    category: 'Game Topup', 
+    image: 'https://seeklogo.com/images/P/pubg-mobile-logo-6699D48DB4-seeklogo.com.png' 
+  },
+  { 
+    id: 'pubg_uc_pack', 
+    name: 'PUBG UC Pack & Pass', 
+    category: 'Game Topup', 
+    image: 'https://seeklogo.com/images/P/pubg-mobile-logo-6699D48DB4-seeklogo.com.png' 
+  },
+  { 
+    id: 'telegram', 
+    name: 'Telegram Stars & Premium', 
+    category: 'Social App', 
+    image: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg' 
+  },
+  { 
+    id: 'heartopia', 
+    name: 'Heartopia', 
+    category: 'Game Topup', 
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0mZ2E-L4N4_N_E-K2x_kG7l5q8' 
+  }
 ];
 
 export default function Home() {
@@ -393,16 +418,19 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12">
+      {/* Top Banner */}
       <div className="bg-[#111e33] border-b border-blue-900/40 px-4 py-2 text-xs flex justify-between items-center text-blue-200">
         <span className="font-semibold">🌟 Paing Gyi Game Store - Official Platform</span>
         <span className="text-yellow-400">⭐️ သစ္စာရှိကုမ္ပဏီ / 24/7 အမြန်ဆုံးဝန်ဆောင်မှု</span>
       </div>
 
       <div className="max-w-4xl mx-auto p-4 space-y-6">
+        {/* Navbar */}
         <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111e33]/90 backdrop-blur-md p-4 rounded-2xl border border-blue-900/50">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setSelectedGame(null); setActiveTab('shop'); }}>
-            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">
-              PG
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30 border border-blue-400/40">
+              <img src="/logo.png" alt="PG" className="w-full h-full object-cover" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
+              <span className="text-sm font-black">PG</span>
             </div>
             <div>
               <h1 className="font-bold text-white text-base">Paing Gyi <span className="text-blue-400">shop</span></h1>
@@ -422,6 +450,7 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Tab: Shop / Game Select */}
         {activeTab === 'shop' && !selectedGame && (
           <div className="space-y-4">
             <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ</h2>
@@ -430,13 +459,17 @@ export default function Home() {
                 <div
                   key={game.id}
                   onClick={() => { setSelectedGame(game); setSelectedPkg(null); setMlbbCheckResult(null); }}
-                  className="bg-[#111e33] border border-blue-900/40 hover:border-blue-500/80 p-4 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] flex items-center gap-4"
+                  className="bg-[#111e33] border border-blue-900/40 hover:border-blue-500/80 p-4 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] flex items-center gap-4 group"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-blue-950 flex items-center justify-center text-xl font-bold text-blue-400">
-                    🎮
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-950/80 border border-blue-800/50 flex-shrink-0 flex items-center justify-center p-1 group-hover:border-blue-400 transition-colors">
+                    {game.image ? (
+                      <img src={game.image} alt={game.name} className="w-full h-full object-contain rounded-xl" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
+                    ) : (
+                      <span className="text-2xl">🎮</span>
+                    )}
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-sm">{game.name}</h3>
+                    <h3 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{game.name}</h3>
                     <p className="text-[11px] text-gray-400">{game.category}</p>
                   </div>
                 </div>
@@ -445,20 +478,28 @@ export default function Home() {
           </div>
         )}
 
+        {/* Tab: Game Detail / Purchase */}
         {activeTab === 'shop' && selectedGame && (
           <div className="space-y-6">
             <button onClick={() => setSelectedGame(null)} className="text-xs bg-[#111e33] border border-gray-800 text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-800 transition">
               ← နောက်သို့
             </button>
 
-            <div className="bg-[#111e33] p-4 rounded-2xl border border-blue-900/40 flex items-center gap-3">
-              <span className="text-2xl">🎮</span>
+            <div className="bg-[#111e33] p-4 rounded-2xl border border-blue-900/40 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-950/80 border border-blue-800/50 flex-shrink-0 flex items-center justify-center p-1">
+                {selectedGame.image ? (
+                  <img src={selectedGame.image} alt={selectedGame.name} className="w-full h-full object-contain rounded-xl" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
+                ) : (
+                  <span className="text-2xl">🎮</span>
+                )}
+              </div>
               <div>
                 <h2 className="font-bold text-white text-base">{selectedGame.name}</h2>
                 <p className="text-xs text-gray-400">ဂိမ်း ID ဖြည့်သွင်းပြီး စိန်/UC များ ဝယ်ယူပါ</p>
               </div>
             </div>
 
+            {/* Account Info */}
             <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-xs font-bold text-gray-200">❶ အကောင့်အချက်အလက်</span>
@@ -497,6 +538,7 @@ export default function Home() {
               )}
             </div>
 
+            {/* Packages */}
             <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-3">
               <span className="text-xs font-bold text-gray-200">❷ ပက်ကေ့ဂျ် ရွေးချယ်ပါ</span>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -513,6 +555,7 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Payment Method */}
             <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-4">
               <span className="text-xs font-bold text-gray-200">❸ ငွေပေးချေမှု နည်းလမ်း</span>
               <div className="grid grid-cols-2 gap-3">
@@ -551,6 +594,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* Tab: MLBB Checker Tab */}
         {activeTab === 'mlbb_check' && (
           <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-4 max-w-md mx-auto">
             <div className="text-center space-y-1">
@@ -591,6 +635,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* Tab: Wallet Topup */}
         {activeTab === 'wallet' && (
           <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-6 max-w-lg mx-auto">
             <div className="flex justify-between items-center border-b border-gray-800 pb-4">
@@ -632,6 +677,7 @@ export default function Home() {
           </div>
         )}
 
+        {/* Tab: Search Voucher */}
         {activeTab === 'search' && (
           <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-4 max-w-lg mx-auto">
             <h2 className="text-base font-bold text-white text-center">📦 ဘောက်ချာ / အော်ဒါ ရှာဖွေရန်</h2>
@@ -671,10 +717,12 @@ export default function Home() {
             <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-blue-600/30 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative backdrop-blur-xl bg-white/[0.07] border border-white/20 p-8 rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] space-y-6">
+              {/* Shop Logo Badge */}
               <div className="flex justify-center">
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-full blur opacity-80 group-hover:opacity-100 transition duration-300"></div>
-                  <div className="relative w-20 h-20 rounded-full bg-[#0a1220] border-2 border-white/40 p-2 flex items-center justify-center shadow-2xl">
+                  <div className="relative w-20 h-20 rounded-full bg-[#0a1220] border-2 border-white/40 p-1 flex items-center justify-center shadow-2xl overflow-hidden">
+                    <img src="/logo.png" alt="Shop Logo" className="w-full h-full object-cover rounded-full" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
                     <div className="w-full h-full rounded-full bg-blue-600 flex items-center justify-center font-black text-xl text-white shadow-inner">
                       PG
                     </div>
