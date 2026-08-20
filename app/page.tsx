@@ -2,27 +2,15 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-
-const BOT_TOKEN = '8916421457:AAFu5PmrlTX-czip1Hub8TLqVR8TWRvQiW4';
-const CHAT_ID = '1934339791';
-
-const GAMES = [
-  { id: 'mlbb', name: 'Mobile Legends: Bang Bang', image: '/mlbb.jpg' },
-  { id: 'pubg', name: 'PUBG Mobile UC', image: '/pubg.jpg' },
-  { id: 'pubg_uc_pack', name: 'PUBG UC PACK', image: '/pubg.jpg' },
-  { id: 'telegram', name: 'Telegram Star & Premium', image: '/telegram.jpg' },
-  { id: 'heartopia', name: 'Heartopia', image: '/heartopia.jpg' },
-];
+import React, { useState, useEffect } from 'react';
 
 const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number }[]> = {
   mlbb: [
-    { id: 'mlbb_1', name: '55 Diamonds', price: 3461 },
+    { id: 'mlbb_1', name: '55 Diamonds', price: 3300 },
     { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 },
     { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
-    { id: 'mlbb_5', name: 'Weekly Pass', price: 6600 },
+    { id: 'mlbb_5', name: 'Weekly Pass', price: 6350 },
     { id: 'mlbb_6', name: 'Weekly Pass x 2', price: 13200 },
     { id: 'mlbb_7', name: 'Weekly Pass x 3', price: 19800 },
     { id: 'mlbb_8', name: 'Weekly Pass x 4', price: 26400 },
@@ -30,9 +18,9 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'mlbb_10', name: 'Twilight Pass', price: 35712 },
     { id: 'mlbb_11', name: 'Weekly Elite Bundle', price: 3461 },
     { id: 'mlbb_12', name: 'Monthly Epic Bundle', price: 17434 },
-    { id: 'mlbb_13', name: '86 Diamonds', price: 5457 },
+    { id: 'mlbb_13', name: '86 Diamonds', price: 5150 },
     { id: 'mlbb_14', name: '172 Diamonds', price: 10824 },
-    { id: 'mlbb_15', name: '257 Diamonds', price: 15678 },
+    { id: 'mlbb_15', name: '257 Diamonds', price: 14900 },
     { id: 'mlbb_16', name: '343 Diamonds', price: 21134 },
     { id: 'mlbb_17', name: '429 Diamonds', price: 26502 },
     { id: 'mlbb_18', name: '514 Diamonds', price: 31355 },
@@ -63,7 +51,7 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'mlbb_43', name: '6752 Diamonds', price: 398677 },
     { id: 'mlbb_44', name: '7030 Diamonds', price: 415366 },
     { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 },
-    { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 },
+    { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
   ],
   pubg: [
     { id: 'pubg_1', name: '60 UC', price: 4106 },
@@ -79,7 +67,7 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'pubg_11', name: '5900 UC', price: 367277 },
     { id: 'pubg_12', name: '8100 UC', price: 504112 },
     { id: 'pubg_13', name: 'Royale Pass Upgrade', price: 27885 },
-    { id: 'pubg_14', name: 'Royale Pass Upgrade Plus', price: 73906 },
+    { id: 'pubg_14', name: 'Royale Pass Upgrade Plus', price: 73906 }
   ],
   pubg_uc_pack: [
     { id: 'p_pack_1', name: 'First Purchase Pack', price: 4059 },
@@ -97,7 +85,7 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'p_pack_13', name: 'Elite Pass LV1-100', price: 49324 },
     { id: 'p_pack_14', name: 'Prime Plus (3 Months)', price: 121787 },
     { id: 'p_pack_15', name: 'Prime Plus (6 Months)', price: 239885 },
-    { id: 'p_pack_16', name: 'Prime Plus (12 Months)', price: 484384 },
+    { id: 'p_pack_16', name: 'Prime Plus (12 Months)', price: 484384 }
   ],
   telegram: [
     { id: 'tg_1', name: '50 Stars', price: 3552 },
@@ -115,7 +103,7 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'tg_13', name: '10K Stars', price: 705816 },
     { id: 'tg_14', name: '3 months premium', price: 56420 },
     { id: 'tg_15', name: '6 months premium', price: 75241 },
-    { id: 'tg_16', name: '12 months premium', price: 136412 },
+    { id: 'tg_16', name: '12 months premium', price: 136412 }
   ],
   heartopia: [
     { id: 'heart_1', name: '20 Heart Diamond', price: 2588 },
@@ -130,116 +118,75 @@ const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number
     { id: 'heart_10', name: 'GAMG Formal Membership', price: 15057 },
     { id: 'heart_11', name: 'Fashionwave Gift Box', price: 24846 },
     { id: 'heart_12', name: 'Fashionwave Gift Box Upgrade', price: 31102 },
-    { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 },
+    { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 }
   ]
 };
 
-const LIVE_PURCHASES = [
-  { user: 'KoNa', item: '55 Diamonds', time: 'လွန်ခဲ့သော 2 မိနစ်က' },
-  { user: 'KyawOo', item: '60 UC', time: 'လွန်ခဲ့သော 5 မိနစ်က' },
-  { user: 'SuMon', item: 'Weekly Pass', time: 'လွန်ခဲ့သော 8 မိနစ်က' },
-  { user: 'AungMin', item: '100 Stars', time: 'လွန်ခဲ့သော 12 မိနစ်က' },
+const GAMES = [
+  { id: 'mlbb', name: 'Mobile Legends: Bang Bang', category: 'Game Topup' },
+  { id: 'pubg', name: 'PUBG Mobile', category: 'Game Topup' },
+  { id: 'pubg_uc_pack', name: 'PUBG UC Pack & Pass', category: 'Game Topup' },
+  { id: 'telegram', name: 'Telegram Stars & Premium', category: 'Social App' },
+  { id: 'heartopia', name: 'Heartopia', category: 'Game Topup' }
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'shop' | 'categories' | 'search' | 'wallet' | 'login' | 'mlbb_check'>('shop');
-  const [selectedGame, setSelectedGame] = useState<typeof GAMES[0] | null>(null);
+  const [activeTab, setActiveTab] = useState<'shop' | 'search' | 'mlbb_check' | 'wallet' | 'login'>('shop');
+  const [packages, setPackages] = useState(INITIAL_PACKAGES);
+  const [selectedGame, setSelectedGame] = useState<any>(null);
+  const [selectedPkg, setSelectedPkg] = useState<any>(null);
+  const [userId, setUserId] = useState('');
+  const [zoneId, setZoneId] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'slip'>('wallet');
+  const [loading, setLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
 
-  const [balance, setBalance] = useState(0);
+  // MLBB Checker
+  const [checkMlbbId, setCheckMlbbId] = useState('');
+  const [checkMlbbZone, setCheckMlbbZone] = useState('');
+  const [checkingMlbb, setCheckingMlbb] = useState(false);
+  const [mlbbCheckResult, setMlbbCheckResult] = useState<any>(null);
+
+  // Auth & Balance
   const [currentAuthUser, setCurrentAuthUser] = useState<any>(null);
-
+  const [balance, setBalance] = useState<number>(0);
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authMsg, setAuthMsg] = useState('');
 
-  const [userId, setUserId] = useState('');
-  const [zoneId, setZoneId] = useState('');
-  const [packages, setPackages] = useState(INITIAL_PACKAGES);
-  useEffect(() => {
-    const fetchPrices = async () => {
-      try {
-        const res = await fetch('/api/prices', { cache: 'no-store' });
-        const result = await res.json();
-        if (result.data && result.data.length > 0) {
-          setPackages(prev => {
-            const updated = JSON.parse(JSON.stringify(prev));
-            result.data.forEach((item: any) => {
-              if (updated[item.game_id]) {
-                updated[item.game_id] = updated[item.game_id].map((p: any) =>
-                  p.id === item.id ? { ...p, price: item.price } : p
-                );
-              }
-            });
-            return updated;
-          });
-        }
-      } catch (err) {
-        console.error('Failed to load prices', err);
-      }
-    };
-    fetchPrices();
-  }, []);
-
-  const [selectedPkg, setSelectedPkg] = useState<{ id: string; name: string; price: number } | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'slip' | 'wallet'>('slip');
-  const [slipFile, setSlipFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [statusMsg, setStatusMsg] = useState('');
-
+  // Search Orders
   const [searchOrderId, setSearchOrderId] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
 
-  const [userNotification, setUserNotification] = useState<string | null>(null);
-
-  const [checkMlbbId, setCheckMlbbId] = useState('');
-  const [checkMlbbZone, setCheckMlbbZone] = useState('');
-  const [mlbbCheckResult, setMlbbCheckResult] = useState<any>(null);
-  const [checkingMlbb, setCheckingMlbb] = useState(false);
-
+  // Wallet Topup
   const [topupAmount, setTopupAmount] = useState('');
-  const [topupSlip, setTopupSlip] = useState<File | null>(null);
   const [topupNote, setTopupNote] = useState('');
   const [topupLoading, setTopupLoading] = useState(false);
 
-  useEffect(() => {
-    fetchPricesFromDB();
-    fetchUserBalance();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setCurrentAuthUser(session.user);
-        fetchUserBalance();
-      } else {
-        setCurrentAuthUser(null);
-        setBalance(0);
+  const fetchPricesFromDB = async () => {
+    try {
+      const res = await fetch('/api/prices', { cache: 'no-store' });
+      const data = await res.json();
+      if (data && data.data && data.data.length > 0) {
+        const grouped: Record<string, any[]> = {};
+        data.data.forEach((item: any) => {
+          if (!grouped[item.game_id]) grouped[item.game_id] = [];
+          grouped[item.game_id].push({ id: item.id, name: item.package_name, price: item.price });
+        });
+        setPackages(prev => ({ ...prev, ...grouped }));
       }
-    });
-
-    const orderSubscription = supabase
-      .channel('orders-realtime-notification')
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, (payload) => {
-        if (payload.new && payload.new.status === 'completed') {
-          if (userId && payload.new.player_id === userId) {
-            setUserNotification('🎉 ငွေဖြည့်ပြီးပါပြီ! သင့်အော်ဒါ အောင်မြင်စွာ ဆောင်ရွက်ပြီးပါပြီ။');
-          }
-          fetchUserBalance();
-        }
-      })
-      .subscribe();
-
-    return () => {
-      authListener.subscription.unsubscribe();
-      supabase.removeChannel(orderSubscription);
-    };
-  }, [userId]);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const fetchUserBalance = async (userObj = currentAuthUser) => {
     if (!userObj) return;
     try {
-      const res = await fetch(`/api/user?id=${userObj.id}&email=${userObj.email || ''}`, { cache: 'no-store' });
+      const res = await fetch('/api/user?id=' + userObj.id + '&email=' + (userObj.email || ''), { cache: 'no-store' });
       const json = await res.json();
       if (json && typeof json.balance === 'number') {
         setBalance(json.balance);
@@ -249,17 +196,17 @@ export default function Home() {
     }
   };
 
-  const fetchPricesFromDB = async () => {
-    const { data } = await supabase.from('prices').select('*');
-    if (data && data.length > 0) {
-      const grouped: Record<string, any[]> = {};
-      data.forEach((item) => {
-        if (!grouped[item.game_id]) grouped[item.game_id] = [];
-        grouped[item.game_id].push({ id: item.id, name: item.package_name, price: item.price });
-      });
-      setPackages(prev => ({ ...prev, ...grouped }));
+  useEffect(() => {
+    fetchPricesFromDB();
+    const savedUser = localStorage.getItem('pg_shop_user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        setCurrentAuthUser(user);
+        fetchUserBalance(user);
+      } catch (e) {}
     }
-  };
+  }, []);
 
   const handleMlbbCheck = async (e?: React.FormEvent, targetId?: string, targetZone?: string) => {
     if (e) e.preventDefault();
@@ -275,12 +222,12 @@ export default function Home() {
     setMlbbCheckResult(null);
 
     try {
-      const res = await fetch(`/api/mlbb-check?userId=${id}&zoneId=${zone}`);
+      const res = await fetch('/api/mlbb-check?userId=' + id + '&zoneId=' + zone);
       const result = await res.json();
 
       if (res.ok && result.success) {
         setMlbbCheckResult({
-          name: `${result.name} (${zone}) - ✨ 2x Bonus ရရှိနိုင်`
+          name: result.name + ' (' + zone + ') - ✨ 2x Bonus ရရှိနိုင်',
         });
       } else {
         setMlbbCheckResult({ error: result.error || 'အကောင့် ရှာမတွေ့ပါ' });
@@ -313,16 +260,17 @@ export default function Home() {
         throw new Error(result.error || 'လုပ်ဆောင်မှု မအောင်မြင်ပါ');
       }
 
+      const userData = result.data?.user || { id: authEmail, email: authEmail };
+      setCurrentAuthUser(userData);
+      localStorage.setItem('pg_shop_user', JSON.stringify(userData));
+
       if (isSignUp) {
         setAuthMsg('✅ အကောင့်သစ် အောင်မြင်စွာ ဖွင့်ပြီးပါပြီ!');
       } else {
         setAuthMsg('✅ Login အောင်မြင်စွာ ဝင်ပြီးပါပြီ!');
       }
 
-      if (result.data?.user) {
-        setCurrentAuthUser(result.data.user);
-      }
-      fetchUserBalance(result.data?.user || currentAuthUser);
+      fetchUserBalance(userData);
       setTimeout(() => setActiveTab('shop'), 1000);
     } catch (err: any) {
       setAuthMsg('❌ အမှား ဖြစ်ပွားပါသည်: ' + (err.message || err));
@@ -331,8 +279,8 @@ export default function Home() {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
+    localStorage.removeItem('pg_shop_user');
     setCurrentAuthUser(null);
     setBalance(0);
     alert('Logged out successful');
@@ -345,10 +293,12 @@ export default function Home() {
       return;
     }
 
-    if (paymentMethod === 'slip' && !slipFile) {
-      alert('ကျေးဇူးပြု၍ ငွေလွှဲစလစ် (Slip) ပုံတင်ပေးပါ။');
+    if (paymentMethod === 'wallet' && !currentAuthUser) {
+      alert('Wallet ဖြင့် ဝယ်ယူရန် အရင်ဆုံး Login ဝင်ပေးပါ');
+      setActiveTab('login');
       return;
     }
+
     setLoading(true);
     setStatusMsg('');
     try {
@@ -363,7 +313,7 @@ export default function Home() {
           player_id: userId,
           zone_id: zoneId,
           payment_method: paymentMethod,
-          user_id: currentAuthUser?.id,
+          user_id: currentAuthUser?.id || currentAuthUser?.email,
           slip_url: paymentMethod === 'wallet' ? 'Wallet Payment' : 'Direct Slip Upload',
         }),
       });
@@ -371,23 +321,6 @@ export default function Home() {
       const result = await res.json();
       if (!res.ok || result.error) {
         throw new Error(result.error || 'အော်ဒါတင်ခြင်း မအောင်မြင်ပါ');
-      }
-
-      const caption = `🚨 Admin - အော်ဒါအသစ်ဝင်လာပါပြီ! (${paymentMethod === 'wallet' ? '💳 Wallet Payment' : '🧾 Slip Upload'})\n\n` +
-        `🎮 ဂိမ်း: ${selectedGame.name}\n` +
-        `📦 ပက်ကေ့ဂျ်: ${selectedPkg.name} (${selectedPkg.price.toLocaleString()} Ks)\n` +
-        `👤 User ID: ${userId}\n` +
-        `🏷️ Zone ID: ${zoneId || '-'}\n` +
-        `⏰ အချိန်: ${new Date().toLocaleString()}`;
-
-      try {
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: CHAT_ID, text: caption }),
-        });
-      } catch (tgErr) {
-        console.error('Telegram notification error', tgErr);
       }
 
       setStatusMsg('✅ အော်ဒါ အောင်မြင်စွာ တင်ပြီးပါပြီ!');
@@ -405,8 +338,16 @@ export default function Home() {
     e.preventDefault();
     if (!searchOrderId) return;
     setSearching(true);
-    const { data } = await supabase.from('orders').select('*').eq('player_id', searchOrderId).order('created_at', { ascending: false });
-    if (data) setSearchResults(data);
+    try {
+      const res = await fetch('/api/admin');
+      const data = await res.json();
+      if (data.orders) {
+        const found = data.orders.filter((o: any) => o.player_id === searchOrderId);
+        setSearchResults(found);
+      }
+    } catch (e) {
+      console.error(e);
+    }
     setSearching(false);
   };
 
@@ -449,81 +390,287 @@ export default function Home() {
       setTopupLoading(false);
     }
   };
+
   return (
-    <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12 relative overflow-hidden">
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#1A3054] rounded-full blur-[120px] pointer-events-none opacity-50" />
-      <div className="absolute top-1/2 right-10 w-80 h-80 bg-[#C0CAFF] rounded-full blur-[150px] pointer-events-none opacity-10" />
-
-      {userNotification && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-[#C0CAFF]/90 backdrop-blur-md text-[#1A3054] px-6 py-3.5 rounded-3xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] border border-white/40 flex items-center gap-3 animate-bounce">
-          <span className="text-xl">🔔</span>
-          <span className="font-extrabold text-xs">{userNotification}</span>
-          <button
-            onClick={() => setUserNotification(null)}
-            className="ml-2 font-bold bg-[#1A3054] text-white rounded-full w-5 h-5 text-[10px] flex items-center justify-center"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
-      <div className="bg-[#1A3054]/80 backdrop-blur-xl border-b border-[#C0CAFF]/20 py-2.5 px-4 flex justify-between items-center text-xs shadow-lg">
-        <div className="flex items-center gap-2 font-bold text-[#C0CAFF] drop-shadow">
-          <span>🌟</span>
-          <span>Paing Gyi Game Store - Official Platform</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="bg-[#0e1b30]/60 backdrop-blur px-3 py-1 rounded-full border border-[#C0CAFF]/30 text-white shadow-inner">
-            ⭐ သစ္စာရှိကုမ္ပဏီ / 24/7 အမြန်ဆုံးဝန်ဆောင်မှု
-          </span>
-        </div>
+    <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12">
+      <div className="bg-[#111e33] border-b border-blue-900/40 px-4 py-2 text-xs flex justify-between items-center text-blue-200">
+        <span className="font-semibold">🌟 Paing Gyi Game Store - Official Platform</span>
+        <span className="text-yellow-400">⭐️ သစ္စာရှိကုမ္ပဏီ / 24/7 အမြန်ဆုံးဝန်ဆောင်မှု</span>
       </div>
 
-      <div className="bg-[#0e1b30]/60 backdrop-blur border-b border-[#C0CAFF]/20 py-2 px-4 text-xs text-[#C0CAFF] overflow-hidden whitespace-nowrap">
-        <div className="inline-block animate-pulse">
-          📢 ငွေဖြည့်ချိန် ၅ မိနစ်အတွင်း အကောင့်ထဲ ရောက်ပါမည်... Paing Gyi shop မှ ကြိုဆိုပါသည်။ လူကြီးမင်းတို့၏ ဂိမ်းအကောင့်အချက်အလက်များကို မှန်ကန်စွာ ဖြည့်သွင်းပေးပါရန် မေတ္တာရပ်ခံအပ်ပါသည်။ 📢
-        </div>
-      </div>
-
-      <header className="bg-[#1A3054]/70 backdrop-blur-2xl border-b border-[#C0CAFF]/20 sticky top-0 z-40 shadow-[0_10px_30px_rgba(0,0,0,0.3)]">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center flex-wrap gap-2">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setActiveTab('shop'); setSelectedGame(null); }}>
-            {selectedGame && activeTab === 'shop' && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSelectedGame(null);
-                  setStatusMsg('');
-                }}
-                className="text-[#C0CAFF] text-xs font-bold bg-[#0e1b30]/60 backdrop-blur hover:bg-[#C0CAFF] hover:text-[#1A3054] px-3 py-1.5 rounded-2xl border border-[#C0CAFF]/40 transition-all shadow-inner"
-              >
-                ← နောက်သို့
-              </button>
-            )}
-            <img src="/logo.jpg" alt="Paing Gyi shop Logo" className="w-10 h-10 object-cover rounded-2xl border-2 border-[#C0CAFF]/80 shadow-[0_0_15px_rgba(192,202,255,0.4)]" />
-            <h1 className="text-lg font-bold tracking-wide text-white drop-shadow">
-              Paing Gyi <span className="text-[#C0CAFF]">shop</span>
-            </h1>
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111e33]/90 backdrop-blur-md p-4 rounded-2xl border border-blue-900/50">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setSelectedGame(null); setActiveTab('shop'); }}>
+            <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30">
+              PG
+            </div>
+            <div>
+              <h1 className="font-bold text-white text-base">Paing Gyi <span className="text-blue-400">shop</span></h1>
+            </div>
           </div>
-          <div className="flex gap-1.5 flex-wrap justify-end">
-            <button onClick={() => { setActiveTab('shop'); setSelectedGame(null); }} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'shop' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>ပင်မစာမျက်နှာ</button>
-            <button onClick={() => setActiveTab('categories')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'categories' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>အမျိုးအစားများ</button>
-            <button onClick={() => setActiveTab('search')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'search' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>အော်ဒါရှာမည်</button>
-            <button onClick={() => setActiveTab('mlbb_check')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'mlbb_check' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>MLBB စစ်ဆေးမည်</button>
-            <button onClick={() => setActiveTab('wallet')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'wallet' ? 'bg-[#C0CAFF] text-[#1A3054] shadow-[0_0_15px_rgba(192,202,255,0.5)]' : 'bg-[#1A3054]/50 backdrop-blur text-gray-300 border border-[#C0CAFF]/30 hover:border-[#C0CAFF]'}`}>Wallet ({balance.toLocaleString()} Ks)</button>
+
+          <div className="flex flex-wrap gap-2 text-xs">
+            <button onClick={() => { setSelectedGame(null); setActiveTab('shop'); }} className={'px-3 py-1.5 rounded-xl border transition ' + (activeTab === 'shop' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ပင်မစာမျက်နှာ</button>
+            <button onClick={() => setActiveTab('search')} className={'px-3 py-1.5 rounded-xl border transition ' + (activeTab === 'search' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ဘောက်ချာရှာမည်</button>
+            <button onClick={() => setActiveTab('mlbb_check')} className={'px-3 py-1.5 rounded-xl border transition ' + (activeTab === 'mlbb_check' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>MLBB စစ်ဆေးမည်</button>
+            <button onClick={() => setActiveTab('wallet')} className={'px-3 py-1.5 rounded-xl border transition ' + (activeTab === 'wallet' ? 'bg-yellow-600 text-white border-yellow-500' : 'bg-[#0a1220] border-gray-800 text-yellow-400 font-bold')}>Wallet ({balance.toLocaleString()} Ks)</button>
             {currentAuthUser ? (
-              <button onClick={handleLogout} className="px-3 py-1.5 rounded-2xl text-xs font-bold bg-rose-600/80 backdrop-blur text-white border border-rose-700 shadow-inner">Logout</button>
+              <button onClick={handleLogout} className="bg-red-600/80 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl transition">Logout</button>
             ) : (
-              <button onClick={() => setActiveTab('login')} className={`px-3 py-1.5 rounded-2xl text-xs font-bold transition-all shadow-inner ${activeTab === 'login' && (
+              <button onClick={() => setActiveTab('login')} className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl transition font-medium">ဝင်ရောက်မည်</button>
+            )}
+          </div>
+        </div>
+
+        {activeTab === 'shop' && !selectedGame && (
+          <div className="space-y-4">
+            <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {GAMES.map(game => (
+                <div
+                  key={game.id}
+                  onClick={() => { setSelectedGame(game); setSelectedPkg(null); setMlbbCheckResult(null); }}
+                  className="bg-[#111e33] border border-blue-900/40 hover:border-blue-500/80 p-4 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] flex items-center gap-4"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-blue-950 flex items-center justify-center text-xl font-bold text-blue-400">
+                    🎮
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white text-sm">{game.name}</h3>
+                    <p className="text-[11px] text-gray-400">{game.category}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'shop' && selectedGame && (
+          <div className="space-y-6">
+            <button onClick={() => setSelectedGame(null)} className="text-xs bg-[#111e33] border border-gray-800 text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-800 transition">
+              ← နောက်သို့
+            </button>
+
+            <div className="bg-[#111e33] p-4 rounded-2xl border border-blue-900/40 flex items-center gap-3">
+              <span className="text-2xl">🎮</span>
+              <div>
+                <h2 className="font-bold text-white text-base">{selectedGame.name}</h2>
+                <p className="text-xs text-gray-400">ဂိမ်း ID ဖြည့်သွင်းပြီး စိန်/UC များ ဝယ်ယူပါ</p>
+              </div>
+            </div>
+
+            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-gray-200">❶ အကောင့်အချက်အလက်</span>
+                {selectedGame.id === 'mlbb' && (
+                  <button
+                    onClick={() => handleMlbbCheck(undefined, userId, zoneId)}
+                    disabled={checkingMlbb}
+                    className="text-[11px] bg-blue-600/80 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition"
+                  >
+                    {checkingMlbb ? 'စစ်နေသည်...' : '🔍 ID စစ်မည်'}
+                  </button>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  placeholder="User ID"
+                  value={userId}
+                  onChange={e => setUserId(e.target.value)}
+                  className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+                />
+                <input
+                  type="text"
+                  placeholder="Zone ID (optional)"
+                  value={zoneId}
+                  onChange={e => setZoneId(e.target.value)}
+                  className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+                />
+              </div>
+
+              {mlbbCheckResult && (
+                <div className={'p-3 rounded-xl text-xs font-semibold ' + (mlbbCheckResult.error ? 'bg-red-900/40 text-red-400 border border-red-800' : 'bg-green-900/40 text-green-300 border border-green-800')}>
+                  {mlbbCheckResult.error ? '❌ ' + mlbbCheckResult.error : '✅ အကောင့်အမည်: ' + mlbbCheckResult.name}
+                </div>
+              )}
+            </div>
+
+            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-3">
+              <span className="text-xs font-bold text-gray-200">❷ ပက်ကေ့ဂျ် ရွေးချယ်ပါ</span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {(packages[selectedGame.id] || []).map((pkg: any) => (
+                  <div
+                    key={pkg.id}
+                    onClick={() => setSelectedPkg(pkg)}
+                    className={'p-3 rounded-xl border cursor-pointer transition text-center ' + (selectedPkg?.id === pkg.id ? 'bg-blue-600/30 border-blue-400 shadow-md shadow-blue-500/20' : 'bg-[#0a1220] border-gray-800 hover:border-gray-700')}
+                  >
+                    <p className="text-xs font-bold text-white">{pkg.name}</p>
+                    <p className="text-xs text-yellow-400 font-semibold mt-1">{pkg.price.toLocaleString()} Ks</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-4">
+              <span className="text-xs font-bold text-gray-200">❸ ငွေပေးချေမှု နည်းလမ်း</span>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('wallet')}
+                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'wallet' ? 'bg-blue-600/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
+                >
+                  💳 Wallet Balance
+                  <p className="text-[10px] font-normal text-yellow-400 mt-1">လက်ကျန်: {balance.toLocaleString()} Ks</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('slip')}
+                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'slip' ? 'bg-blue-600/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
+                >
+                  🧾 Direct Slip Upload
+                  <p className="text-[10px] font-normal text-gray-400 mt-1">ငွေလွှဲစလစ် တင်မည်</p>
+                </button>
+              </div>
+
+              {statusMsg && (
+                <div className={'p-3 rounded-xl text-xs font-semibold ' + (statusMsg.includes('✅') ? 'bg-green-900/40 text-green-300 border border-green-800' : 'bg-red-900/40 text-red-400 border border-red-800')}>
+                  {statusMsg}
+                </div>
+              )}
+
+              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50 text-sm shadow-lg shadow-blue-600/30"
+              >
+                {loading ? 'ဆောင်ရွက်နေပါသည်...' : 'ယခု ဝယ်ယူမည်'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'mlbb_check' && (
+          <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-4 max-w-md mx-auto">
+            <div className="text-center space-y-1">
+              <span className="text-3xl">🎮</span>
+              <h2 className="text-lg font-bold text-white">MLBB User ID စစ်ဆေးရန်</h2>
+              <p className="text-xs text-gray-400">In-Game Name မှန်မမှန် အလိုအလျောက် စစ်ဆေးပေးပါသည်</p>
+            </div>
+
+            <form onSubmit={e => handleMlbbCheck(e)} className="space-y-3">
+              <input
+                type="text"
+                placeholder="User ID"
+                value={checkMlbbId}
+                onChange={e => setCheckMlbbId(e.target.value)}
+                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+              />
+              <input
+                type="text"
+                placeholder="Zone ID"
+                value={checkMlbbZone}
+                onChange={e => setCheckMlbbZone(e.target.value)}
+                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+              />
+              <button
+                type="submit"
+                disabled={checkingMlbb}
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition disabled:opacity-50"
+              >
+                {checkingMlbb ? 'စစ်ဆေးနေပါသည်...' : 'စစ်ဆေးမည်'}
+              </button>
+            </form>
+
+            {mlbbCheckResult && (
+              <div className={'p-4 rounded-xl text-xs font-semibold ' + (mlbbCheckResult.error ? 'bg-red-900/40 text-red-400 border border-red-800' : 'bg-green-900/40 text-green-300 border border-green-800')}>
+                {mlbbCheckResult.error ? '❌ ' + mlbbCheckResult.error : '✅ အကောင့်အမည်: ' + mlbbCheckResult.name}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'wallet' && (
+          <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-6 max-w-lg mx-auto">
+            <div className="flex justify-between items-center border-b border-gray-800 pb-4">
+              <div>
+                <h2 className="text-base font-bold text-white">💰 လက်ရှိလက်ကျန်ငွေ</h2>
+                <p className="text-xl font-extrabold text-yellow-400">{balance.toLocaleString()} Ks</p>
+              </div>
+            </div>
+
+            <div className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 space-y-2 text-xs">
+              <p className="text-gray-400 font-bold">💳 ငွေလွှဲပေးချေမှု အကောင့်များ</p>
+              <div className="flex justify-between text-gray-300"><span>Wave / KBZPay:</span><span className="font-mono text-yellow-400">09967241357</span></div>
+              <div className="flex justify-between text-gray-300"><span>အကောင့်ပိုင်ရှင်:</span><span>U Ye Paing Oo</span></div>
+            </div>
+
+            <form onSubmit={handleTopupSubmit} className="space-y-3">
+              <input
+                type="number"
+                placeholder="ငွေပမာဏ (Ks) - ဥပမာ 10000"
+                value={topupAmount}
+                onChange={e => setTopupAmount(e.target.value)}
+                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+                required
+              />
+              <textarea
+                placeholder="မှတ်ချက် (ငွေလွှဲနောက်ဆုံး ၄ လုံး စသည်)"
+                value={topupNote}
+                onChange={e => setTopupNote(e.target.value)}
+                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500 h-20"
+              />
+              <button
+                type="submit"
+                disabled={topupLoading}
+                className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 rounded-xl text-xs transition disabled:opacity-50"
+              >
+                {topupLoading ? 'တောင်းဆိုနေပါသည်...' : 'ငွေဖြည့်တောင်းဆိုမည်'}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {activeTab === 'search' && (
+          <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-4 max-w-lg mx-auto">
+            <h2 className="text-base font-bold text-white text-center">📦 ဘောက်ချာ / အော်ဒါ ရှာဖွေရန်</h2>
+            <form onSubmit={handleSearchOrder} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="Player ID သို့မဟုတ် User Email"
+                value={searchOrderId}
+                onChange={e => setSearchOrderId(e.target.value)}
+                className="flex-1 bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+              />
+              <button type="submit" disabled={searching} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-3 rounded-xl text-xs font-bold transition">
+                {searching ? 'ရှာနေသည်...' : 'ရှာမည်'}
+              </button>
+            </form>
+
+            <div className="space-y-2 mt-4">
+              {searchResults.map((o: any) => (
+                <div key={o.id} className="bg-[#0a1220] p-3 rounded-xl border border-gray-800 text-xs flex justify-between items-center">
+                  <div>
+                    <p className="font-bold text-white">{o.package_name}</p>
+                    <p className="text-gray-400 text-[10px]">ID: {o.player_id} | {o.price} Ks</p>
+                  </div>
+                  <span className={'px-2 py-0.5 rounded text-[10px] font-bold ' + (o.status === 'approved' || o.status === 'completed' ? 'bg-green-900/60 text-green-400' : o.status === 'rejected' ? 'bg-red-900/60 text-red-400' : 'bg-yellow-900/60 text-yellow-400')}>
+                    {o.status || 'pending'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Login / Signup (Glassmorphism UI with Shop Logo) */}
+        {activeTab === 'login' && (
           <div className="relative max-w-md mx-auto my-6 p-2">
-            {/* Background Ambient Glows */}
             <div className="absolute -top-6 -left-6 w-48 h-48 bg-purple-600/30 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-blue-600/30 rounded-full blur-3xl pointer-events-none" />
 
-            {/* Glassmorphism Card */}
             <div className="relative backdrop-blur-xl bg-white/[0.07] border border-white/20 p-8 rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] space-y-6">
-              
-              {/* Shop Logo Badge */}
               <div className="flex justify-center">
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-full blur opacity-80 group-hover:opacity-100 transition duration-300"></div>
@@ -535,7 +682,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Title */}
               <div className="text-center space-y-1.5">
                 <h2 className="text-2xl font-extrabold text-white tracking-wide">
                   {isSignUp ? 'Create Account' : 'Welcome Back!'}
@@ -545,7 +691,6 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Auth Form */}
               <form onSubmit={handleAuthSubmit} className="space-y-4">
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
@@ -580,7 +725,7 @@ export default function Home() {
                 </div>
 
                 {authMsg && (
-                  <div className={`p-3 rounded-xl text-xs text-center font-medium ${authMsg.includes('✅') ? 'bg-green-500/20 border border-green-500/30 text-green-300' : 'bg-red-500/20 border border-red-500/30 text-red-300'}`}>
+                  <div className={'p-3 rounded-xl text-xs text-center font-medium ' + (authMsg.includes('✅') ? 'bg-green-500/20 border border-green-500/30 text-green-300' : 'bg-red-500/20 border border-red-500/30 text-red-300')}>
                     {authMsg}
                   </div>
                 )}
