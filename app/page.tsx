@@ -127,31 +127,31 @@ const GAMES = [
     id: 'mlbb', 
     name: 'Mobile Legends: Bang Bang', 
     category: 'Game Topup', 
-    image: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/Mobile_Legends_Bang_Bang_logo.svg/512px-Mobile_Legends_Bang_Bang_logo.svg.png' 
+    image: '/games/mlbb.png' 
   },
   { 
     id: 'pubg', 
     name: 'PUBG Mobile', 
     category: 'Game Topup', 
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PUBG_Mobile_Logo.svg/512px-PUBG_Mobile_Logo.svg.png' 
+    image: '/games/pubg.png' 
   },
   { 
     id: 'pubg_uc_pack', 
     name: 'PUBG UC Pack & Pass', 
     category: 'Game Topup', 
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PUBG_Mobile_Logo.svg/512px-PUBG_Mobile_Logo.svg.png' 
+    image: '/games/pubg.png' 
   },
   { 
     id: 'telegram', 
     name: 'Telegram Stars & Premium', 
     category: 'Social App', 
-    image: 'https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg' 
+    image: '/games/telegram.png' 
   },
   { 
     id: 'heartopia', 
     name: 'Heartopia', 
     category: 'Game Topup', 
-    image: 'https://cdn-icons-png.flaticon.com/512/833/833472.png' 
+    image: '/games/heartopia.png' 
   }
 ];
 
