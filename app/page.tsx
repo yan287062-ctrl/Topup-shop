@@ -127,31 +127,31 @@ const GAMES = [
     id: 'mlbb', 
     name: 'Mobile Legends: Bang Bang', 
     category: 'Game Topup', 
-    image: '/games/mlbb.png' 
+    image: 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/en/thumb/e/e0/Mobile_Legends_Bang_Bang_logo.svg/512px-Mobile_Legends_Bang_Bang_logo.svg.png' 
   },
   { 
     id: 'pubg', 
     name: 'PUBG Mobile', 
     category: 'Game Topup', 
-    image: '/games/pubg.png' 
+    image: 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PUBG_Mobile_Logo.svg/512px-PUBG_Mobile_Logo.svg.png' 
   },
   { 
     id: 'pubg_uc_pack', 
     name: 'PUBG UC Pack & Pass', 
     category: 'Game Topup', 
-    image: '/games/pubg.png' 
+    image: 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/c/cf/PUBG_Mobile_Logo.svg/512px-PUBG_Mobile_Logo.svg.png' 
   },
   { 
     id: 'telegram', 
     name: 'Telegram Stars & Premium', 
     category: 'Social App', 
-    image: '/games/telegram.png' 
+    image: 'https://images.weserv.nl/?url=upload.wikimedia.org/wikipedia/commons/thumb/8/82/Telegram_logo.svg/512px-Telegram_logo.svg.png' 
   },
   { 
     id: 'heartopia', 
     name: 'Heartopia', 
     category: 'Game Topup', 
-    image: '/games/heartopia.png' 
+    image: 'https://images.weserv.nl/?url=cdn-icons-png.flaticon.com/512/833/833472.png' 
   }
 ];
 
@@ -429,7 +429,6 @@ export default function Home() {
         <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111e33]/90 backdrop-blur-md p-4 rounded-2xl border border-blue-900/50">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setSelectedGame(null); setActiveTab('shop'); }}>
             <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/30 border border-blue-400/40">
-              <img src="/logo.png" alt="PG" className="w-full h-full object-cover" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
               <span className="text-sm font-black">PG</span>
             </div>
             <div>
