@@ -273,72 +273,7 @@ export default function AdminPage() {
               <div className="relative group">
                 <div className="absolute -inset-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-full blur opacity-80 group-hover:opacity-100 transition duration-300"></div>
                 <div className="relative w-20 h-20 rounded-full bg-[#0a1220] border-2 border-white/40 p-1 flex items-center justify-center shadow-2xl overflow-hidden">
-                  <img src="/logo.png" alt="Admin Logo" className="w-full h-full object-cover rounded-full" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
-                  <span className="text-xl font-black text-white">PG</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Title */}
-            <div className="text-center space-y-1.5">
-              <h2 className="text-2xl font-extrabold text-white tracking-wide">
-                Admin Portal
-              </h2>
-              <p className="text-xs text-gray-300 font-light">
-                Paing Gyi Shop Management Panel
-              </p>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
-                <input
-                  type="password"
-                  placeholder="Admin Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-white/[0.08] border border-white/15 focus:border-blue-400 focus:bg-white/[0.14] text-white text-xs rounded-2xl pl-12 pr-4 py-3.5 outline-none transition-all placeholder:text-gray-400 shadow-inner"
-                  required
-                />
-              </div>
-
-              {loginError && (
-                <div className="p-3 rounded-xl text-xs text-center font-medium bg-red-500/20 border border-red-500/30 text-red-300">
-                  {loginError}
-                </div>
-              )}
-
-              <button
-                type="submit"
-                className="w-full relative group overflow-hidden rounded-2xl p-[1px] font-semibold text-white shadow-xl transition-all active:scale-95 mt-2"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 transition-all duration-300 group-hover:brightness-110"></div>
-                <div className="relative px-6 py-3.5 rounded-2xl bg-transparent flex items-center justify-center gap-2 text-sm tracking-wider font-bold">
-                  🔐 Login to Admin
-                </div>
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Authenticated Admin Dashboard
-  return (
-    <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12">
-      <div className="max-w-6xl mx-auto p-4 space-y-6">
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111e33]/90 backdrop-blur-md p-4 rounded-2xl border border-blue-900/50">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center font-bold text-white border border-blue-400/40">
-              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover rounded-full" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
-              <span className="text-sm font-black">PG</span>
+                  <img src="/logo.png" alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
             <div>
               <h1 className="font-bold text-white text-base">Paing Gyi <span className="text-blue-400">Admin Panel</span></h1>
