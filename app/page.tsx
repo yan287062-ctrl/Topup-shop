@@ -127,31 +127,31 @@ const GAMES = [
     id: 'mlbb', 
     name: 'Mobile Legends: Bang Bang', 
     category: 'Game Topup', 
-    image: 'https://play-lh.googleusercontent.com/492G-Z-p3_mQhV6F5_GZqTqgC_B0l9MhY9yYj7X8K-qJ4mN2e6R7vT1uF8pA3s2x4w=w240-h480' 
+    image: '/games/mlbb.png' 
   },
   { 
     id: 'pubg', 
     name: 'PUBG Mobile', 
     category: 'Game Topup', 
-    image: 'https://play-lh.googleusercontent.com/JRd05PYGvhD-BeRRgahUdznDREduvYA600ZiMfioTxxn-hfTGnMrL-CinWdr462pgPU=w240-h480' 
+    image: '/games/pubg.png' 
   },
   { 
     id: 'pubg_uc_pack', 
     name: 'PUBG UC Pack & Pass', 
     category: 'Game Topup', 
-    image: 'https://play-lh.googleusercontent.com/JRd05PYGvhD-BeRRgahUdznDREduvYA600ZiMfioTxxn-hfTGnMrL-CinWdr462pgPU=w240-h480' 
+    image: '/games/pubg_uc.png' 
   },
   { 
     id: 'telegram', 
     name: 'Telegram Stars & Premium', 
     category: 'Social App', 
-    image: 'https://img.freepik.com/premium-vector/star-vector-icon-isolated-black-background_1292685-485.jpg' 
+    image: '/games/telegram.png' 
   },
   { 
     id: 'heartopia', 
     name: 'Heartopia', 
     category: 'Game Topup', 
-    image: 'https://img.tapimg.net/market/images/8c34f8e5f1d1f0bb0cfcb274092b7c4a.png' 
+    image: '/games/heartopia.png' 
   }
 ];
 
