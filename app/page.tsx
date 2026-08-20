@@ -190,6 +190,19 @@ export default function Home() {
   const [topupAmount, setTopupAmount] = useState('');
   const [topupNote, setTopupNote] = useState('');
   const [topupLoading, setTopupLoading] = useState(false);
+  const [orderSlip, setOrderSlip] = useState('');
+  const [walletSlip, setWalletSlip] = useState('');
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setter(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const fetchPricesFromDB = async () => {
     try {
@@ -339,7 +352,7 @@ export default function Home() {
           zone_id: zoneId,
           payment_method: paymentMethod,
           user_id: currentAuthUser?.id || currentAuthUser?.email,
-          slip_url: paymentMethod === 'wallet' ? 'Wallet Payment' : 'Direct Slip Upload',
+          slip_url: paymentMethod === 'wallet' ? 'Wallet Payment' : (orderSlip || 'Direct Slip Upload'),
         }),
       });
 
@@ -398,7 +411,7 @@ export default function Home() {
           email: currentAuthUser.email,
           amount: Number(topupAmount),
           note: topupNote,
-          slipUrl: 'Slip Uploaded',
+          slipUrl: walletSlip || 'Slip Uploaded',
         }),
       });
       const result = await res.json();
@@ -576,6 +589,27 @@ export default function Home() {
                 </button>
               </div>
 
+              {paymentMethod === 'slip' && (
+                <div className="p-3.5 bg-[#0a1220] border border-dashed border-blue-500/50 rounded-xl space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-300 font-semibold">🧾 ငွေလွှဲပြေစာ (Slip) ပုံတင်ပါ:</span>
+                    {orderSlip && <span className="text-green-400 font-bold">✅ ပုံရွေးချယ်ပြီး</span>}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, setOrderSlip)}
+                    className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
+                    required
+                  />
+                  {orderSlip && (
+                    <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-700 mt-2">
+                      <img src={orderSlip} alt="Order Slip Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              )}
+
               {statusMsg && (
                 <div className={'p-3 rounded-xl text-xs font-semibold ' + (statusMsg.includes('✅') ? 'bg-green-900/40 text-green-300 border border-green-800' : 'bg-red-900/40 text-red-400 border border-red-800')}>
                   {statusMsg}
@@ -665,6 +699,25 @@ export default function Home() {
                 onChange={e => setTopupNote(e.target.value)}
                 className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500 h-20"
               />
+
+              <div className="p-3.5 bg-[#0a1220] border border-dashed border-yellow-500/50 rounded-xl space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-300 font-semibold">🧾 ငွေလွှဲပြေစာ (Slip) ပုံတင်ပါ:</span>
+                  {walletSlip && <span className="text-green-400 font-bold">✅ ပုံရွေးချယ်ပြီး</span>}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, setWalletSlip)}
+                  className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-yellow-600 file:text-white hover:file:bg-yellow-500 cursor-pointer"
+                  required
+                />
+                {walletSlip && (
+                  <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-700 mt-2">
+                    <img src={walletSlip} alt="Wallet Slip Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
               <button
                 type="submit"
                 disabled={topupLoading}
