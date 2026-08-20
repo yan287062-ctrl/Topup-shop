@@ -270,14 +270,28 @@ export default function Home() {
       setMlbbCheckResult({ error: 'User ID နှင့် Zone ID ရိုက်ထည့်ပါ' });
       return;
     }
+
     setCheckingMlbb(true);
     setMlbbCheckResult(null);
-    setTimeout(() => {
-      setCheckingMlbb(false);
-      setMlbbCheckResult({ name: `Verified_Gamer_${id} (${zone})` });
-    }, 800);
-  };
 
+    try {
+      const res = await fetch(`/api/mlbb-check?userId=${id}&zoneId=${zone}`);
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        setMlbbCheckResult({ 
+          name: `${result.name} (Zone: ${zone})`,
+          bonus: '✨ 2x Double Bonus ရရှိနိုင်ပါသည်'
+        });
+      } else {
+        setMlbbCheckResult({ error: result.error || 'အကောင့် အချက်အလက် ရှာမတွေ့ပါ' });
+      }
+    } catch (err) {
+      setMlbbCheckResult({ error: 'စစ်ဆေးမှု မအောင်မြင်ပါ' });
+    } finally {
+      setCheckingMlbb(false);
+    }
+  };
 
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
