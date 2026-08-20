@@ -236,16 +236,16 @@ export default function Home() {
     };
   }, [userId]);
 
-  const fetchUserBalance = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      setCurrentAuthUser(user);
-      const { data } = await supabase
-        .from('profiles')
-        .select('balance')
-        .eq('id', user.id)
-        .single();
-      if (data) setBalance(data.balance || 0);
+  const fetchUserBalance = async (userObj = currentAuthUser) => {
+    if (!userObj) return;
+    try {
+      const res = await fetch(`/api/user?id=${userObj.id}&email=${userObj.email || ''}`, { cache: 'no-store' });
+      const json = await res.json();
+      if (json && typeof json.balance === 'number') {
+        setBalance(json.balance);
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
@@ -338,87 +338,54 @@ export default function Home() {
     setLoading(true);
     setStatusMsg('');
     try {
-      let slipUrl = 'Wallet Balance Payment';
-      if (paymentMethod === 'wallet') {
-        if (!currentAuthUser) {
-          alert('Wallet ဖြင့် ဝယ်ယူရန် အရင်ဆုံး Login ဝင်ပေးပါ');
-          setActiveTab('login');
-          setLoading(false);
-          return;
-        }
-        if (balance < selectedPkg.price) {
-          alert('Wallet ထဲတွင် လက်ကျန်ငွေ မလုံလောက်ပါ။ ကျေးဇူးပြု၍ ငွေကြိုဖြည့်ပါ။');
-          setLoading(false);
-          return;
-        }
-        const newBalance = balance - selectedPkg.price;
-        const { error: balanceError } = await supabase
-          .from('profiles')
-          .update({ balance: newBalance })
-          .eq('id', currentAuthUser.id);
-        if (balanceError) throw balanceError;
-        setBalance(newBalance);
-      } else {
-        const fileExt = slipFile!.name.split('.').pop();
-        const fileName = `${Date.now()}.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from('slips')
-          .upload(fileName, slipFile!);
-        if (uploadError) throw uploadError;
-        const { data: publicURLData } = supabase.storage
-          .from('slips')
-          .getPublicUrl(fileName);
-        slipUrl = publicURLData.publicUrl;
-      }
-
-      const { error } = await supabase.from('orders').insert([
-        {
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           game_id: selectedGame.id,
           game_name: selectedGame.name,
           package_name: selectedPkg.name,
           price: selectedPkg.price,
           player_id: userId,
-          zone_id: zoneId || null,
-          slip_url: slipUrl,
-          status: paymentMethod === 'wallet' ? 'completed' : 'pending',
-        },
-      ]);
-      if (error) throw error;
+          zone_id: zoneId,
+          payment_method: paymentMethod,
+          user_id: currentAuthUser?.id,
+          slip_url: paymentMethod === 'wallet' ? 'Wallet Payment' : 'Direct Slip Upload'
+        })
+      });
 
-      const caption = `🚨 𝗔𝗱𝗺𝗶𝗻 - အော်ဒါအသစ်ဝင်လာပါပြီ! (${paymentMethod === 'wallet' ? '💳 Wallet Payment' : '🧾 Slip Upload'})\n\n` +
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        throw new Error(result.error || 'အော်ဒါတင်ခြင်း မအောင်မြင်ပါ');
+      }
+
+      // Telegram Bot သို့ Alert ပို့ခြင်း
+      const caption = `🚨 Admin - အော်ဒါအသစ်ဝင်လာပါပြီ! (${paymentMethod === 'wallet' ? '💳 Wallet Payment' : '🧾 Slip Upload'})\n\n` +
         `🎮 ဂိမ်း: ${selectedGame.name}\n` +
         `📦 ပက်ကေ့ဂျ်: ${selectedPkg.name} (${selectedPkg.price.toLocaleString()} Ks)\n` +
         `👤 User ID: ${userId}\n` +
         `🏷️ Zone ID: ${zoneId || '-'}\n` +
         `⏰ အချိန်: ${new Date().toLocaleString()}`;
 
-      if (paymentMethod === 'wallet' || !slipFile) {
+      try {
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ chat_id: CHAT_ID, text: caption }),
         });
-      } else {
-        const formData = new FormData();
-        formData.append('chat_id', CHAT_ID);
-        formData.append('photo', slipFile);
-        formData.append('caption', caption);
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-          method: 'POST',
-          body: formData,
-        });
+      } catch (tgErr) {
+        console.error('Telegram notification error', tgErr);
       }
+
       setStatusMsg('✅ အော်ဒါ အောင်မြင်စွာ တင်ပြီးပါပြီ!');
-      setUserId('');
-      setZoneId('');
-      setSelectedPkg(null);
-      setSlipFile(null);
+      if (paymentMethod === 'wallet') {
+        fetchUserBalance();
+      }
     } catch (err: any) {
-      alert('အော်ဒါ တင်၍မရပါ: ' + (err.message || 'Error occurred'));
+      setStatusMsg('❌ အမှားဖြစ်သွားပါသည်: ' + (err.message || err));
     } finally {
       setLoading(false);
     }
-  };
 
   const handleSearchOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -436,37 +403,34 @@ export default function Home() {
       setActiveTab('login');
       return;
     }
-    if (!topupAmount || !topupSlip) {
-      alert('ပမာဏနှင့် ငွေလွှဲစလစ်ပုံ ထည့်သွင်းပေးပါ။');
+    if (!topupAmount || Number(topupAmount) <= 0) {
+      alert('ဖြည့်သွင်းမည့် ငွေပမာဏ ထည့်ပါ');
       return;
     }
+
     setTopupLoading(true);
     try {
-      const fileExt = topupSlip.name.split('.').pop();
-      const fileName = `topup_${Date.now()}.${fileExt}`;
-      await supabase.storage.from('slips').upload(fileName, topupSlip);
-
-      const caption = `💰 𝗔𝗱𝗺𝗶𝗻 - ငွေဖြည့်တောင်းဆိုမှု အသစ်!\n\n` +
-        `👤 User Auth ID: ${currentAuthUser.id}\n` +
-        `📧 Email: ${currentAuthUser.email}\n` +
-        `💵 ပမာဏ: ${Number(topupAmount).toLocaleString()} Ks\n` +
-        `📝 မှတ်ချက်: ${topupNote || '-'}\n` +
-        `⏰ အချိန်: ${new Date().toLocaleString()}`;
-
-      const formData = new FormData();
-      formData.append('chat_id', CHAT_ID);
-      formData.append('photo', topupSlip);
-      formData.append('caption', caption);
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+      const res = await fetch('/api/user', {
         method: 'POST',
-        body: formData,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentAuthUser.id,
+          email: currentAuthUser.email,
+          amount: Number(topupAmount),
+          note: topupNote,
+          slipUrl: 'Slip Uploaded'
+        })
       });
-      alert('✅ ငွေဖြည့်တောင်းဆိုချက် ပို့ပြီးပါပြီ! Admin မှ စစ်ဆေးပြီး Wallet Balance ထည့်ပေးပါမည်။');
-      setTopupAmount('');
-      setTopupSlip(null);
-      setTopupNote('');
+      const result = await res.json();
+      if (result.success) {
+        alert('✅ ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ Admin စစ်ဆေးပြီးပါက လက်ကျန်ငွေ တိုးပေးပါမည်။');
+        setTopupAmount('');
+        setTopupNote('');
+      } else {
+        alert('အမှားဖြစ်သွားပါသည်: ' + result.error);
+      }
     } catch (err: any) {
-      alert('Error: ' + err.message);
+      alert('အမှားဖြစ်သွားပါသည်: ' + err.message);
     } finally {
       setTopupLoading(false);
     }

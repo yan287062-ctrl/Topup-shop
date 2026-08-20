@@ -10,18 +10,29 @@ const supabase = createClient(
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { email, password, action } = body;
+    const { email, password, action } = await req.json();
 
     if (action === 'signup') {
       const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+      if (data.user) {
+        await supabase.from('profiles').upsert(
+          { id: data.user.id, email: data.user.email, balance: 0 },
+          { onConflict: 'id' }
+        );
+      }
       return NextResponse.json({ success: true, data });
     } 
     
     if (action === 'login') {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+      if (data.user) {
+        const { data: prof } = await supabase.from('profiles').select('id').eq('id', data.user.id).maybeSingle();
+        if (!prof) {
+          await supabase.from('profiles').insert({ id: data.user.id, email: data.user.email, balance: 0 });
+        }
+      }
       return NextResponse.json({ success: true, data });
     }
 
