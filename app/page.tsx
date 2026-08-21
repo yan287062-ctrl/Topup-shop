@@ -204,6 +204,13 @@ export default function Home() {
   const [topupLoading, setTopupLoading] = useState(false);
   const [orderSlip, setOrderSlip] = useState('');
   const [walletSlip, setWalletSlip] = useState('');
+  const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedPhone(text);
+    setTimeout(() => setCopiedPhone(null), 2000);
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
     const file = e.target.files?.[0];
@@ -477,240 +484,109 @@ export default function Home() {
         {/* Tab: Shop / Game Select */}
         {activeTab === 'shop' && !selectedGame && (
           <div className="space-y-4">
-            <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {GAMES.map(game => (
-                <div
-                  key={game.id}
-                  onClick={() => { setSelectedGame(game); setSelectedPkg(null); setMlbbCheckResult(null); }}
-                  className="bg-[#111e33] border border-blue-900/40 hover:border-blue-500/80 p-4 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] flex items-center gap-4 group"
-                >
-                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-950/80 border border-blue-800/50 flex-shrink-0 flex items-center justify-center p-1 group-hover:border-blue-400 transition-colors">
-                    {game.image ? (
-                      <img src={game.image} alt={game.name} className="w-full h-full object-contain rounded-xl"  />
-                    ) : (
-                      <span className="text-2xl">🎮</span>
-                    )}
+<div className="space-y-3">
+              <h3 className="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+                <span>💳</span> ငွေလွှဲပေးချေမှု
+              </h3>
+
+              {/* Wave */}
+              <div className="bg-[#0e1726] border border-blue-900/40 hover:border-blue-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-[#ffdf00] flex items-center justify-center p-1 flex-shrink-0 shadow-md">
+                    <img 
+                      src="https://img.icons8.com/color/96/wave.png" 
+                      alt="Wave" 
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{game.name}</h3>
-                    <p className="text-[11px] text-gray-400">{game.category}</p>
+                    <h4 className="font-bold text-white text-xs">Wave</h4>
+                    <p className="text-[11px] text-gray-400">U Ye Paing Oo</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Tab: Game Detail / Purchase */}
-        {activeTab === 'shop' && selectedGame && (
-          <div className="space-y-6">
-            <button onClick={() => setSelectedGame(null)} className="text-xs bg-[#111e33] border border-gray-800 text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-800 transition">
-              ← နောက်သို့
-            </button>
-
-            <div className="bg-[#111e33] p-4 rounded-2xl border border-blue-900/40 flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-950/80 border border-blue-800/50 flex-shrink-0 flex items-center justify-center p-1">
-                {selectedGame.image ? (
-                  <img src={selectedGame.image} alt={selectedGame.name} className="w-full h-full object-contain rounded-xl"  />
-                ) : (
-                  <span className="text-2xl">🎮</span>
-                )}
-              </div>
-              <div>
-                <h2 className="font-bold text-white text-base">{selectedGame.name}</h2>
-                <p className="text-xs text-gray-400">ဂိမ်း ID ဖြည့်သွင်းပြီး စိန်/UC များ ဝယ်ယူပါ</p>
-              </div>
-            </div>
-
-            {/* Account Info */}
-            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-xs font-bold text-gray-200">❶ အကောင့်အချက်အလက်</span>
-                {selectedGame.id === 'mlbb' && (
+                <div className="flex flex-col items-end gap-1.5">
+                  <span className="font-mono text-xs font-bold text-white tracking-wide">09967241357</span>
                   <button
-                    onClick={() => handleMlbbCheck(undefined, userId, zoneId)}
-                    disabled={checkingMlbb}
-                    className="text-[11px] bg-blue-600/80 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition"
+                    type="button"
+                    onClick={() => copyToClipboard('09967241357')}
+                    className="bg-blue-600/30 hover:bg-blue-600 border border-blue-500/40 text-blue-300 hover:text-white text-[10px] font-bold px-3 py-1 rounded-full transition-all active:scale-95"
                   >
-                    {checkingMlbb ? 'စစ်နေသည်...' : '🔍 ID စစ်မည်'}
+                    {copiedPhone === '09967241357' ? '✅ ကူးပြီး' : 'ငွေလွှဲရန်'}
                   </button>
-                )}
+                </div>
               </div>
 
-              {selectedGame.id === 'smile_coin' ? (
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Telegram name ထည့်ရန် (ဥပမာ - @username သို့မဟုတ် နာမည်)"
-                    value={userId}
-                    onChange={e => setUserId(e.target.value)}
-                    className="w-full bg-[#0a1220] border border-blue-500/50 p-3.5 rounded-xl text-xs text-white outline-none focus:border-blue-400 placeholder:text-gray-400 shadow-inner"
-                    required
-                  />
+              {/* K pay */}
+              <div className="bg-[#0e1726] border border-blue-900/40 hover:border-blue-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-[#00529b] flex items-center justify-center p-1 flex-shrink-0 shadow-md">
+                    <span className="text-white font-black text-[11px] tracking-tighter">KBZ</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white text-xs">K pay</h4>
+                    <p className="text-[11px] text-gray-400">U Ye Paing Oo</p>
+                  </div>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input
-                    type="text"
-                    placeholder="User ID"
-                    value={userId}
-                    onChange={e => setUserId(e.target.value)}
-                    className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Zone ID (optional)"
-                    value={zoneId}
-                    onChange={e => setZoneId(e.target.value)}
-                    className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
-                  />
-                </div>
-              )}
-
-              {mlbbCheckResult && (
-                <div className={'p-3 rounded-xl text-xs font-semibold ' + (mlbbCheckResult.error ? 'bg-red-900/40 text-red-400 border border-red-800' : 'bg-green-900/40 text-green-300 border border-green-800')}>
-                  {mlbbCheckResult.error ? '❌ ' + mlbbCheckResult.error : '✅ အကောင့်အမည်: ' + mlbbCheckResult.name}
-                </div>
-              )}
-            </div>
-
-            {/* Packages */}
-            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-3">
-              <span className="text-xs font-bold text-gray-200">❷ ပက်ကေ့ဂျ် ရွေးချယ်ပါ</span>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {(packages[selectedGame.id] || []).map((pkg: any) => (
-                  <div
-                    key={pkg.id}
-                    onClick={() => setSelectedPkg(pkg)}
-                    className={'p-3 rounded-xl border cursor-pointer transition text-center ' + (selectedPkg?.id === pkg.id ? 'bg-blue-600/30 border-blue-400 shadow-md shadow-blue-500/20' : 'bg-[#0a1220] border-gray-800 hover:border-gray-700')}
+                <div className="flex flex-col items-end gap-1.5">
+                  <span className="font-mono text-xs font-bold text-white tracking-wide">09967241357</span>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('09967241357')}
+                    className="bg-blue-600/30 hover:bg-blue-600 border border-blue-500/40 text-blue-300 hover:text-white text-[10px] font-bold px-3 py-1 rounded-full transition-all active:scale-95"
                   >
-                    <p className="text-xs font-bold text-white">{pkg.name}</p>
-                    <p className="text-xs text-yellow-400 font-semibold mt-1">{pkg.price.toLocaleString()} Ks</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Payment Method */}
-            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-4">
-              <span className="text-xs font-bold text-gray-200">❸ ငွေပေးချေမှု နည်းလမ်း</span>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('wallet')}
-                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'wallet' ? 'bg-blue-600/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
-                >
-                  💳 Wallet Balance
-                  <p className="text-[10px] font-normal text-yellow-400 mt-1">လက်ကျန်: {balance.toLocaleString()} Ks</p>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('slip')}
-                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'slip' ? 'bg-blue-600/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
-                >
-                  🧾 Direct Slip Upload
-                  <p className="text-[10px] font-normal text-gray-400 mt-1">ငွေလွှဲစလစ် တင်မည်</p>
-                </button>
-              </div>
-
-              {paymentMethod === 'slip' && (
-                <div className="p-3.5 bg-[#0a1220] border border-dashed border-blue-500/50 rounded-xl space-y-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-gray-300 font-semibold">🧾 ငွေလွှဲပြေစာ (Slip) ပုံတင်ပါ:</span>
-                    {orderSlip && <span className="text-green-400 font-bold">✅ ပုံရွေးချယ်ပြီး</span>}
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e, setOrderSlip)}
-                    className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
-                    required
-                  />
-                  {orderSlip && (
-                    <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-700 mt-2">
-                      <img src={orderSlip} alt="Order Slip Preview" className="w-full h-full object-cover" />
-                    </div>
-                  )}
+                    {copiedPhone === '09967241357' ? '✅ ကူးပြီး' : 'ငွေလွှဲရန်'}
+                  </button>
                 </div>
-              )}
+              </div>
 
-              {statusMsg && (
-                <div className={'p-3 rounded-xl text-xs font-semibold ' + (statusMsg.includes('✅') ? 'bg-green-900/40 text-green-300 border border-green-800' : 'bg-red-900/40 text-red-400 border border-red-800')}>
-                  {statusMsg}
+              {/* AYA PAY */}
+              <div className="bg-[#0e1726] border border-blue-900/40 hover:border-blue-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-[#e31b23] flex items-center justify-center p-1 flex-shrink-0 shadow-md">
+                    <span className="text-white font-black text-[10px]">AYA</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white text-xs">AYA PAY</h4>
+                    <p className="text-[11px] text-gray-400">U Ye Paing Oo</p>
+                  </div>
                 </div>
-              )}
-
-              <button
-                onClick={handleSubmit}
-                disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50 text-sm shadow-lg shadow-blue-600/30"
-              >
-                {loading ? 'ဆောင်ရွက်နေပါသည်...' : 'ယခု ဝယ်ယူမည်'}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Tab: MLBB Checker Tab */}
-        {activeTab === 'mlbb_check' && (
-          <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-4 max-w-md mx-auto">
-            <div className="text-center space-y-1">
-              <span className="text-3xl">🎮</span>
-              <h2 className="text-lg font-bold text-white">MLBB User ID စစ်ဆေးရန်</h2>
-              <p className="text-xs text-gray-400">In-Game Name မှန်မမှန် အလိုအလျောက် စစ်ဆေးပေးပါသည်</p>
-            </div>
-
-            <form onSubmit={e => handleMlbbCheck(e)} className="space-y-3">
-              <input
-                type="text"
-                placeholder="User ID"
-                value={checkMlbbId}
-                onChange={e => setCheckMlbbId(e.target.value)}
-                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
-              />
-              <input
-                type="text"
-                placeholder="Zone ID"
-                value={checkMlbbZone}
-                onChange={e => setCheckMlbbZone(e.target.value)}
-                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
-              />
-              <button
-                type="submit"
-                disabled={checkingMlbb}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition disabled:opacity-50"
-              >
-                {checkingMlbb ? 'စစ်ဆေးနေပါသည်...' : 'စစ်ဆေးမည်'}
-              </button>
-            </form>
-
-            {mlbbCheckResult && (
-              <div className={'p-4 rounded-xl text-xs font-semibold ' + (mlbbCheckResult.error ? 'bg-red-900/40 text-red-400 border border-red-800' : 'bg-green-900/40 text-green-300 border border-green-800')}>
-                {mlbbCheckResult.error ? '❌ ' + mlbbCheckResult.error : '✅ အကောင့်အမည်: ' + mlbbCheckResult.name}
+                <div className="flex flex-col items-end gap-1.5">
+                  <span className="font-mono text-xs font-bold text-white tracking-wide">09967241357</span>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('09967241357')}
+                    className="bg-blue-600/30 hover:bg-blue-600 border border-blue-500/40 text-blue-300 hover:text-white text-[10px] font-bold px-3 py-1 rounded-full transition-all active:scale-95"
+                  >
+                    {copiedPhone === '09967241357' ? '✅ ကူးပြီး' : 'ငွေလွှဲရန်'}
+                  </button>
+                </div>
               </div>
-            )}
-          </div>
-        )}
 
-        {/* Tab: Wallet Topup */}
-        {activeTab === 'wallet' && (
-          <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-6 max-w-lg mx-auto">
-            <div className="flex justify-between items-center border-b border-gray-800 pb-4">
-              <div>
-                <h2 className="text-base font-bold text-white">💰 လက်ရှိလက်ကျန်ငွေ</h2>
-                <p className="text-xl font-extrabold text-yellow-400">{balance.toLocaleString()} Ks</p>
+              {/* UAB Pay */}
+              <div className="bg-[#0e1726] border border-blue-900/40 hover:border-blue-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-purple-800 to-indigo-600 flex items-center justify-center p-1 flex-shrink-0 shadow-md">
+                    <span className="text-white font-black text-[10px]">UAB</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white text-xs">UAB Pay</h4>
+                    <p className="text-[11px] text-gray-400">U Ye Paing Oo</p>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1.5">
+                  <span className="font-mono text-xs font-bold text-white tracking-wide">09967241357</span>
+                  <button
+                    type="button"
+                    onClick={() => copyToClipboard('09967241357')}
+                    className="bg-blue-600/30 hover:bg-blue-600 border border-blue-500/40 text-blue-300 hover:text-white text-[10px] font-bold px-3 py-1 rounded-full transition-all active:scale-95"
+                  >
+                    {copiedPhone === '09967241357' ? '✅ ကူးပြီး' : 'ငွေလွှဲရန်'}
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 space-y-2 text-xs">
-              <p className="text-gray-400 font-bold">💳 ငွေလွှဲပေးချေမှု အကောင့်များ</p>
-              <div className="flex justify-between text-gray-300"><span>Wave / KBZPay:</span><span className="font-mono text-yellow-400">09967241357</span></div>
-              <div className="flex justify-between text-gray-300"><span>အကောင့်ပိုင်ရှင်:</span><span>U Ye Paing Oo</span></div>
-            </div>
-
-            <form onSubmit={handleTopupSubmit} className="space-y-3">
-              <input
+            <input
                 type="number"
                 placeholder="ငွေပမာဏ (Ks) - ဥပမာ 10000"
                 value={topupAmount}
