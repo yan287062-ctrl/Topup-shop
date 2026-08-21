@@ -99,3 +99,38 @@ body {
   -webkit-backdrop-filter: blur(10px);
   margin-bottom: 20px;
 }
+
+/* ၁။ အပြင်ဘက် နောက်ခံအပြည့်ကို မူလ အမည်းရောင်သို့ ပြန်ပြောင်းခြင်း */
+body {
+  background-image: none !important;
+  background-color: #070d18 !important;
+}
+.glass-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* ၂။ အပေါ်ပိုင်း Header ဘောက်စ်ထဲသို့သာ GIF ပုံကို ထည့်သွင်းခြင်း */
+.neat-header {
+  position: relative;
+  background-image: url('/bg.gif') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  overflow: hidden; /* ထောင့်ဝိုင်းလေးများ အပြင်သို့ ပုံမထွက်စေရန် */
+}
+
+/* ၃။ ပုံကြောင့် စာမမြင်ရမှာစိုးသဖြင့် ပုံပေါ်မှ ခပ်မှောင်မှောင် အရောင်လေး ထပ်အုပ်ထားခြင်း */
+.neat-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(7, 13, 24, 0.65) !important; 
+  z-index: 1;
+}
+
+/* ၄။ ခလုတ်များနှင့် စာများကို အရှေ့ဆုံးသို့ ဆွဲထုတ်ခြင်း (ဖိနှိပ်၍ရစေရန်) */
+.neat-header > * {
+  position: relative;
+  z-index: 2;
+}
