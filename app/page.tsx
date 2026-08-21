@@ -453,7 +453,7 @@ export default function Home() {
         {/* Navbar */}
         <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111e33]/90 backdrop-blur-md p-4 rounded-2xl border border-blue-900/50">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setSelectedGame(null); setActiveTab('shop'); }}>
-            <div className="w-11 h-11 rounded-full overflow-hidden bg-[#0a1220] border-2 border-blue-400/60 p-0.5 flex items-center justify-center shadow-lg shadow-blue-500/30 flex-shrink-0">
+            <div className="gif-header-box w-11 h-11 rounded-full overflow-hidden bg-[#0a1220] border-2 border-blue-400/60 p-0.5 flex items-center justify-center shadow-lg shadow-blue-500/30 flex-shrink-0">
               <img src="/logo.png" alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
             <div>

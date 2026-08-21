@@ -134,3 +134,16 @@ body {
   position: relative;
   z-index: 2;
 }
+
+/* တစ်မျက်နှာလုံး အမည်းရောင် ပြန်ထားမည် */
+body {
+  background-image: none !important;
+  background-color: #070d18 !important;
+}
+/* Header အကွက်လေးအတွက်သာ GIF ပုံကို ထည့်မည် */
+.gif-header-box {
+  background-image: linear-gradient(rgba(7, 13, 24, 0.75), rgba(7, 13, 24, 0.75)), url('/bg.gif') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
