@@ -1,38 +1,52 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-
-const supabase = createClient(
-  'https://aasncvjvjftsyhywrueo.supabase.co',
-  'sb_publishable_BWPJnQPpWwysRe84oYfgAw_GinZLV98'
-);
 
 export async function GET() {
   try {
-    const { data, error } = await supabase.from('prices').select('*');
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ data });
+    const { data, error } = await supabase
+      .from('prices')
+      .select('*');
+
+    if (error) {
+      return NextResponse.json({ success: false, data: [] }, { status: 200 });
+    }
+    return NextResponse.json({ success: true, data: data || [] });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Server error' }, { status: 500 });
+    return NextResponse.json({ success: false, data: [] }, { status: 500 });
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
-    const { id, game_id, package_name, price } = body;
-    const { data, error } = await supabase.from('prices').upsert({
-      id,
-      game_id,
-      package_name,
-      price: Number(price),
-    }, { onConflict: 'id' });
+    const body = await request.json();
+    const { game_id, packages } = body;
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!packages || !Array.isArray(packages)) {
+      return NextResponse.json({ error: 'Invalid packages data' }, { status: 400 });
+    }
+
+    const records = packages.map((pkg: any) => ({
+      id: pkg.id,
+      game_id: game_id,
+      package_name: pkg.name,
+      price: Number(pkg.price),
+      updated_at: new Date().toISOString()
+    }));
+
+    const { data, error } = await supabase
+      .from('prices')
+      .upsert(records, { onConflict: 'id' });
+
+    if (error) {
+      console.error('Supabase Upsert Error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
     return NextResponse.json({ success: true, data });
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Server error' }, { status: 500 });
+    console.error('API Route Error:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
