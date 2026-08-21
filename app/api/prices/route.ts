@@ -10,11 +10,11 @@ export async function GET() {
       .select('*');
 
     if (error) {
-      return NextResponse.json({ success: false, data: [] }, { status: 200 });
+      return NextResponse.json({ success: false, error: error.message, data: [] }, { status: 200 });
     }
     return NextResponse.json({ success: true, data: data || [] });
   } catch (err: any) {
-    return NextResponse.json({ success: false, data: [] }, { status: 500 });
+    return NextResponse.json({ success: false, error: err.message, data: [] }, { status: 500 });
   }
 }
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const { game_id, packages } = body;
 
     if (!packages || !Array.isArray(packages)) {
-      return NextResponse.json({ error: 'Invalid packages data' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid packages format' }, { status: 400 });
     }
 
     const records = packages.map((pkg: any) => ({
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data });
   } catch (err: any) {
-    console.error('API Route Error:', err);
+    console.error('API Error:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

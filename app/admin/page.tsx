@@ -243,14 +243,19 @@ export default function AdminPage() {
   const savePrices = async () => {
     setSavingPrice(true);
     try {
-      await fetch('/api/prices', {
+      const res = await fetch('/api/prices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ game_id: selectedGameKey, packages: packages[selectedGameKey] }),
       });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        alert('❌ Error: ' + (data.error || 'ဈေးနှုန်းသိမ်းဆည်းရာတွင် အမှားဖြစ်သွားပါသည်'));
+        return;
+      }
       alert('✅ ဈေးနှုန်းများ အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!');
-    } catch (e) {
-      alert('❌ ဈေးနှုန်းသိမ်းဆည်းရာတွင် အမှားဖြစ်သွားပါသည်');
+    } catch (e: any) {
+      alert('❌ Error: ' + (e?.message || 'Network error'));
     } finally {
       setSavingPrice(false);
     }
