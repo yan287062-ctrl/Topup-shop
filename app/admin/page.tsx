@@ -20,7 +20,7 @@ export default function AdminPage() {
   }, []);
 
   const handleAction = async (id: string, status: string, email: string, amount: number) => {
-    if (!confirm('ဒီအော်ဒါကို ' + (status === 'approved' ? 'လက်ခံ' : 'ငြင်းပယ်') + ' မည်လား?')) return;
+    if (!confirm('သေချာပါသလား?')) return;
     
     setLoading(true);
     try {
@@ -48,11 +48,11 @@ export default function AdminPage() {
     <div className="min-h-screen bg-[#070d18] text-white p-4">
       <h2 className="text-lg font-bold mb-4">ငွေဖြည့်တောင်းဆိုမှုများ</h2>
       <div className="space-y-3">
-        {topups.length === 0 ? <p className="text-sm text-gray-500">မရှိသေးပါ</p> : topups.map((t: any) => (
+        {topups.map((t: any) => (
           <div key={t.id} className="bg-[#0e1726] p-4 rounded-xl border border-gray-800 flex justify-between items-center">
             <div>
               <p className="text-sm font-bold">{t.email}</p>
-              <p className="text-xs text-gray-400">{t.amount} Ks | <span className="text-yellow-500">{t.status}</span></p>
+              <p className="text-xs text-gray-400">{t.amount} Ks | Status: <span className="text-yellow-500">{t.status}</span></p>
             </div>
             <div className="flex gap-2">
               <button 
