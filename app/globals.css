@@ -37,3 +37,27 @@ body {
   background-size: 400% 400%;
   animation: gradient 5s ease infinite; /* 5 စက္ကန့်ဖြင့် မြန်မြန် ရွေ့လျားမည် */
 }
+
+@keyframes myCoolGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.my-animated-bg {
+  background: linear-gradient(-45deg, #070d18, #3b0764, #1a103d, #4c1d95);
+  background-size: 400% 400%;
+  animation: myCoolGradient 6s ease infinite;
+}
+
+
+@keyframes myCoolGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.my-animated-bg {
+  background: linear-gradient(-45deg, #070d18, #3b0764, #1a103d, #4c1d95);
+  background-size: 400% 400%;
+  animation: myCoolGradient 6s ease infinite;
+}
