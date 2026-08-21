@@ -442,7 +442,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12">
+    <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12" animate-bg-gradient bg-transparent">
       {/* Top Banner */}
       <div className="bg-[#111e33] border-b border-blue-900/40 px-4 py-2 text-xs flex justify-between items-center text-blue-200">
         <span className="font-semibold">🌟 Paing Gyi Game Store - Official Platform</span>
