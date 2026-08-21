@@ -442,7 +442,7 @@ export default function Home() {
   };
 
   return (
-    <div className="glass-wrapper min-h-screen     text-gray-100 font-sans pb-12">
+    <div className=" min-h-screen     text-gray-100 font-sans pb-12">
       {/* Top Banner */}
       <div className="bg-[#111e33] border-b border-blue-900/40 px-6 py-3 text-sm flex justify-between items-center text-blue-200">
         <span className="font-semibold">🌟 Paing Gyi Game Store - Official Platform</span>
@@ -461,7 +461,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 text-sm">
+          <div className="gif-header-box flex flex-wrap gap-2 text-sm">
             <button onClick={() => { setSelectedGame(null); setActiveTab('shop'); }} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'shop' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ပင်မစာမျက်နှာ</button>
             <button onClick={() => setActiveTab('search')} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'search' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ဘောက်ချာရှာမည်</button>
             <button onClick={() => setActiveTab('mlbb_check')} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'mlbb_check' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>MLBB စစ်ဆေးမည်</button>
