@@ -19,11 +19,10 @@ export async function GET() {
       .map((o: any) => ({
         id: o.id,
         email: o.player_id || o.email || 'customer@gmail.com',
-        amount: o.price,
+        amount: Number(o.price || 0),
         note: o.zone_id || '-',
         slip_url: o.slip_url,
-        status: o.status || 'pending',
-        is_legacy: true
+        status: o.status || 'pending'
       }));
 
     const { data: directTopups } = await supabase
@@ -31,9 +30,10 @@ export async function GET() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    const topups = [...(directTopups || []), ...legacyTopups];
-
-    return NextResponse.json({ orders: orders || [], topups: topups || [] });
+    return NextResponse.json({
+      orders: orders || [],
+      topups: [...(directTopups || []), ...legacyTopups]
+    });
   } catch (err: any) {
     return NextResponse.json({ orders: [], topups: [] }, { status: 500 });
   }
@@ -42,51 +42,31 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { action, orderId, topupId, status } = body;
+    const { action, id, email, amount, status } = body;
 
-    if (action === 'update_order' && orderId) {
-      await supabase.from('orders').update({ status }).eq('id', orderId);
+    if (action === 'update_order' && id) {
+      await supabase.from('orders').update({ status }).eq('id', id);
       return NextResponse.json({ success: true });
     }
 
-    if (action === 'topup_action' && topupId) {
-      let targetEmail = '';
-      let topupAmount = 0;
+    if (action === 'update_topup' && id) {
+      // 1. Topup Table / Orders Table status update
+      await supabase.from('wallet_topups').update({ status }).eq('id', id);
+      await supabase.from('orders').update({ status }).eq('id', id);
 
-      const { data: topupRow } = await supabase
-        .from('wallet_topups')
-        .select('*')
-        .eq('id', topupId)
-        .single();
+      // 2. Approved ဖြစ်ပါက Balance တိုးပေးခြင်း
+      if (status === 'approved' && email && amount) {
+        const cleanEmail = email.trim().toLowerCase();
+        const topupAmt = Number(amount);
 
-      if (topupRow) {
-        targetEmail = topupRow.email;
-        topupAmount = Number(topupRow.amount);
-        await supabase.from('wallet_topups').update({ status }).eq('id', topupId);
-      } else {
-        const { data: orderRow } = await supabase
-          .from('orders')
-          .select('*')
-          .eq('id', topupId)
-          .single();
-
-        if (orderRow) {
-          targetEmail = orderRow.player_id || orderRow.email;
-          topupAmount = Number(orderRow.price);
-          await supabase.from('orders').update({ status }).eq('id', topupId);
-        }
-      }
-
-      if (status === 'approved' && targetEmail && topupAmount > 0) {
-        const cleanEmail = targetEmail.trim().toLowerCase();
         const { data: profile } = await supabase
           .from('profiles')
-          .select('*')
+          .select('wallet_balance')
           .ilike('email', cleanEmail)
           .single();
 
         if (profile) {
-          const newBal = Number(profile.wallet_balance || 0) + topupAmount;
+          const newBal = Number(profile.wallet_balance || 0) + topupAmt;
           await supabase
             .from('profiles')
             .update({ wallet_balance: newBal })
@@ -94,7 +74,7 @@ export async function POST(request: Request) {
         } else {
           await supabase
             .from('profiles')
-            .insert([{ email: cleanEmail, wallet_balance: topupAmount }]);
+            .insert([{ email: cleanEmail, wallet_balance: topupAmt }]);
         }
       }
 
