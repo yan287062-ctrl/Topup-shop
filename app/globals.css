@@ -61,3 +61,14 @@ body {
   background-size: 400% 400%;
   animation: myCoolGradient 6s ease infinite;
 }
+
+.gif-bg {
+  background-image: url('/bg.gif');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+/* ပုံကြောင့် စာတွေ ဖတ်မရဖြစ်မှာစိုးလို့ အပေါ်ကနေ ခပ်မှောင်မှောင်လေး ၈၅% အုပ်ထားပါမယ် */
+.overlay-dark {
+  background-color: rgba(7, 13, 24, 0.85); 
+}
