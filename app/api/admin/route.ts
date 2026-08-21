@@ -42,46 +42,60 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { action, id, email, amount, status } = body;
+    const action = body.action;
+    const targetId = body.topupId || body.orderId || body.id;
+    const status = body.status;
+    let targetEmail = body.email || '';
+    let topupAmount = Number(body.amount || 0);
 
-    if (action === 'update_order' && id) {
-      await supabase.from('orders').update({ status }).eq('id', id);
-      return NextResponse.json({ success: true });
+    if (!targetId || !status) {
+      return NextResponse.json({ success: false, error: 'Missing id or status' }, { status: 400 });
     }
 
-    if (action === 'update_topup' && id) {
-      // 1. Topup Table / Orders Table status update
-      await supabase.from('wallet_topups').update({ status }).eq('id', id);
-      await supabase.from('orders').update({ status }).eq('id', id);
+    // Orders သို့မဟုတ် Topups table status update လုပ်ခြင်း
+    await supabase.from('wallet_topups').update({ status }).eq('id', targetId);
+    await supabase.from('orders').update({ status }).eq('id', targetId);
 
-      // 2. Approved ဖြစ်ပါက Balance တိုးပေးခြင်း
-      if (status === 'approved' && email && amount) {
-        const cleanEmail = email.trim().toLowerCase();
-        const topupAmt = Number(amount);
-
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('wallet_balance')
-          .ilike('email', cleanEmail)
-          .single();
-
-        if (profile) {
-          const newBal = Number(profile.wallet_balance || 0) + topupAmt;
-          await supabase
-            .from('profiles')
-            .update({ wallet_balance: newBal })
-            .ilike('email', cleanEmail);
-        } else {
-          await supabase
-            .from('profiles')
-            .insert([{ email: cleanEmail, wallet_balance: topupAmt }]);
+    // Email နှင့် Amount မပါလာပါက Database မှ ရှာဖွေခြင်း
+    if (status === 'approved' && (!targetEmail || topupAmount <= 0)) {
+      const { data: tRow } = await supabase.from('wallet_topups').select('*').eq('id', targetId).single();
+      if (tRow) {
+        targetEmail = tRow.email;
+        topupAmount = Number(tRow.amount || 0);
+      } else {
+        const { data: oRow } = await supabase.from('orders').select('*').eq('id', targetId).single();
+        if (oRow) {
+          targetEmail = oRow.player_id || oRow.email;
+          topupAmount = Number(oRow.price || 0);
         }
       }
-
-      return NextResponse.json({ success: true });
     }
 
-    return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
+    // Approved ဖြစ်ပါက User ၏ Profiles Table ထဲ Balance ပေါင်းထည့်ပေးခြင်း
+    if (status === 'approved' && targetEmail && topupAmount > 0) {
+      const cleanEmail = targetEmail.trim().toLowerCase();
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .ilike('email', cleanEmail)
+        .single();
+
+      if (profile) {
+        const currentBal = Number(profile.wallet_balance || 0);
+        const newBal = currentBal + topupAmount;
+        await supabase
+          .from('profiles')
+          .update({ wallet_balance: newBal, updated_at: new Date().toISOString() })
+          .ilike('email', cleanEmail);
+      } else {
+        await supabase
+          .from('profiles')
+          .insert([{ email: cleanEmail, wallet_balance: topupAmount }]);
+      }
+    }
+
+    return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });
   }
