@@ -27,12 +27,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid packages format' }, { status: 400 });
     }
 
+    // updated_at ကို ဖြုတ်ပြီး Database column များနှင့် ကွက်တိ ကိုက်ညီစေခြင်း
     const records = packages.map((pkg: any) => ({
       id: pkg.id,
       game_id: game_id,
       package_name: pkg.name,
-      price: Number(pkg.price),
-      updated_at: new Date().toISOString()
+      price: Number(pkg.price)
     }));
 
     const { data, error } = await supabase
