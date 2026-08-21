@@ -72,3 +72,30 @@ body {
 .overlay-dark {
   background-color: rgba(7, 13, 24, 0.85); 
 }
+
+/* ပြီးပြည့်စုံသော နောက်ခံပုံနှင့် မှန်သားအထူးပြုလုပ်ချက် (Glassmorphism) */
+body {
+  background-image: url('/bg.gif') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+  background-color: #070d18 !important;
+}
+
+.glass-wrapper {
+  background: rgba(7, 13, 24, 0.75) !important; /* ပုံကို နောက်ခံကနေ မှိန်မှိန်လေး မြင်ရအောင် */
+  min-height: 100vh;
+  backdrop-filter: blur(4px); /* နောက်ခံကို အနည်းငယ် ဝါးပေးမည် */
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.neat-header {
+  background: rgba(14, 23, 38, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 16px 24px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  margin-bottom: 20px;
+}

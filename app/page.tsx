@@ -442,7 +442,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen gif-bg overlay-dark   text-gray-100 font-sans pb-12">
+    <div className="glass-wrapper min-h-screen     text-gray-100 font-sans pb-12">
       {/* Top Banner */}
       <div className="bg-[#111e33] border-b border-blue-900/40 px-6 py-3 text-sm flex justify-between items-center text-blue-200">
         <span className="font-semibold">🌟 Paing Gyi Game Store - Official Platform</span>
