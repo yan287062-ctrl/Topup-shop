@@ -218,22 +218,18 @@ export default function AdminPage() {
     }
   };
 
-  const handleTopupAction = async (id: string, status: string, email?: string, amount?: number) => {
+  const handleTopupAction = async (topupId: string, action: 'approve' | 'reject') => {
     try {
       const res = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'topup_action', topupId: id, id, status, email, amount })
+        body: JSON.stringify({ action: 'topup_action', topupId, status: action === 'approve' ? 'approved' : 'rejected' }),
       });
-      const data = await res.json();
-      if (data.success) {
-        alert(status === 'approved' ? '✅ ငွေဖြည့်မှု လက်ခံအတည်ပြုပြီးပါပြီ!' : '❌ ငွေဖြည့်မှု ငြင်းပယ်လိုက်ပါပြီ!');
-        window.location.reload();
-      } else {
-        alert('အမှား: ' + (data.error || 'မအောင်မြင်ပါ'));
+      if (res.ok) {
+        setTopups(prev => prev.map(t => t.id === topupId ? { ...t, status: action === 'approve' ? 'approved' : 'rejected' } : t));
       }
     } catch (e) {
-      alert('Network Error');
+      console.error(e);
     }
   };
 

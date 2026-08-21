@@ -5,93 +5,91 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const { data: allOrders } = await supabase
+    // Orders များကို ဆွဲထုတ်ခြင်း
+    const { data: orders } = await supabase
       .from('orders')
       .select('*')
       .order('created_at', { ascending: false });
 
-    const orders = (allOrders || []).filter(
-      (o: any) => o.game_id !== 'wallet_topup' && !o.game_name?.toLowerCase().includes('wallet')
-    );
-
-    const legacyTopups = (allOrders || [])
-      .filter((o: any) => o.game_id === 'wallet_topup' || o.game_name?.toLowerCase().includes('wallet'))
-      .map((o: any) => ({
-        id: o.id,
-        email: o.player_id || o.email || 'customer@gmail.com',
-        amount: Number(o.price || 0),
-        note: o.zone_id || '-',
-        slip_url: o.slip_url,
-        status: o.status || 'pending'
-      }));
-
-    const { data: directTopups } = await supabase
+    // သီးသန့် wallet_topups များကို ဆွဲထုတ်ခြင်း
+    const { data: topups } = await supabase
       .from('wallet_topups')
       .select('*')
       .order('created_at', { ascending: false });
 
-    return NextResponse.json({
-      orders: orders || [],
-      topups: [...(directTopups || []), ...legacyTopups]
-    });
+    // wallet_topups များကို မူလ Admin Panel က နားလည်သော Order format အဖြစ် ပြောင်းလဲခြင်း
+    const mappedTopups = (topups || []).map((t: any) => ({
+      id: t.id,
+      game_name: 'Wallet Balance Topup',
+      package_name: 'ငွေဖြည့် ' + t.amount + ' Ks',
+      player_id: t.email,
+      zone_id: '-',
+      price: t.amount,
+      payment_method: 'Wallet',
+      status: t.status,
+      created_at: t.created_at,
+      slip_url: t.slip_url
+    }));
+
+    // အားလုံးပေါင်းပြီး အချိန်အလိုက် စီပေးခြင်း
+    const combinedOrders = [...(orders || []), ...mappedTopups].sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    return NextResponse.json({ orders: combinedOrders });
   } catch (err: any) {
-    return NextResponse.json({ orders: [], topups: [] }, { status: 500 });
+    return NextResponse.json({ orders: [] }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const action = body.action;
-    const targetId = body.topupId || body.orderId || body.id;
+    const targetId = body.orderId || body.topupId || body.id;
     const status = body.status;
-    let targetEmail = body.email || '';
-    let topupAmount = Number(body.amount || 0);
 
     if (!targetId || !status) {
-      return NextResponse.json({ success: false, error: 'Missing id or status' }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Missing id or status' });
     }
 
-    // Orders သို့မဟုတ် Topups table status update လုပ်ခြင်း
-    await supabase.from('wallet_topups').update({ status }).eq('id', targetId);
+    // Order ဇယား နှင့် Topup ဇယား နှစ်ခုလုံးတွင် status ပြင်ဆင်ခြင်း
     await supabase.from('orders').update({ status }).eq('id', targetId);
+    await supabase.from('wallet_topups').update({ status }).eq('id', targetId);
 
-    // Email နှင့် Amount မပါလာပါက Database မှ ရှာဖွေခြင်း
-    if (status === 'approved' && (!targetEmail || topupAmount <= 0)) {
-      const { data: tRow } = await supabase.from('wallet_topups').select('*').eq('id', targetId).single();
-      if (tRow) {
-        targetEmail = tRow.email;
-        topupAmount = Number(tRow.amount || 0);
+    // လက်ခံလိုက်ပါက ငွေတိုးပေးခြင်း Logic
+    if (status === 'approved') {
+      let targetEmail = '';
+      let topupAmount = 0;
+
+      // အရင်ဆုံး Order ဇယားတွင် ရှာမည်
+      const { data: oRow } = await supabase.from('orders').select('*').eq('id', targetId).single();
+      if (oRow && (oRow.game_name?.toLowerCase().includes('wallet') || oRow.game_id === 'wallet_topup')) {
+        targetEmail = oRow.player_id || oRow.email;
+        topupAmount = Number(oRow.price || 0);
       } else {
-        const { data: oRow } = await supabase.from('orders').select('*').eq('id', targetId).single();
-        if (oRow) {
-          targetEmail = oRow.player_id || oRow.email;
-          topupAmount = Number(oRow.price || 0);
+        // မတွေ့ပါက Topup ဇယားတွင် ရှာမည်
+        const { data: tRow } = await supabase.from('wallet_topups').select('*').eq('id', targetId).single();
+        if (tRow) {
+          targetEmail = tRow.email;
+          topupAmount = Number(tRow.amount || 0);
         }
       }
-    }
 
-    // Approved ဖြစ်ပါက User ၏ Profiles Table ထဲ Balance ပေါင်းထည့်ပေးခြင်း
-    if (status === 'approved' && targetEmail && topupAmount > 0) {
-      const cleanEmail = targetEmail.trim().toLowerCase();
-      
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .ilike('email', cleanEmail)
-        .single();
+      // ငွေတိုးပေးခြင်း
+      if (targetEmail && topupAmount > 0) {
+        const cleanEmail = targetEmail.trim().toLowerCase();
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .ilike('email', cleanEmail)
+          .single();
 
-      if (profile) {
-        const currentBal = Number(profile.wallet_balance || 0);
-        const newBal = currentBal + topupAmount;
-        await supabase
-          .from('profiles')
-          .update({ wallet_balance: newBal, updated_at: new Date().toISOString() })
-          .ilike('email', cleanEmail);
-      } else {
-        await supabase
-          .from('profiles')
-          .insert([{ email: cleanEmail, wallet_balance: topupAmount }]);
+        if (profile) {
+          const newBal = Number(profile.wallet_balance || 0) + topupAmount;
+          await supabase.from('profiles').update({ wallet_balance: newBal }).ilike('email', cleanEmail);
+        } else {
+          await supabase.from('profiles').insert([{ email: cleanEmail, wallet_balance: topupAmount }]);
+        }
       }
     }
 
