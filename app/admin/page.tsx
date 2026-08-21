@@ -228,8 +228,7 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success) {
         alert(status === 'approved' ? '✅ ငွေဖြည့်မှု လက်ခံအတည်ပြုပြီးပါပြီ!' : '❌ ငွေဖြည့်မှု ငြင်းပယ်လိုက်ပါပြီ!');
-        if (typeof fetchData === 'function') fetchData();
-        else window.location.reload();
+        window.location.reload();
       } else {
         alert('အမှား: ' + (data.error || 'မအောင်မြင်ပါ'));
       }
