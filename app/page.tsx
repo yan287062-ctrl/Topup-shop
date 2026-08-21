@@ -4,20 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 
-interface PackageItem {
-  id: string;
-  name: string;
-  price: number;
-}
-
-interface GameItem {
-  id: string;
-  name: string;
-  category: string;
-  image: string;
-}
-
-const INITIAL_PACKAGES: Record<string, PackageItem[]> = {
+const INITIAL_PACKAGES: Record<string, { id: string; name: string; price: number }[]> = {
   mlbb: [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3300 },
     { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
@@ -118,7 +105,7 @@ const INITIAL_PACKAGES: Record<string, PackageItem[]> = {
     { id: 'tg_15', name: '6 months premium', price: 75241 },
     { id: 'tg_16', name: '12 months premium', price: 136412 }
   ],
-  smile_coin: [
+    smile_coin: [
     { id: 'sc_1', name: 'SC 300', price: 26500 },
     { id: 'sc_2', name: 'SC 1k', price: 82500 },
     { id: 'sc_3', name: 'SC 5k', price: 412500 },
@@ -141,80 +128,86 @@ const INITIAL_PACKAGES: Record<string, PackageItem[]> = {
   ]
 };
 
-const GAMES: GameItem[] = [
-  { id: 'mlbb', name: 'Mobile Legends', category: 'MOBA', image: 'https://play-lh.googleusercontent.com/fL9j5gVzK0W4K8oXl_jLzP2_B8h0x=w240-h480' },
-  { id: 'pubg', name: 'PUBG Mobile', category: 'Battle Royale', image: 'https://play-lh.googleusercontent.com/7bQyWqJ_8aL7X=w240-h480' },
-  { id: 'pubg_uc_pack', name: 'PUBG UC Pack', category: 'Package', image: 'https://play-lh.googleusercontent.com/7bQyWqJ_8aL7X=w240-h480' },
-  { id: 'telegram', name: 'Telegram Stars', category: 'Social', image: 'https://img.icons8.com/color/144/telegram-app.png' },
-  { id: 'smile_coin', name: 'Smile Coin', category: 'Currency', image: '/games/smile_coin.png' },
-  { id: 'heartopia', name: 'Heartopia', category: 'Casual', image: 'https://play-lh.googleusercontent.com/vH1yN4r5k=w240-h480' }
+const GAMES = [
+  { 
+    id: 'mlbb', 
+    name: 'Mobile Legends: Bang Bang', 
+    category: 'Game Topup', 
+    image: '/games/mlbb.png' 
+  },
+  { 
+    id: 'pubg', 
+    name: 'PUBG Mobile', 
+    category: 'Game Topup', 
+    image: '/games/pubg.png' 
+  },
+  { 
+    id: 'pubg_uc_pack', 
+    name: 'PUBG UC Pack & Pass', 
+    category: 'Game Topup', 
+    image: '/games/pubg_uc.png' 
+  },
+  { 
+    id: 'telegram', 
+    name: 'Telegram Stars & Premium', 
+    category: 'Social App', 
+    image: '/games/telegram.png' 
+  },
+    { 
+    id: 'smile_coin', 
+    name: 'Smile Coin', 
+    category: 'Game Currency', 
+    image: '/games/smile_coin.png' 
+  },
+  { 
+    id: 'heartopia', 
+    name: 'Heartopia', 
+    category: 'Game Topup', 
+    image: '/games/heartopia.png' 
+  }
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'shop' | 'wallet' | 'search' | 'mlbb_check'>('shop');
-  const [packages, setPackages] = useState<Record<string, PackageItem[]>>(INITIAL_PACKAGES);
-  const [selectedGame, setSelectedGame] = useState<GameItem>(GAMES[0]);
-  const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(INITIAL_PACKAGES.mlbb[0]);
+  const [activeTab, setActiveTab] = useState<'shop' | 'search' | 'mlbb_check' | 'wallet' | 'login'>('shop');
+  const [packages, setPackages] = useState(INITIAL_PACKAGES);
+  const [selectedGame, setSelectedGame] = useState<any>(null);
+  const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'direct_slip'>('wallet');
-  const [slipImage, setSlipImage] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'wallet' | 'slip'>('wallet');
   const [loading, setLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
 
-  // Wallet Topup States
-  const [walletBalance, setWalletBalance] = useState(0);
-  const [walletAmount, setWalletAmount] = useState('');
-  const [walletNote, setWalletNote] = useState('');
-  const [walletSlip, setWalletSlip] = useState('');
-  const [topupLoading, setTopupLoading] = useState(false);
-  const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
+  // MLBB Checker
+  const [checkMlbbId, setCheckMlbbId] = useState('');
+  const [checkMlbbZone, setCheckMlbbZone] = useState('');
+  const [checkingMlbb, setCheckingMlbb] = useState(false);
+  const [mlbbCheckResult, setMlbbCheckResult] = useState<any>(null);
 
-  // Order Search States
+  // Auth & Balance
+  const [currentAuthUser, setCurrentAuthUser] = useState<any>(null);
+  const [balance, setBalance] = useState<number>(0);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authMsg, setAuthMsg] = useState('');
+
+  // Search Orders
   const [searchOrderId, setSearchOrderId] = useState('');
-  const [searchResult, setSearchResult] = useState<any>(null);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
 
-  useEffect(() => {
-    const loadDynamicPrices = async () => {
-      try {
-        const res = await fetch('/api/prices', { cache: 'no-store' });
-        const resData = await res.json();
-        if (resData && resData.data && resData.data.length > 0) {
-          const grouped: Record<string, PackageItem[]> = {};
-          resData.data.forEach((item: any) => {
-            if (!grouped[item.game_id]) grouped[item.game_id] = [];
-            grouped[item.game_id].push({ id: item.id, name: item.package_name, price: item.price });
-          });
-          setPackages(prev => ({ ...prev, ...grouped }));
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-    loadDynamicPrices();
-  }, []);
+  // Wallet Topup
+  const [topupAmount, setTopupAmount] = useState('');
+  const [topupNote, setTopupNote] = useState('');
+  const [topupLoading, setTopupLoading] = useState(false);
+  const [orderSlip, setOrderSlip] = useState('');
+  const [walletSlip, setWalletSlip] = useState('');
 
-  const handleGameSelect = (game: GameItem) => {
-    setSelectedGame(game);
-    const gamePkgs = packages[game.id] || INITIAL_PACKAGES[game.id] || [];
-    setSelectedPackage(gamePkgs[0] || null);
-    setUserId('');
-    setZoneId('');
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedPhone(text);
-    setTimeout(() => setCopiedPhone(null), 2000);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        alert('ဖိုင်ဆိုဒ် 5MB အောက်သာ တင်ပေးပါ');
-        return;
-      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setter(reader.result as string);
@@ -223,22 +216,141 @@ export default function Home() {
     }
   };
 
-  const handleOrderSubmit = async (e: React.FormEvent) => {
+  const fetchPricesFromDB = async () => {
+    try {
+      const res = await fetch('/api/prices', { cache: 'no-store' });
+      const data = await res.json();
+      if (data && data.data && data.data.length > 0) {
+        const grouped: Record<string, any[]> = {};
+        data.data.forEach((item: any) => {
+          if (!grouped[item.game_id]) grouped[item.game_id] = [];
+          grouped[item.game_id].push({ id: item.id, name: item.package_name, price: item.price });
+        });
+        setPackages(prev => ({ ...prev, ...grouped }));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchUserBalance = async (userObj = currentAuthUser) => {
+    if (!userObj) return;
+    try {
+      const res = await fetch('/api/user?id=' + userObj.id + '&email=' + (userObj.email || ''), { cache: 'no-store' });
+      const json = await res.json();
+      if (json && typeof json.balance === 'number') {
+        setBalance(json.balance);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPricesFromDB();
+    const savedUser = localStorage.getItem('pg_shop_user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        setCurrentAuthUser(user);
+        fetchUserBalance(user);
+      } catch (e) {}
+    }
+  }, []);
+
+  const handleMlbbCheck = async (e?: React.FormEvent, targetId?: string, targetZone?: string) => {
+    if (e) e.preventDefault();
+    const id = targetId || checkMlbbId || userId;
+    const zone = targetZone || checkMlbbZone || zoneId;
+
+    if (!id || !zone) {
+      setMlbbCheckResult({ error: 'User ID နှင့် Zone ID ရိုက်ထည့်ပါ' });
+      return;
+    }
+
+    setCheckingMlbb(true);
+    setMlbbCheckResult(null);
+
+    try {
+      const res = await fetch('/api/mlbb-check?userId=' + id + '&zoneId=' + zone);
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        setMlbbCheckResult({
+          name: result.name + ' (' + zone + ') - ✨ 2x Bonus ရရှိနိုင်',
+        });
+      } else {
+        setMlbbCheckResult({ error: result.error || 'အကောင့် ရှာမတွေ့ပါ' });
+      }
+    } catch (err) {
+      setMlbbCheckResult({ error: 'စစ်ဆေးမှု မအောင်မြင်ပါ' });
+    } finally {
+      setCheckingMlbb(false);
+    }
+  };
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedPackage) {
-      alert('ပက်ကေ့ဂျ် ရွေးချယ်ပေးပါ');
+    setAuthLoading(true);
+    setAuthMsg('');
+
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: authEmail,
+          password: authPassword,
+          action: isSignUp ? 'signup' : 'login',
+        }),
+      });
+
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        throw new Error(result.error || 'လုပ်ဆောင်မှု မအောင်မြင်ပါ');
+      }
+
+      const userData = result.data?.user || { id: authEmail, email: authEmail };
+      setCurrentAuthUser(userData);
+      localStorage.setItem('pg_shop_user', JSON.stringify(userData));
+
+      if (isSignUp) {
+        setAuthMsg('✅ အကောင့်သစ် အောင်မြင်စွာ ဖွင့်ပြီးပါပြီ!');
+      } else {
+        setAuthMsg('✅ Login အောင်မြင်စွာ ဝင်ပြီးပါပြီ!');
+      }
+
+      fetchUserBalance(userData);
+      setTimeout(() => setActiveTab('shop'), 1000);
+    } catch (err: any) {
+      setAuthMsg('❌ အမှား ဖြစ်ပွားပါသည်: ' + (err.message || err));
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('pg_shop_user');
+    setCurrentAuthUser(null);
+    setBalance(0);
+    alert('Logged out successful');
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedGame || !userId || !selectedPkg) {
+      alert('အချက်အလက်များကို အပြည့်အစုံ ဖြည့်သွင်းပေးပါ။');
       return;
     }
-    if (!userId) {
-      alert(selectedGame.id === 'smile_coin' ? 'Telegram name ထည့်သွင်းပေးပါ' : 'User ID ထည့်သွင်းပေးပါ');
-      return;
-    }
-    if (paymentMethod === 'direct_slip' && !slipImage) {
-      alert('ငွေလွှဲပြေစာ (Slip) ပုံ ထည့်သွင်းပေးပါ');
+
+    if (paymentMethod === 'wallet' && !currentAuthUser) {
+      alert('Wallet ဖြင့် ဝယ်ယူရန် အရင်ဆုံး Login ဝင်ပေးပါ');
+      setActiveTab('login');
       return;
     }
 
     setLoading(true);
+    setStatusMsg('');
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
@@ -246,377 +358,395 @@ export default function Home() {
         body: JSON.stringify({
           game_id: selectedGame.id,
           game_name: selectedGame.name,
-          package_name: selectedPackage.name,
-          price: selectedPackage.price,
+          package_name: selectedPkg.name,
+          price: selectedPkg.price,
           player_id: userId,
-          zone_id: zoneId || null,
+          zone_id: zoneId,
           payment_method: paymentMethod,
-          slip_url: paymentMethod === 'direct_slip' ? slipImage : null
-        })
+          user_id: currentAuthUser?.id || currentAuthUser?.email,
+          slip_url: paymentMethod === 'wallet' ? 'Wallet Payment' : (orderSlip || 'Direct Slip Upload'),
+        }),
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        alert('🎉 အော်ဒါအောင်မြင်စွာ တင်ပြီးပါပြီ!');
-        setUserId('');
-        setZoneId('');
-        setSlipImage('');
-      } else {
-        alert('❌ အော်ဒါတင်ရာတွင် အမှားဖြစ်သွားပါသည်: ' + (data.error || ''));
+
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        throw new Error(result.error || 'အော်ဒါတင်ခြင်း မအောင်မြင်ပါ');
       }
-    } catch (e: any) {
-      alert('❌ အမှားဖြစ်သွားပါသည်: ' + e?.message);
+
+      setStatusMsg('✅ အော်ဒါ အောင်မြင်စွာ တင်ပြီးပါပြီ!');
+      if (paymentMethod === 'wallet') {
+        fetchUserBalance();
+      }
+    } catch (err: any) {
+      setStatusMsg('❌ အမှားဖြစ်သွားပါသည်: ' + (err.message || err));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleWalletTopup = async (e: React.FormEvent) => {
+  const handleSearchOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!walletAmount || Number(walletAmount) < 1000) {
-      alert('အနည်းဆုံး ၁,၀၀၀ ကျပ် ဖြည့်ပေးပါ');
+    if (!searchOrderId) return;
+    setSearching(true);
+    try {
+      const res = await fetch('/api/admin');
+      const data = await res.json();
+      if (data.orders) {
+        const found = data.orders.filter((o: any) => o.player_id === searchOrderId);
+        setSearchResults(found);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    setSearching(false);
+  };
+
+  const handleTopupSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!currentAuthUser) {
+      alert('ငွေဖြည့်ရန် အရင်ဆုံး Login ဝင်ပေးပါ');
+      setActiveTab('login');
       return;
     }
-    if (!walletSlip) {
-      alert('ငွေလွှဲပြေစာ (Slip) ပုံ ထည့်သွင်းပေးပါ');
+    if (!topupAmount || Number(topupAmount) <= 0) {
+      alert('ဖြည့်သွင်းမည့် ငွေပမာဏ ထည့်ပါ');
       return;
     }
 
     setTopupLoading(true);
     try {
-      const res = await fetch('/api/topup', {
+      const res = await fetch('/api/user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: Number(walletAmount),
-          note: walletNote,
-          slip_url: walletSlip
-        })
+          userId: currentAuthUser.id,
+          email: currentAuthUser.email,
+          amount: Number(topupAmount),
+          note: topupNote,
+          slipUrl: walletSlip || 'Slip Uploaded',
+        }),
       });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        alert('✅ ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ Admin စစ်ဆေးပြီးပါက Wallet ထဲသို့ ငွေရောက်ရှိပါမည်။');
-        setWalletAmount('');
-        setWalletNote('');
-        setWalletSlip('');
+      const result = await res.json();
+      if (result.success) {
+        alert('✅ ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ Admin စစ်ဆေးပြီးပါက လက်ကျန်ငွေ တိုးပေးပါမည်။');
+        setTopupAmount('');
+        setTopupNote('');
       } else {
-        alert('❌ တောင်းဆိုမှု မအောင်မြင်ပါ: ' + (data.error || ''));
+        alert('အမှားဖြစ်သွားပါသည်: ' + result.error);
       }
-    } catch (e: any) {
-      alert('❌ Error: ' + e?.message);
+    } catch (err: any) {
+      alert('အမှားဖြစ်သွားပါသည်: ' + err.message);
     } finally {
       setTopupLoading(false);
     }
   };
 
-  const handleSearchOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchOrderId.trim()) return;
-    setSearching(true);
-    try {
-      const res = await fetch(`/api/orders?search=${encodeURIComponent(searchOrderId.trim())}`);
-      const data = await res.json();
-      setSearchResult(data.data || null);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSearching(false);
-    }
-  };
-
-  const currentPackages = packages[selectedGame.id] || INITIAL_PACKAGES[selectedGame.id] || [];
-
   return (
-    <div className="min-h-screen bg-[#070d18] text-gray-100 font-sans pb-16">
-      <div className="max-w-md mx-auto p-4 space-y-5">
-        
-        {/* Header Logo & Navigation */}
-        <div className="bg-[#0e1726]/90 backdrop-blur-md p-4 rounded-3xl border border-blue-900/40 space-y-4 shadow-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full border-2 border-blue-500/50 p-0.5 overflow-hidden bg-[#070d18] shadow-lg shadow-blue-500/20">
-                <img src="/logo.png" alt="Shop Logo" className="w-full h-full object-cover rounded-full" onError={(e: any) => { e.currentTarget.style.display = 'none'; }} />
-              </div>
-              <div>
-                <h1 className="font-extrabold text-white text-base tracking-wide">Paing Gyi <span className="text-blue-400">shop</span></h1>
-                <p className="text-[10px] text-gray-400">Instant Game Top-up</p>
-              </div>
+    <div className="min-h-screen bg-[#0a1220] text-gray-100 font-sans pb-12">
+      {/* Top Banner */}
+      <div className="bg-[#111e33] border-b border-blue-900/40 px-4 py-2 text-xs flex justify-between items-center text-blue-200">
+        <span className="font-semibold">🌟 Paing Gyi Game Store - Official Platform</span>
+        <span className="text-yellow-400">⭐️ သစ္စာရှိကုမ္ပဏီ / 24/7 အမြန်ဆုံးဝန်ဆောင်မှု</span>
+      </div>
+
+      <div className="max-w-4xl mx-auto p-4 space-y-6">
+        {/* Navbar */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-[#111e33]/90 backdrop-blur-md p-4 rounded-2xl border border-blue-900/50">
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => { setSelectedGame(null); setActiveTab('shop'); }}>
+            <div className="w-11 h-11 rounded-full overflow-hidden bg-[#0a1220] border-2 border-blue-400/60 p-0.5 flex items-center justify-center shadow-lg shadow-blue-500/30 flex-shrink-0">
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
-            <a href="/admin" className="text-[10px] text-gray-400 hover:text-blue-400 border border-gray-800 hover:border-blue-500/40 px-2.5 py-1 rounded-xl transition">
-              Admin
-            </a>
+            <div>
+              <h1 className="font-bold text-white text-base">Paing Gyi <span className="text-blue-400">shop</span></h1>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-1.5 text-xs">
-            <button onClick={() => setActiveTab('shop')} className={`px-3 py-1.5 rounded-xl border font-bold transition ${activeTab === 'shop' ? 'bg-blue-600 border-blue-500 text-white shadow-md' : 'bg-[#070d18] border-gray-800 text-gray-300'}`}>ပင်မစာမျက်နှာ</button>
-            <button onClick={() => setActiveTab('search')} className={`px-3 py-1.5 rounded-xl border font-bold transition ${activeTab === 'search' ? 'bg-blue-600 border-blue-500 text-white shadow-md' : 'bg-[#070d18] border-gray-800 text-gray-300'}`}>ဘောက်ချာရှာမည်</button>
-            <button onClick={() => setActiveTab('wallet')} className={`px-3 py-1.5 rounded-xl border font-bold transition ${activeTab === 'wallet' ? 'bg-yellow-600 border-yellow-500 text-white shadow-md' : 'bg-[#070d18] border-gray-800 text-yellow-400'}`}>Wallet ({walletBalance} Ks)</button>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <button onClick={() => { setSelectedGame(null); setActiveTab('shop'); }} className={'px-3 py-1.5 rounded-xl border transition ' + (activeTab === 'shop' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ပင်မစာမျက်နှာ</button>
+            <button onClick={() => setActiveTab('search')} className={'px-3 py-1.5 rounded-xl border transition ' + (activeTab === 'search' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ဘောက်ချာရှာမည်</button>
+            <button onClick={() => setActiveTab('mlbb_check')} className={'px-3 py-1.5 rounded-xl border transition ' + (activeTab === 'mlbb_check' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>MLBB စစ်ဆေးမည်</button>
+            <button onClick={() => setActiveTab('wallet')} className={'px-3 py-1.5 rounded-xl border transition ' + (activeTab === 'wallet' ? 'bg-yellow-600 text-white border-yellow-500' : 'bg-[#0a1220] border-gray-800 text-yellow-400 font-bold')}>Wallet ({balance.toLocaleString()} Ks)</button>
+            {currentAuthUser ? (
+              <button onClick={handleLogout} className="bg-red-600/80 hover:bg-red-600 text-white px-3 py-1.5 rounded-xl transition">Logout</button>
+            ) : (
+              <button onClick={() => setActiveTab('login')} className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-xl transition font-medium">ဝင်ရောက်မည်</button>
+            )}
           </div>
         </div>
 
-        {/* Tab 1: Shop */}
-        {activeTab === 'shop' && (
-          <div className="space-y-5">
-            {/* Game Grid */}
-            <div>
-              <h2 className="text-xs font-bold text-gray-300 mb-2.5">🎮 ဂိမ်းရွေးချယ်ပါ</h2>
-              <div className="grid grid-cols-3 gap-2.5">
-                {GAMES.map(g => (
-                  <button
-                    key={g.id}
-                    onClick={() => handleGameSelect(g)}
-                    className={`p-2 rounded-2xl border flex flex-col items-center gap-1.5 transition-all text-center ${selectedGame.id === g.id ? 'bg-blue-900/40 border-blue-500 ring-2 ring-blue-500/30' : 'bg-[#0e1726] border-gray-800 hover:border-gray-700'}`}
-                  >
-                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-[#070d18] flex items-center justify-center p-0.5">
-                      <img src={g.image} alt={g.name} className="w-full h-full object-cover rounded-lg" onError={(e: any) => { e.currentTarget.src = '/logo.png'; }} />
-                    </div>
-                    <span className="text-[11px] font-bold text-gray-200 line-clamp-1">{g.name}</span>
-                  </button>
-                ))}
+        {/* Tab: Shop / Game Select */}
+        {activeTab === 'shop' && !selectedGame && (
+          <div className="space-y-4">
+            <h2 className="text-sm font-bold text-gray-300 uppercase tracking-wider">ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {GAMES.map(game => (
+                <div
+                  key={game.id}
+                  onClick={() => { setSelectedGame(game); setSelectedPkg(null); setMlbbCheckResult(null); }}
+                  className="bg-[#111e33] border border-blue-900/40 hover:border-blue-500/80 p-4 rounded-2xl cursor-pointer transition-all hover:scale-[1.02] flex items-center gap-4 group"
+                >
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-950/80 border border-blue-800/50 flex-shrink-0 flex items-center justify-center p-1 group-hover:border-blue-400 transition-colors">
+                    {game.image ? (
+                      <img src={game.image} alt={game.name} className="w-full h-full object-contain rounded-xl"  />
+                    ) : (
+                      <span className="text-2xl">🎮</span>
+                    )}
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{game.name}</h3>
+                    <p className="text-[11px] text-gray-400">{game.category}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Game Detail / Purchase */}
+        {activeTab === 'shop' && selectedGame && (
+          <div className="space-y-6">
+            <button onClick={() => setSelectedGame(null)} className="text-xs bg-[#111e33] border border-gray-800 text-gray-300 px-4 py-2 rounded-xl hover:bg-gray-800 transition">
+              ← နောက်သို့
+            </button>
+
+            <div className="bg-[#111e33] p-4 rounded-2xl border border-blue-900/40 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-950/80 border border-blue-800/50 flex-shrink-0 flex items-center justify-center p-1">
+                {selectedGame.image ? (
+                  <img src={selectedGame.image} alt={selectedGame.name} className="w-full h-full object-contain rounded-xl"  />
+                ) : (
+                  <span className="text-2xl">🎮</span>
+                )}
+              </div>
+              <div>
+                <h2 className="font-bold text-white text-base">{selectedGame.name}</h2>
+                <p className="text-xs text-gray-400">ဂိမ်း ID ဖြည့်သွင်းပြီး စိန်/UC များ ဝယ်ယူပါ</p>
               </div>
             </div>
 
-            {/* Order Form Card */}
-            <div className="bg-[#0e1726] p-4 rounded-3xl border border-blue-900/40 space-y-4 shadow-lg">
-              {/* Account Input */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-300">
-                  {selectedGame.id === 'smile_coin' ? 'Telegram Account ထည့်ရန်' : 'ဂိမ်းအကောင့် ID ထည့်ရန်'}
-                </label>
-                {selectedGame.id === 'smile_coin' ? (
+            {/* Account Info */}
+            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold text-gray-200">❶ အကောင့်အချက်အလက်</span>
+                {selectedGame.id === 'mlbb' && (
+                  <button
+                    onClick={() => handleMlbbCheck(undefined, userId, zoneId)}
+                    disabled={checkingMlbb}
+                    className="text-[11px] bg-blue-600/80 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition"
+                  >
+                    {checkingMlbb ? 'စစ်နေသည်...' : '🔍 ID စစ်မည်'}
+                  </button>
+                )}
+              </div>
+
+              {selectedGame.id === 'smile_coin' ? (
+                <div>
                   <input
                     type="text"
                     placeholder="Telegram name ထည့်ရန် (ဥပမာ - @username သို့မဟုတ် နာမည်)"
                     value={userId}
                     onChange={e => setUserId(e.target.value)}
-                    className="w-full bg-[#070d18] border border-blue-500/50 p-3.5 rounded-2xl text-xs text-white outline-none focus:border-blue-400 placeholder:text-gray-500 shadow-inner"
+                    className="w-full bg-[#0a1220] border border-blue-500/50 p-3.5 rounded-xl text-xs text-white outline-none focus:border-blue-400 placeholder:text-gray-400 shadow-inner"
                     required
                   />
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <input
-                      type="text"
-                      placeholder="User ID"
-                      value={userId}
-                      onChange={e => setUserId(e.target.value)}
-                      className="bg-[#070d18] border border-gray-800 p-3 rounded-2xl text-xs text-white outline-none focus:border-blue-500 placeholder:text-gray-500"
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Zone ID (optional)"
-                      value={zoneId}
-                      onChange={e => setZoneId(e.target.value)}
-                      className="bg-[#070d18] border border-gray-800 p-3 rounded-2xl text-xs text-white outline-none focus:border-blue-500 placeholder:text-gray-500"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Package Selection */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-300">💎 ပက်ကေ့ဂျ် ရွေးချယ်ပါ</label>
-                <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1">
-                  {currentPackages.map(pkg => (
-                    <button
-                      key={pkg.id}
-                      type="button"
-                      onClick={() => setSelectedPackage(pkg)}
-                      className={`p-2.5 rounded-xl border text-left transition-all ${selectedPackage?.id === pkg.id ? 'bg-blue-600/30 border-blue-500 ring-1 ring-blue-500' : 'bg-[#070d18] border-gray-800 hover:border-gray-700'}`}
-                    >
-                      <div className="text-[11px] font-bold text-white line-clamp-1">{pkg.name}</div>
-                      <div className="text-[11px] font-extrabold text-yellow-400 mt-0.5">{pkg.price.toLocaleString()} Ks</div>
-                    </button>
-                  ))}
                 </div>
-              </div>
-
-              {/* Payment Method */}
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-300">💳 ငွေပေးချေမှုပုံစံ</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('wallet')}
-                    className={`p-2.5 rounded-xl border text-xs font-bold transition ${paymentMethod === 'wallet' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-[#070d18] border-gray-800 text-gray-400'}`}
-                  >
-                    💰 Wallet
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('direct_slip')}
-                    className={`p-2.5 rounded-xl border text-xs font-bold transition ${paymentMethod === 'direct_slip' ? 'bg-blue-600 border-blue-500 text-white' : 'bg-[#070d18] border-gray-800 text-gray-400'}`}
-                  >
-                    🧾 ပြေစာတင်မည်
-                  </button>
-                </div>
-              </div>
-
-              {/* Direct Slip Upload Option */}
-              {paymentMethod === 'direct_slip' && (
-                <div className="bg-[#070d18] p-3 rounded-2xl border border-dashed border-gray-700 space-y-2">
-                  <span className="text-[11px] text-gray-300 font-bold block">ငွေလွှဲပြေစာ (Slip) တင်ပါ</span>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleFileChange(e, setSlipImage)}
-                    className="text-xs text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white"
+                    type="text"
+                    placeholder="User ID"
+                    value={userId}
+                    onChange={e => setUserId(e.target.value)}
+                    className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
                   />
-                  {slipImage && <span className="text-[10px] text-green-400 block">✅ ပုံတင်ပြီးပါပြီ</span>}
+                  <input
+                    type="text"
+                    placeholder="Zone ID (optional)"
+                    value={zoneId}
+                    onChange={e => setZoneId(e.target.value)}
+                    className="bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+                  />
                 </div>
               )}
 
-              {/* Submit Button */}
+              {mlbbCheckResult && (
+                <div className={'p-3 rounded-xl text-xs font-semibold ' + (mlbbCheckResult.error ? 'bg-red-900/40 text-red-400 border border-red-800' : 'bg-green-900/40 text-green-300 border border-green-800')}>
+                  {mlbbCheckResult.error ? '❌ ' + mlbbCheckResult.error : '✅ အကောင့်အမည်: ' + mlbbCheckResult.name}
+                </div>
+              )}
+            </div>
+
+            {/* Packages */}
+            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-3">
+              <span className="text-xs font-bold text-gray-200">❷ ပက်ကေ့ဂျ် ရွေးချယ်ပါ</span>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {(packages[selectedGame.id] || []).map((pkg: any) => (
+                  <div
+                    key={pkg.id}
+                    onClick={() => setSelectedPkg(pkg)}
+                    className={'p-3 rounded-xl border cursor-pointer transition text-center ' + (selectedPkg?.id === pkg.id ? 'bg-blue-600/30 border-blue-400 shadow-md shadow-blue-500/20' : 'bg-[#0a1220] border-gray-800 hover:border-gray-700')}
+                  >
+                    <p className="text-xs font-bold text-white">{pkg.name}</p>
+                    <p className="text-xs text-yellow-400 font-semibold mt-1">{pkg.price.toLocaleString()} Ks</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Payment Method */}
+            <div className="bg-[#111e33] p-5 rounded-2xl border border-blue-900/40 space-y-4">
+              <span className="text-xs font-bold text-gray-200">❸ ငွေပေးချေမှု နည်းလမ်း</span>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('wallet')}
+                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'wallet' ? 'bg-blue-600/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
+                >
+                  💳 Wallet Balance
+                  <p className="text-[10px] font-normal text-yellow-400 mt-1">လက်ကျန်: {balance.toLocaleString()} Ks</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('slip')}
+                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'slip' ? 'bg-blue-600/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
+                >
+                  🧾 Direct Slip Upload
+                  <p className="text-[10px] font-normal text-gray-400 mt-1">ငွေလွှဲစလစ် တင်မည်</p>
+                </button>
+              </div>
+
+              {paymentMethod === 'slip' && (
+                <div className="p-3.5 bg-[#0a1220] border border-dashed border-blue-500/50 rounded-xl space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-gray-300 font-semibold">🧾 ငွေလွှဲပြေစာ (Slip) ပုံတင်ပါ:</span>
+                    {orderSlip && <span className="text-green-400 font-bold">✅ ပုံရွေးချယ်ပြီး</span>}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, setOrderSlip)}
+                    className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
+                    required
+                  />
+                  {orderSlip && (
+                    <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-700 mt-2">
+                      <img src={orderSlip} alt="Order Slip Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {statusMsg && (
+                <div className={'p-3 rounded-xl text-xs font-semibold ' + (statusMsg.includes('✅') ? 'bg-green-900/40 text-green-300 border border-green-800' : 'bg-red-900/40 text-red-400 border border-red-800')}>
+                  {statusMsg}
+                </div>
+              )}
+
               <button
-                onClick={handleOrderSubmit}
+                onClick={handleSubmit}
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 active:scale-98 text-white font-extrabold py-3.5 rounded-2xl text-xs transition disabled:opacity-50 shadow-lg shadow-blue-600/30"
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50 text-sm shadow-lg shadow-blue-600/30"
               >
-                {loading ? 'ဆောင်ရွက်နေပါသည်...' : `ဝယ်ယူမည် - ${(selectedPackage?.price || 0).toLocaleString()} Ks`}
+                {loading ? 'ဆောင်ရွက်နေပါသည်...' : 'ယခု ဝယ်ယူမည်'}
               </button>
             </div>
           </div>
         )}
 
-        {/* Tab 2: Wallet */}
-        {activeTab === 'wallet' && (
-          <div className="space-y-4">
-            <div className="bg-[#0e1726] p-4 rounded-3xl border border-yellow-600/30 space-y-1">
-              <span className="text-xs text-yellow-500 font-bold">💰 လက်ရှိလက်ကျန်ငွေ</span>
-              <h2 className="text-2xl font-black text-white">{walletBalance.toLocaleString()} Ks</h2>
+        {/* Tab: MLBB Checker Tab */}
+        {activeTab === 'mlbb_check' && (
+          <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-4 max-w-md mx-auto">
+            <div className="text-center space-y-1">
+              <span className="text-3xl">🎮</span>
+              <h2 className="text-lg font-bold text-white">MLBB User ID စစ်ဆေးရန်</h2>
+              <p className="text-xs text-gray-400">In-Game Name မှန်မမှန် အလိုအလျောက် စစ်ဆေးပေးပါသည်</p>
             </div>
 
-            {/* 💳 Payment Account Cards */}
-            <div className="space-y-2.5">
-              <h3 className="text-xs font-bold text-gray-300 flex items-center gap-1.5">
-                <span>💳</span> ငွေလွှဲပေးချေမှု
-              </h3>
-
-              {/* Wave */}
-              <div className="bg-[#0e1726] border border-blue-900/40 hover:border-blue-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-[#ffdf00] flex items-center justify-center p-1 flex-shrink-0 shadow-md">
-                    <img src="https://img.icons8.com/color/96/wave.png" alt="Wave" className="w-full h-full object-contain" />
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-xs">Wave</h4>
-                    <p className="text-[11px] text-gray-400">U Ye Paing Oo</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  <span className="font-mono text-xs font-bold text-white tracking-wide">09967241357</span>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard('09967241357')}
-                    className="bg-blue-600/30 hover:bg-blue-600 border border-blue-500/40 text-blue-300 hover:text-white text-[10px] font-bold px-3 py-1 rounded-full transition-all active:scale-95"
-                  >
-                    {copiedPhone === '09967241357' ? '✅ ကူးပြီး' : 'ငွေလွှဲရန်'}
-                  </button>
-                </div>
-              </div>
-
-              {/* K pay */}
-              <div className="bg-[#0e1726] border border-blue-900/40 hover:border-blue-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-[#00529b] flex items-center justify-center p-1 flex-shrink-0 shadow-md">
-                    <span className="text-white font-black text-[11px]">KBZ</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-xs">K pay</h4>
-                    <p className="text-[11px] text-gray-400">U Ye Paing Oo</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  <span className="font-mono text-xs font-bold text-white tracking-wide">09967241357</span>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard('09967241357')}
-                    className="bg-blue-600/30 hover:bg-blue-600 border border-blue-500/40 text-blue-300 hover:text-white text-[10px] font-bold px-3 py-1 rounded-full transition-all active:scale-95"
-                  >
-                    {copiedPhone === '09967241357' ? '✅ ကူးပြီး' : 'ငွေလွှဲရန်'}
-                  </button>
-                </div>
-              </div>
-
-              {/* AYA PAY */}
-              <div className="bg-[#0e1726] border border-blue-900/40 hover:border-blue-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-[#e31b23] flex items-center justify-center p-1 flex-shrink-0 shadow-md">
-                    <span className="text-white font-black text-[10px]">AYA</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-xs">AYA PAY</h4>
-                    <p className="text-[11px] text-gray-400">U Ye Paing Oo</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  <span className="font-mono text-xs font-bold text-white tracking-wide">09967241357</span>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard('09967241357')}
-                    className="bg-blue-600/30 hover:bg-blue-600 border border-blue-500/40 text-blue-300 hover:text-white text-[10px] font-bold px-3 py-1 rounded-full transition-all active:scale-95"
-                  >
-                    {copiedPhone === '09967241357' ? '✅ ကူးပြီး' : 'ငွေလွှဲရန်'}
-                  </button>
-                </div>
-              </div>
-
-              {/* UAB Pay */}
-              <div className="bg-[#0e1726] border border-blue-900/40 hover:border-blue-500/50 p-3 rounded-2xl flex items-center justify-between transition-all">
-                <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-purple-800 to-indigo-600 flex items-center justify-center p-1 flex-shrink-0 shadow-md">
-                    <span className="text-white font-black text-[10px]">UAB</span>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-xs">UAB Pay</h4>
-                    <p className="text-[11px] text-gray-400">U Ye Paing Oo</p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1.5">
-                  <span className="font-mono text-xs font-bold text-white tracking-wide">09967241357</span>
-                  <button
-                    type="button"
-                    onClick={() => copyToClipboard('09967241357')}
-                    className="bg-blue-600/30 hover:bg-blue-600 border border-blue-500/40 text-blue-300 hover:text-white text-[10px] font-bold px-3 py-1 rounded-full transition-all active:scale-95"
-                  >
-                    {copiedPhone === '09967241357' ? '✅ ကူးပြီး' : 'ငွေလွှဲရန်'}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Topup Form */}
-            <form onSubmit={handleWalletTopup} className="bg-[#0e1726] p-4 rounded-3xl border border-blue-900/40 space-y-3 shadow-lg">
-              <h3 className="text-xs font-bold text-white">ငွေဖြည့်တောင်းဆိုရန်</h3>
+            <form onSubmit={e => handleMlbbCheck(e)} className="space-y-3">
               <input
-                type="number"
-                placeholder="ငွေပမာဏ (Ks) - ဥပမာ 10000"
-                value={walletAmount}
-                onChange={e => setWalletAmount(e.target.value)}
-                className="w-full bg-[#070d18] border border-gray-800 p-3 rounded-2xl text-xs text-white outline-none focus:border-blue-500"
-                required
+                type="text"
+                placeholder="User ID"
+                value={checkMlbbId}
+                onChange={e => setCheckMlbbId(e.target.value)}
+                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
               />
               <input
                 type="text"
-                placeholder="မှတ်ချက် (ငွေလွှဲနောက်ဆုံး ၄ လုံး စသည်)"
-                value={walletNote}
-                onChange={e => setWalletNote(e.target.value)}
-                className="w-full bg-[#070d18] border border-gray-800 p-3 rounded-2xl text-xs text-white outline-none focus:border-blue-500"
+                placeholder="Zone ID"
+                value={checkMlbbZone}
+                onChange={e => setCheckMlbbZone(e.target.value)}
+                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
               />
-              <div className="bg-[#070d18] p-3 rounded-2xl border border-dashed border-gray-700 space-y-2">
-                <span className="text-[11px] text-gray-300 font-bold block">ငွေလွှဲပြေစာ (Slip) တင်ပါ</span>
+              <button
+                type="submit"
+                disabled={checkingMlbb}
+                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition disabled:opacity-50"
+              >
+                {checkingMlbb ? 'စစ်ဆေးနေပါသည်...' : 'စစ်ဆေးမည်'}
+              </button>
+            </form>
+
+            {mlbbCheckResult && (
+              <div className={'p-4 rounded-xl text-xs font-semibold ' + (mlbbCheckResult.error ? 'bg-red-900/40 text-red-400 border border-red-800' : 'bg-green-900/40 text-green-300 border border-green-800')}>
+                {mlbbCheckResult.error ? '❌ ' + mlbbCheckResult.error : '✅ အကောင့်အမည်: ' + mlbbCheckResult.name}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab: Wallet Topup */}
+        {activeTab === 'wallet' && (
+          <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-6 max-w-lg mx-auto">
+            <div className="flex justify-between items-center border-b border-gray-800 pb-4">
+              <div>
+                <h2 className="text-base font-bold text-white">💰 လက်ရှိလက်ကျန်ငွေ</h2>
+                <p className="text-xl font-extrabold text-yellow-400">{balance.toLocaleString()} Ks</p>
+              </div>
+            </div>
+
+            <div className="bg-[#0a1220] p-4 rounded-xl border border-gray-800 space-y-2 text-xs">
+              <p className="text-gray-400 font-bold">💳 ငွေလွှဲပေးချေမှု အကောင့်များ</p>
+              <div className="flex justify-between text-gray-300"><span>Wave / KBZPay:</span><span className="font-mono text-yellow-400">09967241357</span></div>
+              <div className="flex justify-between text-gray-300"><span>အကောင့်ပိုင်ရှင်:</span><span>U Ye Paing Oo</span></div>
+            </div>
+
+            <form onSubmit={handleTopupSubmit} className="space-y-3">
+              <input
+                type="number"
+                placeholder="ငွေပမာဏ (Ks) - ဥပမာ 10000"
+                value={topupAmount}
+                onChange={e => setTopupAmount(e.target.value)}
+                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
+                required
+              />
+              <textarea
+                placeholder="မှတ်ချက် (ငွေလွှဲနောက်ဆုံး ၄ လုံး စသည်)"
+                value={topupNote}
+                onChange={e => setTopupNote(e.target.value)}
+                className="w-full bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500 h-20"
+              />
+
+              <div className="p-3.5 bg-[#0a1220] border border-dashed border-yellow-500/50 rounded-xl space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-gray-300 font-semibold">🧾 ငွေလွှဲပြေစာ (Slip) ပုံတင်ပါ:</span>
+                  {walletSlip && <span className="text-green-400 font-bold">✅ ပုံရွေးချယ်ပြီး</span>}
+                </div>
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={(e) => handleFileChange(e, setWalletSlip)}
-                  className="text-xs text-gray-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white"
+                  onChange={(e) => handleImageUpload(e, setWalletSlip)}
+                  className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-yellow-600 file:text-white hover:file:bg-yellow-500 cursor-pointer"
                   required
                 />
-                {walletSlip && <span className="text-[10px] text-green-400 block">✅ ပြေစာတင်ပြီးပါပြီ</span>}
+                {walletSlip && (
+                  <div className="w-20 h-20 rounded-lg overflow-hidden border border-gray-700 mt-2">
+                    <img src={walletSlip} alt="Wallet Slip Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
               </div>
               <button
                 type="submit"
                 disabled={topupLoading}
-                className="w-full bg-yellow-600 hover:bg-yellow-500 active:scale-98 text-white font-extrabold py-3.5 rounded-2xl text-xs transition disabled:opacity-50 shadow-lg shadow-yellow-600/30"
+                className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold py-3 rounded-xl text-xs transition disabled:opacity-50"
               >
                 {topupLoading ? 'တောင်းဆိုနေပါသည်...' : 'ငွေဖြည့်တောင်းဆိုမည်'}
               </button>
@@ -624,47 +754,131 @@ export default function Home() {
           </div>
         )}
 
-        {/* Tab 3: Search Order */}
+        {/* Tab: Search Voucher */}
         {activeTab === 'search' && (
-          <div className="bg-[#0e1726] p-4 rounded-3xl border border-blue-900/40 space-y-4 shadow-lg">
-            <h2 className="text-xs font-bold text-white">🔍 ဘောက်ချာရှာမည်</h2>
+          <div className="bg-[#111e33] p-6 rounded-2xl border border-blue-900/40 space-y-4 max-w-lg mx-auto">
+            <h2 className="text-base font-bold text-white text-center">📦 ဘောက်ချာ / အော်ဒါ ရှာဖွေရန်</h2>
             <form onSubmit={handleSearchOrder} className="flex gap-2">
               <input
                 type="text"
-                placeholder="Order ID သို့မဟုတ် Player ID"
+                placeholder="Player ID သို့မဟုတ် User Email"
                 value={searchOrderId}
                 onChange={e => setSearchOrderId(e.target.value)}
-                className="flex-1 bg-[#070d18] border border-gray-800 p-3 rounded-2xl text-xs text-white outline-none focus:border-blue-500"
-                required
+                className="flex-1 bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
               />
-              <button
-                type="submit"
-                disabled={searching}
-                className="bg-blue-600 hover:bg-blue-500 text-white font-bold px-4 py-3 rounded-2xl text-xs transition"
-              >
-                {searching ? '...' : 'ရှာမည်'}
+              <button type="submit" disabled={searching} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-3 rounded-xl text-xs font-bold transition">
+                {searching ? 'ရှာနေသည်...' : 'ရှာမည်'}
               </button>
             </form>
 
-            {searchResult && (
-              <div className="bg-[#070d18] p-3.5 rounded-2xl border border-gray-800 space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">ဂိမ်း:</span>
-                  <span className="font-bold text-white">{searchResult.game_name}</span>
+            <div className="space-y-2 mt-4">
+              {searchResults.map((o: any) => (
+                <div key={o.id} className="bg-[#0a1220] p-3 rounded-xl border border-gray-800 text-xs flex justify-between items-center">
+                  <div>
+                    <p className="font-bold text-white">{o.package_name}</p>
+                    <p className="text-gray-400 text-[10px]">ID: {o.player_id} | {o.price} Ks</p>
+                  </div>
+                  <span className={'px-2 py-0.5 rounded text-[10px] font-bold ' + (o.status === 'approved' || o.status === 'completed' ? 'bg-green-900/60 text-green-400' : o.status === 'rejected' ? 'bg-red-900/60 text-red-400' : 'bg-yellow-900/60 text-yellow-400')}>
+                    {o.status || 'pending'}
+                  </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">ပက်ကေ့ဂျ်:</span>
-                  <span className="font-bold text-yellow-400">{searchResult.package_name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">အခြေအနေ:</span>
-                  <span className="font-bold text-blue-400">{searchResult.status}</span>
-                </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         )}
 
+        {/* Tab: Login / Signup (Glassmorphism UI with Shop Logo) */}
+        {activeTab === 'login' && (
+          <div className="relative max-w-md mx-auto my-6 p-2">
+            <div className="absolute -top-6 -left-6 w-48 h-48 bg-purple-600/30 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-blue-600/30 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative backdrop-blur-xl bg-white/[0.07] border border-white/20 p-8 rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] space-y-6">
+              {/* Shop Logo Badge */}
+              <div className="flex justify-center">
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 rounded-full blur opacity-80 group-hover:opacity-100 transition duration-300"></div>
+                  <div className="relative w-20 h-20 rounded-full bg-[#0a1220] border-2 border-white/40 p-1 flex items-center justify-center shadow-2xl overflow-hidden">
+                    <img src="/logo.png" alt="Shop Logo" className="w-full h-full object-cover rounded-full" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center space-y-1.5">
+                <h2 className="text-2xl font-extrabold text-white tracking-wide">
+                  {isSignUp ? 'Create Account' : 'Welcome Back!'}
+                </h2>
+                <p className="text-xs text-gray-300 font-light">
+                  {isSignUp ? 'Paing Gyi Shop တွင် အကောင့်အသစ်ပြုလုပ်ပါ' : 'Login to continue to your account'}
+                </p>
+              </div>
+
+              <form onSubmit={handleAuthSubmit} className="space-y-4">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                    </svg>
+                  </div>
+                  <input
+                    type="email"
+                    placeholder="Email Address"
+                    value={authEmail}
+                    onChange={e => setAuthEmail(e.target.value)}
+                    className="w-full bg-white/[0.08] border border-white/15 focus:border-blue-400 focus:bg-white/[0.14] text-white text-xs rounded-2xl pl-12 pr-4 py-3.5 outline-none transition-all placeholder:text-gray-400 shadow-inner"
+                    required
+                  />
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={authPassword}
+                    onChange={e => setAuthPassword(e.target.value)}
+                    className="w-full bg-white/[0.08] border border-white/15 focus:border-blue-400 focus:bg-white/[0.14] text-white text-xs rounded-2xl pl-12 pr-4 py-3.5 outline-none transition-all placeholder:text-gray-400 shadow-inner"
+                    required
+                  />
+                </div>
+
+                {authMsg && (
+                  <div className={'p-3 rounded-xl text-xs text-center font-medium ' + (authMsg.includes('✅') ? 'bg-green-500/20 border border-green-500/30 text-green-300' : 'bg-red-500/20 border border-red-500/30 text-red-300')}>
+                    {authMsg}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={authLoading}
+                  className="w-full relative group overflow-hidden rounded-2xl p-[1px] font-semibold text-white shadow-xl transition-all active:scale-95 disabled:opacity-50 mt-3"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-pink-500 transition-all duration-300 group-hover:brightness-110"></div>
+                  <div className="relative px-6 py-3.5 rounded-2xl bg-transparent flex items-center justify-center gap-2 text-sm tracking-wider font-bold">
+                    {authLoading ? 'လုပ်ဆောင်နေပါသည်...' : (isSignUp ? 'Sign Up' : 'Login')}
+                  </div>
+                </button>
+              </form>
+
+              <div className="pt-2 text-center">
+                <p className="text-xs text-gray-300">
+                  {isSignUp ? 'အကောင့်ရှိပြီးသားလား? ' : "Don't have an account? "}
+                  <button
+                    type="button"
+                    onClick={() => { setIsSignUp(!isSignUp); setAuthMsg(''); }}
+                    className="text-blue-400 hover:text-pink-400 font-bold underline transition-colors"
+                  >
+                    {isSignUp ? 'Login ဝင်ပါ' : 'Sign up'}
+                  </button>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
