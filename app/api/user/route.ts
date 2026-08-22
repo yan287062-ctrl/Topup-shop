@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabaseAdmin } from '../../../lib/supabase-admin';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-
-const supabase = createClient(
-  'https://aasncvjvjftsyhywrueo.supabase.co',
-  'sb_publishable_BWPJnQPpWwysRe84oYfgAw_GinZLV98'
-);
 
 export async function GET(req: Request) {
   try {
@@ -15,43 +10,116 @@ export async function GET(req: Request) {
     const userId = searchParams.get('id');
     const email = searchParams.get('email');
 
-    if (!userId && !email) return NextResponse.json({ balance: 0 });
+    if (!userId && !email) {
+      return NextResponse.json({ balance: 0 });
+    }
 
-    let query = supabase.from('profiles').select('balance');
+    let query = supabaseAdmin
+      .from('profiles')
+      .select('balance');
+
     if (userId) {
       query = query.eq('id', userId);
     } else if (email) {
-      query = query.eq('email', email);
+      query = query.ilike('email', email.trim().toLowerCase());
     }
 
-    const { data } = await query.maybeSingle();
-    return NextResponse.json({ balance: data?.balance || 0 });
+    const { data, error } = await query.maybeSingle();
+
+    if (error) {
+      console.error('USER BALANCE GET ERROR:', error);
+      return NextResponse.json({ balance: 0 });
+    }
+
+    return NextResponse.json({
+      balance: Number(data?.balance || 0)
+    });
   } catch (err: any) {
+    console.error('USER GET ERROR:', err);
     return NextResponse.json({ balance: 0 });
   }
 }
 
 export async function POST(req: Request) {
   try {
-    const { email, userId, amount, note, slipUrl } = await req.json();
+    const {
+      email,
+      userId,
+      amount,
+      note,
+      slipUrl
+    } = await req.json();
 
-    const { error } = await supabase.from('orders').insert([
-      {
-        game_id: 'wallet_topup',
-        game_name: 'Wallet Balance Topup',
-        package_name: `ငွေဖြည့်: ${Number(amount).toLocaleString()} Ks`,
-        price: Number(amount),
-        player_id: email || userId || 'User',
-        zone_id: note || '',
-        slip_url: slipUrl || '',
-        status: 'pending',
-        created_at: new Date().toISOString()
-      }
-    ]);
+    const numericAmount = Number(amount);
 
-    if (error) throw error;
-    return NextResponse.json({ success: true });
+    if (!numericAmount || numericAmount <= 0) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'ငွေပမာဏ ထည့်သွင်းပေးပါ'
+        },
+        { status: 400 }
+      );
+    }
+
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    const cleanUserId = userId || null;
+
+    if (!cleanEmail && !cleanUserId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'User information မရှိပါ'
+        },
+        { status: 400 }
+      );
+    }
+
+    /*
+     * Wallet topup ကို orders ထဲမထည့်တော့ဘဲ
+     * wallet_topups table ထဲကို တိုက်ရိုက်ထည့်မည်။
+     */
+    const { data, error } = await supabaseAdmin
+      .from('wallet_topups')
+      .insert([
+        {
+          email: cleanEmail || null,
+          user_id: cleanUserId,
+          amount: numericAmount,
+          note: note || '',
+          slip_url: slipUrl || '',
+          status: 'pending'
+        }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error('WALLET TOPUP INSERT ERROR:', error);
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: error.message
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data
+    });
+
   } catch (err: any) {
-    return NextResponse.json({ error: err.message || 'Server error' }, { status: 500 });
+    console.error('USER POST ERROR:', err);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: err.message || 'Server error'
+      },
+      { status: 500 }
+    );
   }
 }
