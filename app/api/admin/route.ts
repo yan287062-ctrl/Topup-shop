@@ -2,99 +2,263 @@ import { NextResponse } from 'next/server';
 import { supabase } from '../../../lib/supabase';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
   try {
-    // Orders များကို ဆွဲထုတ်ခြင်း
-    const { data: orders } = await supabase
+    const { data: orders, error: ordersError } = await supabase
       .from('orders')
       .select('*')
       .order('created_at', { ascending: false });
 
-    // သီးသန့် wallet_topups များကို ဆွဲထုတ်ခြင်း
-    const { data: topups } = await supabase
+    if (ordersError) {
+      console.error('Orders GET error:', ordersError);
+    }
+
+    const { data: topups, error: topupsError } = await supabase
       .from('wallet_topups')
       .select('*')
       .order('created_at', { ascending: false });
 
-    // wallet_topups များကို မူလ Admin Panel က နားလည်သော Order format အဖြစ် ပြောင်းလဲခြင်း
+    if (topupsError) {
+      console.error('Wallet topups GET error:', topupsError);
+    }
+
     const mappedTopups = (topups || []).map((t: any) => ({
       id: t.id,
+      game_id: 'wallet_topup',
       game_name: 'Wallet Balance Topup',
-      package_name: 'ငွေဖြည့် ' + t.amount + ' Ks',
-      player_id: t.email,
+      package_name: 'ငွေဖြည့် ' + Number(t.amount || 0).toLocaleString() + ' Ks',
+      player_id: t.email || t.user_id || '',
       zone_id: '-',
-      price: t.amount,
+      price: Number(t.amount || 0),
       payment_method: 'Wallet',
-      status: t.status,
+      status: t.status || 'pending',
       created_at: t.created_at,
-      slip_url: t.slip_url
+      slip_url: t.slip_url || '',
+      email: t.email || '',
+      user_id: t.user_id || ''
     }));
 
-    // အားလုံးပေါင်းပြီး အချိန်အလိုက် စီပေးခြင်း
-    const combinedOrders = [...(orders || []), ...mappedTopups].sort(
-      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    const combinedOrders = [
+      ...(orders || []),
+      ...mappedTopups
+    ].sort(
+      (a: any, b: any) =>
+        new Date(b.created_at).getTime() -
+        new Date(a.created_at).getTime()
     );
 
-    return NextResponse.json({ orders: combinedOrders });
+    return NextResponse.json({
+      orders: combinedOrders
+    });
   } catch (err: any) {
-    return NextResponse.json({ orders: [] }, { status: 500 });
+    console.error('Admin GET error:', err);
+
+    return NextResponse.json(
+      {
+        orders: [],
+        error: err.message || 'Server error'
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+
     const targetId = body.orderId || body.topupId || body.id;
     const status = body.status;
 
     if (!targetId || !status) {
-      return NextResponse.json({ success: false, error: 'Missing id or status' });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Missing id or status'
+        },
+        { status: 400 }
+      );
     }
 
-    // Order ဇယား နှင့် Topup ဇယား နှစ်ခုလုံးတွင် status ပြင်ဆင်ခြင်း
-    await supabase.from('orders').update({ status }).eq('id', targetId);
-    await supabase.from('wallet_topups').update({ status }).eq('id', targetId);
+    const { data: topupRow } = await supabase
+      .from('wallet_topups')
+      .select('*')
+      .eq('id', targetId)
+      .maybeSingle();
 
-    // လက်ခံလိုက်ပါက ငွေတိုးပေးခြင်း Logic
-    if (status === 'approved') {
-      let targetEmail = '';
-      let topupAmount = 0;
+    const { data: orderRow } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('id', targetId)
+      .maybeSingle();
 
-      // အရင်ဆုံး Order ဇယားတွင် ရှာမည်
-      const { data: oRow } = await supabase.from('orders').select('*').eq('id', targetId).single();
-      if (oRow && (oRow.game_name?.toLowerCase().includes('wallet') || oRow.game_id === 'wallet_topup')) {
-        targetEmail = oRow.player_id || oRow.email;
-        topupAmount = Number(oRow.price || 0);
-      } else {
-        // မတွေ့ပါက Topup ဇယားတွင် ရှာမည်
-        const { data: tRow } = await supabase.from('wallet_topups').select('*').eq('id', targetId).single();
-        if (tRow) {
-          targetEmail = tRow.email;
-          topupAmount = Number(tRow.amount || 0);
-        }
+    /*
+     * WALLET TOPUP
+     */
+    if (topupRow) {
+      const oldStatus = String(
+        topupRow.status || ''
+      ).toLowerCase();
+
+      // Already approved = don't add balance again
+      if (status === 'approved' && oldStatus === 'approved') {
+        return NextResponse.json({
+          success: true,
+          message: 'Already approved. Balance was not added again.'
+        });
       }
 
-      // ငွေတိုးပေးခြင်း
-      if (targetEmail && topupAmount > 0) {
-        const cleanEmail = targetEmail.trim().toLowerCase();
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .ilike('email', cleanEmail)
-          .single();
+      const { error: updateError } = await supabase
+        .from('wallet_topups')
+        .update({ status })
+        .eq('id', targetId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      /*
+       * Add balance only once when status becomes approved.
+       */
+      if (status === 'approved' && oldStatus !== 'approved') {
+        const amount = Number(topupRow.amount || 0);
+
+        if (!amount || amount <= 0) {
+          throw new Error('Invalid topup amount');
+        }
+
+        const email = String(
+          topupRow.email || ''
+        ).trim().toLowerCase();
+
+        const userId = topupRow.user_id || null;
+
+        if (!email && !userId) {
+          throw new Error('Topup user information is missing');
+        }
+
+        let profile: any = null;
+
+        // Find by user ID first
+        if (userId) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', userId)
+            .maybeSingle();
+
+          profile = data;
+        }
+
+        // If not found, find by email
+        if (!profile && email) {
+          const { data } = await supabase
+            .from('profiles')
+            .select('*')
+            .ilike('email', email)
+            .maybeSingle();
+
+          profile = data;
+        }
 
         if (profile) {
-          const newBal = Number(profile.wallet_balance || 0) + topupAmount;
-          await supabase.from('profiles').update({ wallet_balance: newBal }).ilike('email', cleanEmail);
+          const currentBalance = Number(
+            profile.balance || 0
+          );
+
+          const newBalance =
+            currentBalance + amount;
+
+          const { error: balanceError } = await supabase
+            .from('profiles')
+            .update({
+              balance: newBalance
+            })
+            .eq('id', profile.id);
+
+          if (balanceError) {
+            throw balanceError;
+          }
+
+          console.log(
+            `Wallet credited: ${profile.email || profile.id} +${amount} => ${newBalance}`
+          );
         } else {
-          await supabase.from('profiles').insert([{ email: cleanEmail, wallet_balance: topupAmount }]);
+          const insertData: any = {
+            balance: amount
+          };
+
+          if (userId) {
+            insertData.id = userId;
+          }
+
+          if (email) {
+            insertData.email = email;
+          }
+
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert([insertData]);
+
+          if (insertError) {
+            throw insertError;
+          }
+
+          console.log(
+            `New wallet profile created: ${email || userId} +${amount}`
+          );
         }
       }
+
+      return NextResponse.json({
+        success: true,
+        type: 'wallet_topup',
+        message:
+          status === 'approved'
+            ? 'Topup approved and balance updated.'
+            : `Topup status changed to ${status}.`
+      });
     }
 
-    return NextResponse.json({ success: true });
+    /*
+     * NORMAL ORDER
+     */
+    if (orderRow) {
+      const { error: updateError } = await supabase
+        .from('orders')
+        .update({ status })
+        .eq('id', targetId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      return NextResponse.json({
+        success: true,
+        type: 'order',
+        message: `Order status changed to ${status}.`
+      });
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Order or wallet topup not found'
+      },
+      { status: 404 }
+    );
+
   } catch (err: any) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+    console.error('Admin POST error:', err);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: err.message || 'Server error'
+      },
+      { status: 500 }
+    );
   }
 }
