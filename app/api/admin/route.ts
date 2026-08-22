@@ -182,20 +182,12 @@ export async function POST(request: Request) {
          * If not found, find by EMAIL
          */
 
+        
         if (!wallet && email) {
-
-          const { data, error } = await supabase
-            .from('wallets')
-            .select('*')
-            .ilike('email', email)
-            .maybeSingle();
-
-          if (error) {
-            throw error;
-          }
-
-          wallet = data;
+          // wallets table မှာ email column မရှိတဲ့အတွက် email နဲ့ရှာခြင်းကို ကျော်ဖြတ်ပါမယ်
+          console.log('Skipping email search for wallets table');
         }
+
 
 
         /*
@@ -267,9 +259,12 @@ export async function POST(request: Request) {
           insertData.user_id = userId; insertData.id = userId;
         }
 
+        
         if (email) {
-          insertData.email = email;
+          // email column မရှိလို့ မထည့်တော့ပါဘူး၊ phone ရှိရင် phone ထည့်လို့ရပါတယ်
+          // insertData.phone = email; // (လိုအပ်ပါက phone နေရာမှာ email ယာယီထည့်နိုင်ပါတယ်)
         }
+
 
 
         console.log(
