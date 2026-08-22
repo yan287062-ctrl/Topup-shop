@@ -14,30 +14,41 @@ export async function GET(req: Request) {
       return NextResponse.json({ balance: 0 });
     }
 
-    let query = supabaseAdmin
-      .from('profiles')
-      .select('balance');
+    let queryUserId = userId;
 
-    if (userId) {
-      query = query.eq('id', userId);
-    } else if (email) {
-      query = query.ilike('email', email.trim().toLowerCase());
+    // အကယ်၍ userId မပါဘဲ email ပဲပါလာခဲ့ရင် profiles ထဲကနေ userId ကို အရင်ရှာမယ်
+    if (!queryUserId && email) {
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('id')
+        .ilike('email', email.trim().toLowerCase())
+        .maybeSingle();
+      
+      if (profile && profile.id) {
+        queryUserId = profile.id;
+      }
     }
 
-    const { data, error } = await query.maybeSingle();
+    // wallets table ထဲမှာ queryUserId နဲ့ သွားရှာမယ်
+    if (queryUserId) {
+      const { data, error } = await supabaseAdmin
+        .from('wallets')
+        .select('balance')
+        .eq('user_id', queryUserId)
+        .maybeSingle();
 
-    if (error) {
-      console.error('USER BALANCE GET ERROR:', error);
-      return NextResponse.json({ balance: 0 });
+      if (!error && data) {
+        return NextResponse.json({ balance: Number(data.balance || 0) });
+      }
     }
 
-    return NextResponse.json({
-      balance: Number(data?.balance || 0)
-    });
+    // မတွေ့ရင် 0 ပဲ ပြန်ပို့မယ်
+    return NextResponse.json({ balance: 0 });
   } catch (err: any) {
     console.error('USER GET ERROR:', err);
     return NextResponse.json({ balance: 0 });
   }
+}
 }
 
 export async function POST(req: Request) {
