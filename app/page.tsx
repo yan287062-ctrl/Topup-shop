@@ -495,21 +495,7 @@ export default function Home() {
                   <div>
                     <h3 className="font-bold text-white text-sm group-hover:text-pink-400 transition-colors">{game.name}</h3>
                     
-            <div className="flex items-center gap-3 my-6">
-              <div className="flex-1 h-[1px] bg-white/10"></div>
-              <span className="text-[11px] text-gray-500 font-medium uppercase">OR</span>
-              <div className="flex-1 h-[1px] bg-white/10"></div>
-            </div>
             
-            <button type="button" className="w-full py-3.5 bg-white text-gray-900 font-semibold rounded-2xl flex items-center justify-center gap-2 hover:bg-gray-100 transition shadow-md">
-              Continue with Google
-            </button>
-            
-            <div className="text-center pt-4">
-              <p className="text-[10px] text-gray-500 leading-relaxed max-w-xs mx-auto">
-                By signing in, you agree to our Terms & Conditions and Privacy Policy.
-              </p>
-            </div>
 
 <p className="text-[11px] text-gray-400">{game.category}</p>
                   </div>
