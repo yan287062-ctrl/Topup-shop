@@ -457,19 +457,19 @@ export default function Home() {
               <img src="/logo.png" alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
             <div>
-              <h1 className="font-bold text-white text-base">Paing Gyi <span className="text-blue-400">shop</span></h1>
+              <h1 className="font-bold text-white text-base">Paing Gyi <span className="text-pink-400">shop</span></h1>
             </div>
           </div>
 
           <div className=" flex flex-wrap gap-2 text-sm">
-            <button onClick={() => { setSelectedGame(null); setActiveTab('shop'); }} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'shop' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ပင်မစာမျက်နှာ</button>
-            <button onClick={() => setActiveTab('search')} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'search' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ဘောက်ချာရှာမည်</button>
-            <button onClick={() => setActiveTab('mlbb_check')} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'mlbb_check' ? 'bg-blue-600 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>MLBB စစ်ဆေးမည်</button>
+            <button onClick={() => { setSelectedGame(null); setActiveTab('shop'); }} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'shop' ? 'bg-pink-500 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ပင်မစာမျက်နှာ</button>
+            <button onClick={() => setActiveTab('search')} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'search' ? 'bg-pink-500 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>ဘောက်ချာရှာမည်</button>
+            <button onClick={() => setActiveTab('mlbb_check')} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'mlbb_check' ? 'bg-pink-500 text-white border-blue-500' : 'bg-[#0a1220] border-gray-800 text-gray-300')}>MLBB စစ်ဆေးမည်</button>
             <button onClick={() => setActiveTab('wallet')} className={'px-5 py-2.5 rounded-xl border transition ' + (activeTab === 'wallet' ? 'bg-yellow-600 text-white border-yellow-500' : 'bg-[#0a1220] border-gray-800 text-yellow-400 font-bold')}>Wallet ({balance.toLocaleString()} Ks)</button>
             {currentAuthUser ? (
               <button onClick={handleLogout} className="bg-red-600/80 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl transition">Logout</button>
             ) : (
-              <button onClick={() => setActiveTab('login')} className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl transition font-medium">ဝင်ရောက်မည်</button>
+              <button onClick={() => setActiveTab('login')} className="bg-pink-500 hover:bg-pink-400 text-white px-5 py-2.5 rounded-xl transition font-medium">ဝင်ရောက်မည်</button>
             )}
           </div>
         </div>
@@ -493,8 +493,25 @@ export default function Home() {
                     )}
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{game.name}</h3>
-                    <p className="text-[11px] text-gray-400">{game.category}</p>
+                    <h3 className="font-bold text-white text-sm group-hover:text-pink-400 transition-colors">{game.name}</h3>
+                    
+            <div className="flex items-center gap-3 my-6">
+              <div className="flex-1 h-[1px] bg-white/10"></div>
+              <span className="text-[11px] text-gray-500 font-medium uppercase">OR</span>
+              <div className="flex-1 h-[1px] bg-white/10"></div>
+            </div>
+            
+            <button type="button" className="w-full py-3.5 bg-white text-gray-900 font-semibold rounded-2xl flex items-center justify-center gap-2 hover:bg-gray-100 transition shadow-md">
+              Continue with Google
+            </button>
+            
+            <div className="text-center pt-4">
+              <p className="text-[10px] text-gray-500 leading-relaxed max-w-xs mx-auto">
+                By signing in, you agree to our Terms & Conditions and Privacy Policy.
+              </p>
+            </div>
+
+<p className="text-[11px] text-gray-400">{game.category}</p>
                   </div>
                 </div>
               ))}
@@ -531,7 +548,7 @@ export default function Home() {
                   <button
                     onClick={() => handleMlbbCheck(undefined, userId, zoneId)}
                     disabled={checkingMlbb}
-                    className="text-[11px] bg-blue-600/80 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition"
+                    className="text-[11px] bg-pink-500/80 hover:bg-pink-500 text-white px-3 py-1 rounded-lg transition"
                   >
                     {checkingMlbb ? 'စစ်နေသည်...' : '🔍 ID စစ်မည်'}
                   </button>
@@ -583,7 +600,7 @@ export default function Home() {
                   <div
                     key={pkg.id}
                     onClick={() => setSelectedPkg(pkg)}
-                    className={'p-3 rounded-xl border cursor-pointer transition text-center ' + (selectedPkg?.id === pkg.id ? 'bg-blue-600/30 border-blue-400 shadow-md shadow-blue-500/20' : 'bg-[#0a1220] border-gray-800 hover:border-gray-700')}
+                    className={'p-3 rounded-xl border cursor-pointer transition text-center ' + (selectedPkg?.id === pkg.id ? 'bg-pink-500/30 border-blue-400 shadow-md shadow-blue-500/20' : 'bg-[#0a1220] border-gray-800 hover:border-gray-700')}
                   >
                     <p className="text-xs font-bold text-white">{pkg.name}</p>
                     <p className="text-xs text-yellow-400 font-semibold mt-1">{pkg.price.toLocaleString()} Ks</p>
@@ -599,7 +616,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('wallet')}
-                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'wallet' ? 'bg-blue-600/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
+                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'wallet' ? 'bg-pink-500/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
                 >
                   💳 Wallet Balance
                   <p className="text-[10px] font-normal text-yellow-400 mt-1">လက်ကျန်: {balance.toLocaleString()} Ks</p>
@@ -607,7 +624,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('slip')}
-                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'slip' ? 'bg-blue-600/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
+                  className={'p-3 rounded-xl border text-xs font-bold transition text-left ' + (paymentMethod === 'slip' ? 'bg-pink-500/30 border-blue-400' : 'bg-[#0a1220] border-gray-800 text-gray-400')}
                 >
                   🧾 Direct Slip Upload
                   <p className="text-[10px] font-normal text-gray-400 mt-1">ငွေလွှဲစလစ် တင်မည်</p>
@@ -624,7 +641,7 @@ export default function Home() {
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleImageUpload(e, setOrderSlip)}
-                    className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer"
+                    className="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-pink-500 file:text-white hover:file:bg-blue-500 cursor-pointer"
                     required
                   />
                   {orderSlip && (
@@ -644,7 +661,7 @@ export default function Home() {
               <button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50 text-sm shadow-lg shadow-blue-600/30"
+                className="w-full bg-pink-500 hover:bg-pink-400 text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50 text-sm shadow-lg shadow-blue-600/30"
               >
                 {loading ? 'ဆောင်ရွက်နေပါသည်...' : 'ယခု ဝယ်ယူမည်'}
               </button>
@@ -679,7 +696,7 @@ export default function Home() {
               <button
                 type="submit"
                 disabled={checkingMlbb}
-                className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition disabled:opacity-50"
+                className="w-full bg-pink-500 hover:bg-pink-400 text-white font-bold py-3 rounded-xl text-xs transition disabled:opacity-50"
               >
                 {checkingMlbb ? 'စစ်ဆေးနေပါသည်...' : 'စစ်ဆေးမည်'}
               </button>
@@ -766,7 +783,7 @@ export default function Home() {
                 onChange={e => setSearchOrderId(e.target.value)}
                 className="flex-1 bg-[#0a1220] border border-gray-700 p-3 rounded-xl text-xs text-white outline-none focus:border-blue-500"
               />
-              <button type="submit" disabled={searching} className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-3 rounded-xl text-xs font-bold transition">
+              <button type="submit" disabled={searching} className="bg-pink-500 hover:bg-pink-400 text-white px-4 py-3 rounded-xl text-xs font-bold transition">
                 {searching ? 'ရှာနေသည်...' : 'ရှာမည်'}
               </button>
             </form>
@@ -791,7 +808,7 @@ export default function Home() {
         {activeTab === 'login' && (
           <div className="relative max-w-md mx-auto my-6 p-2">
             <div className="absolute -top-6 -left-6 w-48 h-48 bg-purple-600/30 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-blue-600/30 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-pink-500/30 rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative backdrop-blur-xl bg-white/[0.07] border border-white/20 p-8 rounded-[2.5rem] shadow-[0_8px_32px_0_rgba(0,0,0,0.4)] space-y-6">
               {/* Shop Logo Badge */}
@@ -806,10 +823,10 @@ export default function Home() {
 
               <div className="text-center space-y-1.5">
                 <h2 className="text-2xl font-extrabold text-white tracking-wide">
-                  {isSignUp ? 'Create Account' : 'Welcome Back!'}
+                  {isSignUp ? 'Create Account' : 'Continue to Paing Gyi Store'}
                 </h2>
                 <p className="text-xs text-gray-300 font-light">
-                  {isSignUp ? 'Paing Gyi Shop တွင် အကောင့်အသစ်ပြုလုပ်ပါ' : 'Login to continue to your account'}
+                  {isSignUp ? 'Paing Gyi Shop တွင် အကောင့်အသစ်ပြုလုပ်ပါ' : 'Faster top ups, saved history, member discounts active immediately.'}
                 </p>
               </div>
 
@@ -822,7 +839,7 @@ export default function Home() {
                   </div>
                   <input
                     type="email"
-                    placeholder="Email Address"
+                    placeholder="Phone Number / Email"
                     value={authEmail}
                     onChange={e => setAuthEmail(e.target.value)}
                     className="w-full bg-white/[0.08] border border-white/15 focus:border-blue-400 focus:bg-white/[0.14] text-white text-xs rounded-2xl pl-12 pr-4 py-3.5 outline-none transition-all placeholder:text-gray-400 shadow-inner"
@@ -870,7 +887,7 @@ export default function Home() {
                   <button
                     type="button"
                     onClick={() => { setIsSignUp(!isSignUp); setAuthMsg(''); }}
-                    className="text-blue-400 hover:text-pink-400 font-bold underline transition-colors"
+                    className="text-pink-400 hover:text-pink-400 font-bold underline transition-colors"
                   >
                     {isSignUp ? 'Login ဝင်ပါ' : 'Sign up'}
                   </button>
