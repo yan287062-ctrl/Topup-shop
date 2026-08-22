@@ -184,12 +184,12 @@ export async function POST(request: Request) {
          * Find profile by USER ID first
          */
 
-        let profile: any = null;
+        let wallet: any = null;
 
         if (userId) {
 
           const { data, error } = await supabase
-            .from('profiles')
+            .from('wallets')
             .select('*')
             .eq('id', userId)
             .maybeSingle();
@@ -198,7 +198,7 @@ export async function POST(request: Request) {
             throw error;
           }
 
-          profile = data;
+          wallet = data;
         }
 
 
@@ -209,7 +209,7 @@ export async function POST(request: Request) {
         if (!profile && email) {
 
           const { data, error } = await supabase
-            .from('profiles')
+            .from('wallets')
             .select('*')
             .ilike('email', email)
             .maybeSingle();
@@ -218,7 +218,7 @@ export async function POST(request: Request) {
             throw error;
           }
 
-          profile = data;
+          wallet = data;
         }
 
 
@@ -226,10 +226,10 @@ export async function POST(request: Request) {
          * UPDATE EXISTING PROFILE
          */
 
-        if (profile) {
+        if (wallet) {
 
           const currentBalance = Number(
-            profile.balance || 0
+            wallet.balance || 0
           );
 
           const newBalance =
@@ -237,21 +237,21 @@ export async function POST(request: Request) {
 
 
           console.log('BALANCE UPDATE:', {
-            profileId: profile.id,
-            email: profile.email,
+            profileId: wallet.id,
+            email: wallet.email,
             oldBalance: currentBalance,
             addAmount: amount,
             newBalance
           });
 
 
-          const { data: updatedProfile, error: balanceError } =
+          const { data: updatedWallet, error: balanceError } =
             await supabase
-              .from('profiles')
+              .from('wallets')
               .update({
                 balance: newBalance
               })
-              .eq('id', profile.id)
+              .eq('id', wallet.id)
               .select('*')
               .single();
 
@@ -263,7 +263,7 @@ export async function POST(request: Request) {
 
           console.log(
             'BALANCE UPDATED SUCCESSFULLY:',
-            updatedProfile
+            updatedWallet
           );
 
 
@@ -271,7 +271,7 @@ export async function POST(request: Request) {
             success: true,
             type: 'wallet_topup',
             balance: Number(
-              updatedProfile.balance || 0
+              updatedWallet.balance || 0
             ),
             amount,
             message: 'Topup approved and balance updated.'
@@ -280,7 +280,7 @@ export async function POST(request: Request) {
 
 
         /*
-         * PROFILE DOES NOT EXIST
+         * WALLET DOES NOT EXIST
          */
 
         const insertData: any = {
@@ -288,7 +288,7 @@ export async function POST(request: Request) {
         };
 
         if (userId) {
-          insertData.id = userId;
+          insertData.user_id = userId; insertData.id = userId;
         }
 
         if (email) {
@@ -297,14 +297,14 @@ export async function POST(request: Request) {
 
 
         console.log(
-          'CREATING NEW PROFILE:',
+          'CREATING NEW WALLET:',
           insertData
         );
 
 
-        const { data: newProfile, error: insertError } =
+        const { data: newWallet, error: insertError } =
           await supabase
-            .from('profiles')
+            .from('wallets')
             .insert([insertData])
             .select('*')
             .single();
@@ -316,8 +316,8 @@ export async function POST(request: Request) {
 
 
         console.log(
-          'NEW PROFILE CREATED:',
-          newProfile
+          'NEW WALLET CREATED:',
+          newWallet
         );
 
 
@@ -325,7 +325,7 @@ export async function POST(request: Request) {
           success: true,
           type: 'wallet_topup',
           balance: Number(
-            newProfile.balance || 0
+            newWallet.balance || 0
           ),
           amount,
           message: 'Topup approved and new balance created.'
