@@ -11,33 +11,29 @@ export async function GET() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (ordersError) {
-      console.error('Orders GET error:', ordersError);
-    }
+    if (ordersError) throw ordersError;
 
     const { data: topups, error: topupsError } = await supabase
       .from('wallet_topups')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (topupsError) {
-      console.error('Wallet topups GET error:', topupsError);
-    }
+    if (topupsError) throw topupsError;
 
     const mappedTopups = (topups || []).map((t: any) => ({
       id: t.id,
-      game_id: 'wallet_topup',
       game_name: 'Wallet Balance Topup',
       package_name: 'ငွေဖြည့် ' + Number(t.amount || 0).toLocaleString() + ' Ks',
       player_id: t.email || t.user_id || '',
       zone_id: '-',
       price: Number(t.amount || 0),
+      amount: Number(t.amount || 0),
       payment_method: 'Wallet',
-      status: t.status || 'pending',
+      status: t.status,
       created_at: t.created_at,
       slip_url: t.slip_url || '',
-      email: t.email || '',
-      user_id: t.user_id || ''
+      user_id: t.user_id || '',
+      email: t.email || ''
     }));
 
     const combinedOrders = [
@@ -52,25 +48,35 @@ export async function GET() {
     return NextResponse.json({
       orders: combinedOrders
     });
+
   } catch (err: any) {
-    console.error('Admin GET error:', err);
+    console.error('ADMIN GET ERROR:', err);
 
     return NextResponse.json(
       {
+        success: false,
         orders: [],
-        error: err.message || 'Server error'
+        error: err.message || 'Admin data error'
       },
       { status: 500 }
     );
   }
 }
 
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const targetId = body.orderId || body.topupId || body.id;
+    const action = body.action;
+    const targetId = body.topupId || body.orderId || body.id;
     const status = body.status;
+
+    console.log('ADMIN ACTION:', {
+      action,
+      targetId,
+      status
+    });
 
     if (!targetId || !status) {
       return NextResponse.json(
@@ -82,88 +88,146 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: topupRow } = await supabase
+
+    /*
+     * =====================================================
+     * WALLET TOPUP
+     * =====================================================
+     */
+
+    const { data: topupRow, error: topupFindError } = await supabase
       .from('wallet_topups')
       .select('*')
       .eq('id', targetId)
       .maybeSingle();
 
-    const { data: orderRow } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', targetId)
-      .maybeSingle();
+    if (topupFindError) {
+      throw topupFindError;
+    }
 
-    /*
-     * WALLET TOPUP
-     */
+
     if (topupRow) {
+
       const oldStatus = String(
         topupRow.status || ''
       ).toLowerCase();
 
-      // Already approved = don't add balance again
-      if (status === 'approved' && oldStatus === 'approved') {
+      console.log('TOPUP FOUND:', topupRow);
+
+
+      /*
+       * Already approved
+       */
+
+      if (
+        status === 'approved' &&
+        oldStatus === 'approved'
+      ) {
         return NextResponse.json({
           success: true,
+          alreadyApproved: true,
           message: 'Already approved. Balance was not added again.'
         });
       }
 
+
+      /*
+       * Update topup status
+       */
+
       const { error: updateError } = await supabase
         .from('wallet_topups')
-        .update({ status })
+        .update({
+          status
+        })
         .eq('id', targetId);
 
       if (updateError) {
         throw updateError;
       }
 
+
       /*
-       * Add balance only once when status becomes approved.
+       * Only add balance when APPROVED
        */
-      if (status === 'approved' && oldStatus !== 'approved') {
+
+      if (
+        status === 'approved' &&
+        oldStatus !== 'approved'
+      ) {
+
         const amount = Number(topupRow.amount || 0);
 
         if (!amount || amount <= 0) {
-          throw new Error('Invalid topup amount');
+          throw new Error(
+            'Invalid topup amount: ' + topupRow.amount
+          );
         }
+
 
         const email = String(
           topupRow.email || ''
         ).trim().toLowerCase();
 
-        const userId = topupRow.user_id || null;
+        const userId =
+          topupRow.user_id || null;
 
-        if (!email && !userId) {
-          throw new Error('Topup user information is missing');
-        }
+
+        console.log('CREDIT USER:', {
+          userId,
+          email,
+          amount
+        });
+
+
+        /*
+         * Find profile by USER ID first
+         */
 
         let profile: any = null;
 
-        // Find by user ID first
         if (userId) {
-          const { data } = await supabase
+
+          const { data, error } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', userId)
             .maybeSingle();
 
+          if (error) {
+            throw error;
+          }
+
           profile = data;
         }
 
-        // If not found, find by email
+
+        /*
+         * If not found, find by EMAIL
+         */
+
         if (!profile && email) {
-          const { data } = await supabase
+
+          const { data, error } = await supabase
             .from('profiles')
             .select('*')
             .ilike('email', email)
             .maybeSingle();
 
+          if (error) {
+            throw error;
+          }
+
           profile = data;
         }
 
+
+        /*
+         * UPDATE EXISTING PROFILE
+         */
+
         if (profile) {
+
           const currentBalance = Number(
             profile.balance || 0
           );
@@ -171,69 +235,147 @@ export async function POST(request: Request) {
           const newBalance =
             currentBalance + amount;
 
-          const { error: balanceError } = await supabase
-            .from('profiles')
-            .update({
-              balance: newBalance
-            })
-            .eq('id', profile.id);
+
+          console.log('BALANCE UPDATE:', {
+            profileId: profile.id,
+            email: profile.email,
+            oldBalance: currentBalance,
+            addAmount: amount,
+            newBalance
+          });
+
+
+          const { data: updatedProfile, error: balanceError } =
+            await supabase
+              .from('profiles')
+              .update({
+                balance: newBalance
+              })
+              .eq('id', profile.id)
+              .select('*')
+              .single();
+
 
           if (balanceError) {
             throw balanceError;
           }
 
-          console.log(
-            `Wallet credited: ${profile.email || profile.id} +${amount} => ${newBalance}`
-          );
-        } else {
-          const insertData: any = {
-            balance: amount
-          };
-
-          if (userId) {
-            insertData.id = userId;
-          }
-
-          if (email) {
-            insertData.email = email;
-          }
-
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert([insertData]);
-
-          if (insertError) {
-            throw insertError;
-          }
 
           console.log(
-            `New wallet profile created: ${email || userId} +${amount}`
+            'BALANCE UPDATED SUCCESSFULLY:',
+            updatedProfile
           );
+
+
+          return NextResponse.json({
+            success: true,
+            type: 'wallet_topup',
+            balance: Number(
+              updatedProfile.balance || 0
+            ),
+            amount,
+            message: 'Topup approved and balance updated.'
+          });
         }
+
+
+        /*
+         * PROFILE DOES NOT EXIST
+         */
+
+        const insertData: any = {
+          balance: amount
+        };
+
+        if (userId) {
+          insertData.id = userId;
+        }
+
+        if (email) {
+          insertData.email = email;
+        }
+
+
+        console.log(
+          'CREATING NEW PROFILE:',
+          insertData
+        );
+
+
+        const { data: newProfile, error: insertError } =
+          await supabase
+            .from('profiles')
+            .insert([insertData])
+            .select('*')
+            .single();
+
+
+        if (insertError) {
+          throw insertError;
+        }
+
+
+        console.log(
+          'NEW PROFILE CREATED:',
+          newProfile
+        );
+
+
+        return NextResponse.json({
+          success: true,
+          type: 'wallet_topup',
+          balance: Number(
+            newProfile.balance || 0
+          ),
+          amount,
+          message: 'Topup approved and new balance created.'
+        });
       }
+
 
       return NextResponse.json({
         success: true,
         type: 'wallet_topup',
         message:
           status === 'approved'
-            ? 'Topup approved and balance updated.'
+            ? 'Topup approved.'
             : `Topup status changed to ${status}.`
       });
     }
 
+
     /*
+     * =====================================================
      * NORMAL ORDER
+     * =====================================================
      */
-    if (orderRow) {
-      const { error: updateError } = await supabase
+
+    const { data: orderRow, error: orderFindError } =
+      await supabase
         .from('orders')
-        .update({ status })
-        .eq('id', targetId);
+        .select('*')
+        .eq('id', targetId)
+        .maybeSingle();
+
+    if (orderFindError) {
+      throw orderFindError;
+    }
+
+
+    if (orderRow) {
+
+      const { error: updateError } =
+        await supabase
+          .from('orders')
+          .update({
+            status
+          })
+          .eq('id', targetId);
 
       if (updateError) {
         throw updateError;
       }
+
 
       return NextResponse.json({
         success: true,
@@ -241,6 +383,7 @@ export async function POST(request: Request) {
         message: `Order status changed to ${status}.`
       });
     }
+
 
     return NextResponse.json(
       {
@@ -251,12 +394,18 @@ export async function POST(request: Request) {
     );
 
   } catch (err: any) {
-    console.error('Admin POST error:', err);
+
+    console.error(
+      'ADMIN POST ERROR:',
+      err
+    );
 
     return NextResponse.json(
       {
         success: false,
-        error: err.message || 'Server error'
+        error:
+          err?.message ||
+          'Server error'
       },
       { status: 500 }
     );
