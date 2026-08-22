@@ -16,7 +16,6 @@ export async function GET(req: Request) {
 
     let queryUserId = userId;
 
-    // အကယ်၍ userId မပါဘဲ email ပဲပါလာခဲ့ရင် profiles ထဲကနေ userId ကို အရင်ရှာမယ်
     if (!queryUserId && email) {
       const { data: profile } = await supabaseAdmin
         .from('profiles')
@@ -29,7 +28,6 @@ export async function GET(req: Request) {
       }
     }
 
-    // wallets table ထဲမှာ queryUserId နဲ့ သွားရှာမယ်
     if (queryUserId) {
       const { data, error } = await supabaseAdmin
         .from('wallets')
@@ -42,13 +40,11 @@ export async function GET(req: Request) {
       }
     }
 
-    // မတွေ့ရင် 0 ပဲ ပြန်ပို့မယ်
     return NextResponse.json({ balance: 0 });
   } catch (err: any) {
     console.error('USER GET ERROR:', err);
     return NextResponse.json({ balance: 0 });
   }
-}
 }
 
 export async function POST(req: Request) {
@@ -86,10 +82,6 @@ export async function POST(req: Request) {
       );
     }
 
-    /*
-     * Wallet topup ကို orders ထဲမထည့်တော့ဘဲ
-     * wallet_topups table ထဲကို တိုက်ရိုက်ထည့်မည်။
-     */
     const { data, error } = await supabaseAdmin
       .from('wallet_topups')
       .insert([
@@ -107,7 +99,6 @@ export async function POST(req: Request) {
 
     if (error) {
       console.error('WALLET TOPUP INSERT ERROR:', error);
-
       return NextResponse.json(
         {
           success: false,
@@ -124,7 +115,6 @@ export async function POST(req: Request) {
 
   } catch (err: any) {
     console.error('USER POST ERROR:', err);
-
     return NextResponse.json(
       {
         success: false,
