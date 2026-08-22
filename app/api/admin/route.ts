@@ -20,36 +20,12 @@ export async function GET() {
 
     if (topupsError) throw topupsError;
 
-    const mappedTopups = (topups || []).map((t: any) => ({
-      id: t.id,
-      game_name: 'Wallet Balance Topup',
-      package_name: 'ငွေဖြည့် ' + Number(t.amount || 0).toLocaleString() + ' Ks',
-      player_id: t.email || t.user_id || '',
-      zone_id: '-',
-      price: Number(t.amount || 0),
-      amount: Number(t.amount || 0),
-      payment_method: 'Wallet',
-      status: t.status,
-      created_at: t.created_at,
-      slip_url: t.slip_url || '',
-      user_id: t.user_id || '',
-      email: t.email || ''
-    }));
-
-    const combinedOrders = [
-      ...(orders || []),
-      ...mappedTopups
-    ].sort(
-      (a: any, b: any) =>
-        new Date(b.created_at).getTime() -
-        new Date(a.created_at).getTime()
-    );
-
+    
     return NextResponse.json({
-      orders: combinedOrders
+      orders: (orders || []).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()),
+      topups: (topups || []).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     });
-
-  } catch (err: any) {
+} catch (err: any) {
     console.error('ADMIN GET ERROR:', err);
 
     return NextResponse.json(
