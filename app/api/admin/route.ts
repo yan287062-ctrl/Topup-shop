@@ -206,7 +206,7 @@ export async function POST(request: Request) {
          * If not found, find by EMAIL
          */
 
-        if (!profile && email) {
+        if (!wallet && email) {
 
           const { data, error } = await supabase
             .from('wallets')
