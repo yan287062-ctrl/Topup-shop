@@ -8,6 +8,7 @@ export default function TopupPage({ params }: { params: { id: string } }) {
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
+  const [paymentMethod, setPaymentMethod] = useState('');
 
   // အစ်ကိုပေးထားသော MLBB ဈေးနှုန်းစာရင်း
   const mlbbPackages = [
@@ -36,100 +37,228 @@ export default function TopupPage({ params }: { params: { id: string } }) {
     { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
   ];
 
+  const paymentMethods = [
+    { id: 'kpay', name: 'KBZ Pay', color: 'bg-blue-600' },
+    { id: 'wave', name: 'Wave Pay', color: 'bg-yellow-500' },
+    { id: 'ayapay', name: 'AYA Pay', color: 'bg-red-600' },
+    { id: 'cbpay', name: 'CB Pay', color: 'bg-orange-500' }
+  ];
+
   return (
-    <main className="min-h-screen bg-[#070814] pb-32">
+    <main className="min-h-screen bg-[#070814] pb-20">
       <Navbar />
 
-      <div className="max-w-3xl mx-auto px-4 mt-2">
-        {/* Back Button & Header */}
-        <div className="flex items-center space-x-3 mb-6 bg-[#1a1b2e]/60 p-3 rounded-2xl border border-white/10">
-          <Link href="/" className="text-gray-400 hover:text-white bg-white/5 p-2 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-          </Link>
-          <img src="/mlbb.png" alt="MLBB" className="w-12 h-12 rounded-xl object-cover border border-white/10" />
-          <div>
-            <h1 className="text-white font-bold text-sm sm:text-base">Mobile Legends</h1>
-            <p className="text-pink-500 text-[10px] sm:text-xs">Myanmar (Global)</p>
+      <div className="max-w-5xl mx-auto px-4 mt-2 font-sans">
+        
+        {/* Banner Section */}
+        <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
+          {/* Decorative blur */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl -z-10"></div>
+          
+          <img src="/mlbb.png" alt="MLBB" className="w-24 h-24 rounded-2xl shadow-[0_0_20px_rgba(236,72,153,0.3)] object-cover z-10" />
+          <div className="z-10 text-center md:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">Mobile Legends</h1>
+            <p className="text-gray-400 text-sm mt-1">All Server</p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
+              <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Instant Process
+              </span>
+              <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg> 100% Safe
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Step 1: User ID */}
-        <div className="bg-[#131422] p-4 sm:p-5 rounded-2xl mb-4 border border-white/5 shadow-lg">
-          <div className="flex items-center mb-4">
-            <span className="bg-pink-600 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold mr-3 shadow-[0_0_10px_rgba(236,72,153,0.4)]">1</span>
-            <h2 className="text-white text-sm font-semibold">အကောင့်အချက်အလက် ဖြည့်ပါ</h2>
-          </div>
-          <div className="flex space-x-3">
-            <input 
-              type="text" 
-              placeholder="User ID" 
-              className="w-2/3 bg-black/30 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-            />
-            <input 
-              type="text" 
-              placeholder="Zone ID" 
-              className="w-1/3 bg-black/30 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-              value={zoneId}
-              onChange={(e) => setZoneId(e.target.value)}
-            />
-          </div>
-          <p className="text-gray-500 text-[10px] mt-2 ml-1">ဥပမာ: 12345678 (1234)</p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Column: Steps 01, 02, 03 */}
+          <div className="lg:col-span-2 space-y-8">
+            
+            {/* Step 01: Choose Nominal Amount */}
+            <section>
+              <div className="flex items-end gap-3 mb-4">
+                <span className="text-4xl italic font-light text-pink-500/80">01</span>
+                <div className="mb-1">
+                  <h2 className="text-lg font-bold text-white">Choose Nominal Amount</h2>
+                  <p className="text-gray-400 text-[11px]">Pick the Mobile Legends amount you want to top up</p>
+                </div>
+              </div>
+              
+              {/* Tabs */}
+              <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+                <button className="bg-pink-600 text-white px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-[0_0_10px_rgba(236,72,153,0.3)]">Global/Myanmar (မူလဈေး)</button>
+                <button className="bg-[#131422] border border-white/10 text-gray-400 px-5 py-2 rounded-full text-xs font-medium whitespace-nowrap">Indonesia</button>
+                <button className="bg-[#131422] border border-white/10 text-gray-400 px-5 py-2 rounded-full text-xs font-medium whitespace-nowrap">Malaysia</button>
+              </div>
 
-        {/* Step 2: Select Package */}
-        <div className="bg-[#131422] p-4 sm:p-5 rounded-2xl mb-8 border border-white/5 shadow-lg">
-          <div className="flex items-center mb-4">
-            <span className="bg-pink-600 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold mr-3 shadow-[0_0_10px_rgba(236,72,153,0.4)]">2</span>
-            <h2 className="text-white text-sm font-semibold">ပမာဏ ရွေးချယ်ပါ</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {mlbbPackages.map((pkg) => (
-              <button
-                key={pkg.id}
-                onClick={() => setSelectedPkg(pkg)}
-                className={`relative p-3 rounded-xl border text-left transition-all duration-200 ${
-                  selectedPkg?.id === pkg.id 
-                  ? 'bg-pink-900/20 border-pink-500' 
-                  : 'bg-black/20 border-white/10 hover:border-white/30'
-                }`}
-              >
-                {selectedPkg?.id === pkg.id && (
-                  <div className="absolute top-0 right-0 bg-pink-500 rounded-bl-lg rounded-tr-xl p-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+              {/* Grid of Packages */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {mlbbPackages.map((pkg) => (
+                  <button
+                    key={pkg.id}
+                    onClick={() => setSelectedPkg(pkg)}
+                    className={`relative p-3.5 rounded-2xl text-left transition-all duration-200 overflow-hidden ${
+                      selectedPkg?.id === pkg.id 
+                      ? 'bg-pink-950/30 border-2 border-pink-500' 
+                      : 'bg-[#131422] border-2 border-transparent hover:border-white/10'
+                    }`}
+                  >
+                    {selectedPkg?.id === pkg.id && (
+                      <div className="absolute top-0 right-0 bg-pink-500 rounded-bl-xl p-1.5 shadow-md">
+                        <svg className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                      </div>
+                    )}
+                    <div className="text-white font-bold text-sm mb-1">{pkg.name}</div>
+                    <div className="text-gray-500 text-[10px] mb-3">No bonus</div>
+                    <div className="text-pink-500 font-extrabold text-sm">{pkg.price.toLocaleString()} Ks</div>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* Step 02: Game Account Data */}
+            <section>
+              <div className="flex items-end gap-3 mb-4">
+                <span className="text-4xl italic font-light text-pink-500/80">02</span>
+                <div className="mb-1">
+                  <h2 className="text-lg font-bold text-white">Game Account Data</h2>
+                  <p className="text-gray-400 text-[11px]">Make sure User ID and Server ID are correct</p>
+                </div>
+              </div>
+              <div className="bg-[#131422] p-5 rounded-3xl border border-white/5">
+                <div className="flex flex-col sm:flex-row gap-4 mb-3">
+                  <div className="w-full sm:w-1/2">
+                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">ID <span className="text-red-500">*</span></label>
+                    <input 
+                      type="text" 
+                      placeholder="Enter ID" 
+                      className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                    />
                   </div>
-                )}
-                <div className="text-white font-bold text-xs mb-1">{pkg.name}</div>
-                <div className="text-pink-400 text-xs font-medium">{pkg.price.toLocaleString()} Ks</div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+                  <div className="w-full sm:w-1/2">
+                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Server No. <span className="text-red-500">*</span></label>
+                    <input 
+                      type="text" 
+                      placeholder="Enter Server No." 
+                      className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                      value={zoneId}
+                      onChange={(e) => setZoneId(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <p className="text-pink-500/80 text-[11px] cursor-pointer hover:underline flex items-center gap-1">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  Don't know your User ID? Click here
+                </p>
+              </div>
+            </section>
 
-      {/* Bottom Sticky Checkout Bar */}
-      <div className="fixed bottom-0 w-full bg-[#1a1b2e]/95 backdrop-blur-md border-t border-white/10 p-4 z-50 flex justify-between items-center shadow-[0_-10px_30px_rgb(0,0,0,0.5)]">
-        <div>
-          <p className="text-gray-400 text-[10px]">ကျသင့်ငွေ</p>
-          <p className="text-pink-500 font-bold text-lg">
-            {selectedPkg ? `${selectedPkg.price.toLocaleString()} Ks` : '0 Ks'}
-          </p>
+            {/* Step 03: Choose Payment Method */}
+            <section>
+              <div className="flex items-end gap-3 mb-4">
+                <span className="text-4xl italic font-light text-pink-500/80">03</span>
+                <div className="mb-1">
+                  <h2 className="text-lg font-bold text-white">Choose Payment Method</h2>
+                  <p className="text-gray-400 text-[11px]">Various payment methods available</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-2 mb-4">
+                <button className="flex-1 bg-pink-600 text-white py-3 rounded-xl text-xs font-bold shadow-lg">Direct Payment</button>
+                <button className="flex-1 bg-[#131422] border border-white/10 text-gray-400 py-3 rounded-xl text-xs font-bold">Wallet သုံးမည်</button>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {paymentMethods.map((pm) => (
+                  <button
+                    key={pm.id}
+                    onClick={() => setPaymentMethod(pm.id)}
+                    className={`relative p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
+                      paymentMethod === pm.id 
+                      ? 'bg-pink-950/30 border-2 border-pink-500' 
+                      : 'bg-[#131422] border-2 border-transparent hover:border-white/10'
+                    }`}
+                  >
+                    <div className={`w-10 h-10 rounded-xl ${pm.color} flex items-center justify-center text-white font-bold text-xs shadow-lg`}>
+                      {pm.name.split(' ')[0]}
+                    </div>
+                    <span className="text-gray-300 text-[10px] font-medium">{pm.name}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+          </div>
+
+          {/* Right Column: Order Summary (Sticky Sidebar) */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 bg-[#131422] rounded-3xl border border-white/5 p-5 shadow-2xl">
+              <h3 className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-3">Order Summary</h3>
+              
+              <div className="flex items-center gap-3 mb-5">
+                <img src="/mlbb.png" className="w-12 h-12 rounded-xl object-cover" />
+                <div>
+                  <h4 className="text-white font-bold text-sm">Mobile Legends</h4>
+                  <p className="text-pink-500 text-[10px]">
+                    {selectedPkg ? selectedPkg.name : 'No amount selected'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div>
+                  <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Target Account</p>
+                  <p className="text-white text-xs font-medium italic">
+                    {(userId && zoneId) ? `${userId} (${zoneId})` : 'Not filled'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Payment Method</p>
+                  <p className="text-white text-xs font-medium italic">
+                    {paymentMethod ? paymentMethods.find(p => p.id === paymentMethod)?.name : 'Not selected'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2 border-t border-white/10 pt-4 mb-4">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Subtotal</span>
+                  <span className="text-white">{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Service Fee</span>
+                  <span className="text-white">0 Ks</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-400">Promo Discount</span>
+                  <span className="text-pink-500">- 0 Ks</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-6">
+                <span className="text-white font-bold text-sm">Total Payment</span>
+                <span className="text-pink-500 font-extrabold text-xl">
+                  {selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks
+                </span>
+              </div>
+
+              <button 
+                className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg ${
+                  selectedPkg && userId && zoneId && paymentMethod
+                  ? 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]'
+                  : 'bg-[#2a2b3d] text-gray-500 cursor-not-allowed'
+                }`}
+                disabled={!selectedPkg || !userId || !zoneId || !paymentMethod}
+              >
+                {(!selectedPkg || !userId || !zoneId || !paymentMethod) ? 'Complete the data first' : 'Buy Now'}
+              </button>
+            </div>
+          </div>
+
         </div>
-        <button 
-          className={`px-8 py-3 rounded-full font-bold text-sm transition-all duration-300 ${
-            selectedPkg && userId && zoneId
-            ? 'bg-gradient-to-r from-pink-600 to-pink-500 text-white shadow-[0_0_15px_rgba(236,72,153,0.5)]'
-            : 'bg-gray-700 text-gray-400 cursor-not-allowed'
-          }`}
-          disabled={!selectedPkg || !userId || !zoneId}
-        >
-          ဝယ်ယူမည်
-        </button>
       </div>
     </main>
   );
