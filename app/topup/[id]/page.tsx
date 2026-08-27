@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
+import BottomNav from '../../../components/BottomNav';
 import { useParams } from 'next/navigation';
 
 export default function TopupPage() {
@@ -179,11 +180,12 @@ export default function TopupPage() {
 
   const game = gameConfigs[id];
 
+  // Payment Methods များကို ပုံများဖြင့် ပြင်ဆင်ထားပါသည် (Wallet ကဲ့သို့)
   const paymentMethods = [
-    { id: 'kpay', name: 'KBZ Pay', color: 'bg-blue-600' },
-    { id: 'wave', name: 'Wave Pay', color: 'bg-yellow-500' },
-    { id: 'ayapay', name: 'AYA Pay', color: 'bg-red-600' },
-    { id: 'cbpay', name: 'CB Pay', color: 'bg-orange-500' }
+    { id: 'kpay', name: 'KBZ Pay', img: '/kpay.png' },
+    { id: 'wave', name: 'Wave Pay', img: '/wave.png' },
+    { id: 'ayapay', name: 'AYA Pay', img: '/ayapay.png' },
+    { id: 'uabpay', name: 'UAB Pay', img: '/uabpay.png' }
   ];
 
   if (!game) {
@@ -201,7 +203,7 @@ export default function TopupPage() {
     if (!selectedPkg || !paymentMethod) return false;
     if (game.inputType === 'mlbb') return userId && zoneId;
     if (game.inputType === 'pubg') return userId;
-    if (game.inputType === 'username') return userId; // userId represents username here
+    if (game.inputType === 'username') return userId;
     if (game.inputType === 'heartopia') return userId && aid;
     return false;
   })();
@@ -214,10 +216,10 @@ export default function TopupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070814] pb-20">
+    <main className="min-h-screen bg-[#070814] pb-28 font-sans">
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-4 mt-2 font-sans">
+      <div className="max-w-5xl mx-auto px-4 mt-2">
         
         {/* Banner Section */}
         <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
@@ -277,7 +279,7 @@ export default function TopupPage() {
               </div>
             </section>
 
-            {/* Step 02: Dynamic Account Data Input */}
+            {/* Step 02 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">02</span>
@@ -289,7 +291,6 @@ export default function TopupPage() {
 
               <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 space-y-4">
                 
-                {/* Case A: MLBB / Magic Chess (UID & Zone ID) */}
                 {game.inputType === 'mlbb' && (
                   <div className="flex flex-col sm:flex-row gap-4">
                     <div className="w-full sm:w-1/2">
@@ -315,7 +316,6 @@ export default function TopupPage() {
                   </div>
                 )}
 
-                {/* Case B: PUBG & UC Pack (Player ID only) */}
                 {game.inputType === 'pubg' && (
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Player ID <span className="text-red-500">*</span></label>
@@ -329,7 +329,6 @@ export default function TopupPage() {
                   </div>
                 )}
 
-                {/* Case C: Telegram & Smile Coin (Telegram Username) */}
                 {game.inputType === 'username' && (
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Telegram Username <span className="text-red-500">*</span></label>
@@ -343,7 +342,6 @@ export default function TopupPage() {
                   </div>
                 )}
 
-                {/* Case D: Heartopia (UID, Field, AID as requested in image) */}
                 {game.inputType === 'heartopia' && (
                   <div className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4">
@@ -387,7 +385,7 @@ export default function TopupPage() {
               </div>
             </section>
 
-            {/* Step 03: Choose Payment Method */}
+            {/* Step 03: Choose Payment Method (UPDATED WITH LOGOS) */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">03</span>
@@ -408,8 +406,14 @@ export default function TopupPage() {
                       : 'bg-[#131422] border-2 border-transparent hover:border-white/10'
                     }`}
                   >
-                    <div className={`w-10 h-10 rounded-xl ${pm.color} flex items-center justify-center text-white font-bold text-xs shadow-lg`}>
-                      {pm.name.split(' ')[0]}
+                    {/* လိုဂိုပုံထည့်ထားသော နေရာ */}
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1 overflow-hidden shadow-sm mb-1">
+                      <img src={pm.img} alt={pm.name} className="w-full h-full object-contain" 
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement!.innerHTML = `<span class="text-gray-800 font-bold text-xs">${pm.name[0]}</span>`;
+                        }}
+                      />
                     </div>
                     <span className="text-gray-300 text-[10px] font-medium">{pm.name}</span>
                   </button>
@@ -476,6 +480,8 @@ export default function TopupPage() {
           </div>
         </div>
       </div>
+
+      <BottomNav />
     </main>
   );
 }
