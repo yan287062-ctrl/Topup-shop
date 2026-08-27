@@ -91,31 +91,35 @@ export default function TopupPage() {
     { id: 'ucp_17', name: 'Prime Plus (12 Months)', price: 487800 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // ဂိမ်းအချက်အလက်များကို ချိတ်ဆက်ခြင်း (Dynamic Config)
+  // ဂိမ်းအချက်အလက်များကို ချိတ်ဆက်ခြင်း (requireZone: false လျှင် Server No. အကွက် မပေါ်ပါ)
   const gameConfigs: Record<string, any> = {
     'mobile-legends': {
       name: 'Mobile Legends',
       sub: 'All Server',
       img: '/mlbb.png',
-      packages: mlbbPackages
+      packages: mlbbPackages,
+      requireZone: true
     },
     'magic-chess': {
       name: 'Magic Chess Go Go',
       sub: 'All Server',
       img: '/MCGG.png',
-      packages: mcggPackages
+      packages: mcggPackages,
+      requireZone: true
     },
     'pubg-uc': {
       name: 'PUBG UC',
       sub: 'Global',
       img: '/pubg.png',
-      packages: pubgPackages
+      packages: pubgPackages,
+      requireZone: false
     },
     'uc-pack': {
       name: 'UC Pack',
       sub: 'Global',
       img: '/Pubgucpack.png',
-      packages: ucPackPackages
+      packages: ucPackPackages,
+      requireZone: false
     }
   };
 
@@ -137,6 +141,11 @@ export default function TopupPage() {
       </main>
     );
   }
+
+  // Check validation based on game type
+  const isFormValid = game.requireZone 
+    ? (selectedPkg && userId && zoneId && paymentMethod)
+    : (selectedPkg && userId && paymentMethod);
 
   return (
     <main className="min-h-screen bg-[#070814] pb-20">
@@ -202,37 +211,39 @@ export default function TopupPage() {
               </div>
             </section>
 
-            {/* Step 02 */}
+            {/* Step 02: Dynamic Account Data (Server No. conditional) */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">02</span>
                 <div className="mb-1">
                   <h2 className="text-lg font-bold text-white">Game Account Data</h2>
-                  <p className="text-gray-400 text-[11px]">Make sure User ID and Server ID are correct</p>
+                  <p className="text-gray-400 text-[11px]">Make sure your Game ID is correct</p>
                 </div>
               </div>
               <div className="bg-[#131422] p-5 rounded-3xl border border-white/5">
-                <div className="flex flex-col sm:flex-row gap-4 mb-3">
-                  <div className="w-full sm:w-1/2">
-                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">ID <span className="text-red-500">*</span></label>
+                <div className={`flex flex-col ${game.requireZone ? 'sm:flex-row' : ''} gap-4 mb-3`}>
+                  <div className={`w-full ${game.requireZone ? 'sm:w-1/2' : 'w-full'}`}>
+                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Player ID <span className="text-red-500">*</span></label>
                     <input 
                       type="text" 
-                      placeholder="Enter ID" 
+                      placeholder="Enter Player ID" 
                       className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
                       value={userId}
                       onChange={(e) => setUserId(e.target.value)}
                     />
                   </div>
-                  <div className="w-full sm:w-1/2">
-                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Server No. <span className="text-red-500">*</span></label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter Server No." 
-                      className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                      value={zoneId}
-                      onChange={(e) => setZoneId(e.target.value)}
-                    />
-                  </div>
+                  {game.requireZone && (
+                    <div className="w-full sm:w-1/2">
+                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Server No. <span className="text-red-500">*</span></label>
+                      <input 
+                        type="text" 
+                        placeholder="Enter Server No." 
+                        className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                        value={zoneId}
+                        onChange={(e) => setZoneId(e.target.value)}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </section>
@@ -287,7 +298,7 @@ export default function TopupPage() {
                 <div>
                   <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Target Account</p>
                   <p className="text-white text-xs font-medium italic">
-                    {(userId && zoneId) ? `${userId} (${zoneId})` : 'Not filled'}
+                    {userId ? (game.requireZone && zoneId ? `${userId} (${zoneId})` : userId) : 'Not filled'}
                   </p>
                 </div>
                 <div>
@@ -314,13 +325,13 @@ export default function TopupPage() {
 
               <button 
                 className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg ${
-                  selectedPkg && userId && zoneId && paymentMethod
+                  isFormValid
                   ? 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]'
                   : 'bg-[#2a2b3d] text-gray-500 cursor-not-allowed'
                 }`}
-                disabled={!selectedPkg || !userId || !zoneId || !paymentMethod}
+                disabled={!isFormValid}
               >
-                {(!selectedPkg || !userId || !zoneId || !paymentMethod) ? 'Complete the data first' : 'Buy Now'}
+                {!isFormValid ? 'Complete the data first' : 'Buy Now'}
               </button>
             </div>
           </div>
