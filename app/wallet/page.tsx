@@ -12,11 +12,13 @@ export default function WalletPage() {
   const [isUploaded, setIsUploaded] = useState(false);
 
   const presetAmounts = [50000, 100000, 200000, 500000, 1000000];
+  
+  // CB Pay ကို UAB Pay ဖြင့် အစားထိုးပြီး၊ အရောင်များအစား ပုံလင့်ခ်များ (img) ထည့်ထားပါသည်
   const paymentMethods = [
-    { id: 'kpay', name: 'KBZ Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', color: 'bg-blue-600' },
-    { id: 'wave', name: 'Wave Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', color: 'bg-yellow-500' },
-    { id: 'ayapay', name: 'AYA Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', color: 'bg-red-600' },
-    { id: 'cbpay', name: 'CB Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', color: 'bg-orange-500' }
+    { id: 'kpay', name: 'KBZ Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/kpay.png' },
+    { id: 'wave', name: 'Wave Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/wave.png' },
+    { id: 'ayapay', name: 'AYA Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/aya.png' },
+    { id: 'uabpay', name: 'UAB Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/uab.png' }
   ];
 
   const currentMethodObj = paymentMethods.find(m => m.name === selectedMethod) || paymentMethods[1];
@@ -36,7 +38,6 @@ export default function WalletPage() {
         {step === 'form' ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            {/* Left: Top Up Form */}
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-[#131422] p-6 rounded-3xl border border-white/5 shadow-2xl">
                 <h1 className="text-xl font-bold text-white mb-1">Top Up Balance</h1>
@@ -58,7 +59,6 @@ export default function WalletPage() {
                     />
                   </div>
 
-                  {/* Preset Buttons */}
                   <div className="flex flex-wrap gap-2">
                     {presetAmounts.map((amt) => (
                       <button
@@ -92,8 +92,15 @@ export default function WalletPage() {
                           : 'bg-[#0a0b14] border-white/10 hover:border-white/30'
                         }`}
                       >
-                        <div className={`w-8 h-8 rounded-lg ${m.color} mx-auto mb-2 flex items-center justify-center text-white text-xs font-bold`}>
-                          {m.name[0]}
+                        {/* ပုံထည့်ထားသော နေရာ */}
+                        <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-white flex items-center justify-center p-1 overflow-hidden shadow-sm">
+                          <img src={m.img} alt={m.name} className="w-full h-full object-contain" 
+                            onError={(e) => {
+                              // ပုံမရှိပါက နာမည်အစစာလုံးကို ပြမည်
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.parentElement!.innerHTML = `<span class="text-gray-800 font-bold text-xs">${m.name[0]}</span>`;
+                            }}
+                          />
                         </div>
                         <span className="text-xs text-white font-medium block">{m.name}</span>
                         <span className="text-[9px] text-gray-400">Free</span>
@@ -105,7 +112,6 @@ export default function WalletPage() {
               </div>
             </div>
 
-            {/* Right: Summary & Recent */}
             <div className="lg:col-span-1 space-y-6">
               <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 shadow-2xl">
                 <h3 className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-4 border-b border-white/10 pb-3">Summary</h3>
@@ -143,7 +149,6 @@ export default function WalletPage() {
                 </button>
               </div>
 
-              {/* Recent Top Ups */}
               <div className="bg-[#131422] p-5 rounded-3xl border border-white/5">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="text-white text-xs font-bold uppercase tracking-wider">Recent Top Ups</h4>
@@ -167,7 +172,6 @@ export default function WalletPage() {
 
           </div>
         ) : (
-          /* Step 2: Detail / Invoice Page */
           <div className="max-w-2xl mx-auto space-y-6">
             
             <div className="bg-[#131422] p-6 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
@@ -175,7 +179,6 @@ export default function WalletPage() {
                 Complete within 00 : 14 : 59
               </div>
 
-              {/* Payment Information */}
               <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Payment Information</h4>
                 <div className="space-y-2 text-xs">
@@ -198,7 +201,6 @@ export default function WalletPage() {
                 </div>
               </div>
 
-              {/* Payment Proof */}
               <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Payment Proof</h4>
                 <p className="text-gray-500 text-[10px] mb-4">Once transferred, upload your payment screenshot below for admin verification.</p>
@@ -225,7 +227,6 @@ export default function WalletPage() {
                 </button>
               </div>
 
-              {/* Order Summary */}
               <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Order Summary</h4>
                 <div className="space-y-2 text-xs">
@@ -244,7 +245,6 @@ export default function WalletPage() {
                 </div>
               </div>
 
-              {/* Payment Summary */}
               <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Payment Summary</h4>
                 <div className="space-y-2 text-xs">
@@ -263,7 +263,6 @@ export default function WalletPage() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
               <div className="flex gap-3">
                 <button 
                   onClick={() => setStep('form')}
@@ -280,7 +279,6 @@ export default function WalletPage() {
               </div>
 
             </div>
-
           </div>
         )}
 
