@@ -14,7 +14,7 @@ export default function TopupPage() {
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
 
-  // MLBB Packages
+  // 1. MLBB Packages
   const mlbbPackages = [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
@@ -41,7 +41,7 @@ export default function TopupPage() {
     { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // Magic Chess Packages
+  // 2. Magic Chess Packages
   const mcggPackages = [
     { id: 'mcgg_1', name: '10', bonus: '+ 1 Diamonds', price: 900 },
     { id: 'mcgg_2', name: '20', bonus: '+ 2 Diamonds', price: 1700 },
@@ -60,6 +60,38 @@ export default function TopupPage() {
     { id: 'mcgg_15', name: '5035', bonus: '+ 1007 Diamonds', price: 414100 }
   ];
 
+  // 3. PUBG UC Packages
+  const pubgPackages = [
+    { id: 'pubg_1', name: '60 UC', price: 4106 }, { id: 'pubg_2', name: '325 UC', price: 20529 },
+    { id: 'pubg_3', name: '660 UC', price: 41059 }, { id: 'pubg_4', name: '985 UC', price: 61588 },
+    { id: 'pubg_5', name: '1320 UC', price: 82118 }, { id: 'pubg_6', name: '1980 UC', price: 123177 },
+    { id: 'pubg_7', name: '2310 UC', price: 143706 }, { id: 'pubg_8', name: '2640 UC', price: 164236 },
+    { id: 'pubg_9', name: '3850 UC', price: 239512 }, { id: 'pubg_10', name: '4180 UC', price: 260041 },
+    { id: 'pubg_11', name: '5900 UC', price: 367277 }, { id: 'pubg_12', name: '8100 UC', price: 504112 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 4. UC Pack Packages
+  const ucPackPackages = [
+    { id: 'ucp_1', name: 'First Purchase Pack', price: 4100 },
+    { id: 'ucp_2', name: 'Prime (1 Month)', price: 4100 },
+    { id: 'ucp_3', name: 'Weekly Deal Pack 1', price: 4200 },
+    { id: 'ucp_4', name: 'Upgradable Firearm Materials Pack', price: 12300 },
+    { id: 'ucp_5', name: 'Prime (3 Months)', price: 12300 },
+    { id: 'ucp_6', name: 'Weekly Mythic Emblem Value Pack', price: 12400 },
+    { id: 'ucp_7', name: 'Weekly Deal Pack 2', price: 12400 },
+    { id: 'ucp_8', name: 'Mythic Emblem Pack', price: 20400 },
+    { id: 'ucp_9', name: 'Prime (6 Months)', price: 24400 },
+    { id: 'ucp_10', name: 'Elite Pass LV1-50', price: 24800 },
+    { id: 'ucp_11', name: 'Prime Plus (1 Month)', price: 40700 },
+    { id: 'ucp_12', name: 'Prime (12 Months)', price: 48800 },
+    { id: 'ucp_13', name: 'Elite Pass LV1-100', price: 49700 },
+    { id: 'ucp_14', name: 'Prime Plus (3 Months)', price: 122000 },
+    { id: 'ucp_15', name: 'Elite Pass Plus LV1-100', price: 123100 },
+    { id: 'ucp_16', name: 'Prime Plus (6 Months)', price: 243900 },
+    { id: 'ucp_17', name: 'Prime Plus (12 Months)', price: 487800 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // ဂိမ်းအချက်အလက်များကို ချိတ်ဆက်ခြင်း (Dynamic Config)
   const gameConfigs: Record<string, any> = {
     'mobile-legends': {
       name: 'Mobile Legends',
@@ -72,6 +104,18 @@ export default function TopupPage() {
       sub: 'All Server',
       img: '/MCGG.png',
       packages: mcggPackages
+    },
+    'pubg-uc': {
+      name: 'PUBG UC',
+      sub: 'Global',
+      img: '/pubg.png',
+      packages: pubgPackages
+    },
+    'uc-pack': {
+      name: 'UC Pack',
+      sub: 'Global',
+      img: '/Pubgucpack.png',
+      packages: ucPackPackages
     }
   };
 
@@ -99,6 +143,8 @@ export default function TopupPage() {
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 mt-2 font-sans">
+        
+        {/* Banner Section */}
         <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl -z-10"></div>
           
@@ -108,17 +154,21 @@ export default function TopupPage() {
             <p className="text-gray-400 text-sm mt-1">{game.sub}</p>
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
               <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                Instant Process
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Instant Process
               </span>
               <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                100% Safe
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg> 100% Safe
               </span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
+            
+            {/* Step 01 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">01</span>
@@ -152,6 +202,7 @@ export default function TopupPage() {
               </div>
             </section>
 
+            {/* Step 02 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">02</span>
@@ -186,6 +237,7 @@ export default function TopupPage() {
               </div>
             </section>
 
+            {/* Step 03 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">03</span>
@@ -216,6 +268,7 @@ export default function TopupPage() {
             </section>
           </div>
 
+          {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-[#131422] rounded-3xl border border-white/5 p-5 shadow-2xl">
               <h3 className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-3">Order Summary</h3>
