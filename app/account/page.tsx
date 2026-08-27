@@ -5,107 +5,105 @@ import Navbar from '../../components/Navbar';
 import BottomNav from '../../components/BottomNav';
 
 export default function AccountPage() {
-  // နမူနာ User Data (နောက်ပိုင်း Database/Auth နှင့် ချိတ်ရန်)
   const user = {
-    name: 'Mg Mg',
-    email: 'mgmg@gmail.com',
-    phone: '+95 9 123 456 789',
-    balance: 50000,
+    name: 'Mibb Game',
+    email: 'gamer2040@gmail...',
     avatar: '', 
-    role: 'VIP Member'
   };
+
+  const menuItems = [
+    { name: 'ပထမ', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', link: '/' },
+    { name: 'Dashboard', icon: 'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z', link: '/account', active: true },
+    { name: 'ငွေပေးချေမှု မှတ်တမ်း', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', link: '/history' },
+    { name: 'စာများ', icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', link: '/inbox' },
+    { name: 'လက်ကျန်ငွေဖြည့်', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z', link: '/wallet' },
+    { name: 'လက်ကျန်ငွေ မှတ်တမ်း', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z', link: '#' },
+    { name: 'အဆင့်တိုးမြှင့်', icon: 'M5 10l7-7m0 0l7 7m-7-7v18', link: '#' },
+    { name: 'ဆက်တင်များ', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z', link: '#' },
+  ];
 
   return (
     <main className="min-h-screen bg-[#070814] pb-28 font-sans">
       <Navbar />
 
-      <div className="max-w-md mx-auto px-4 mt-6 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 mt-6 flex flex-col md:flex-row gap-6">
         
-        {/* Profile Info Card */}
-        <div className="bg-[#131422] rounded-3xl p-6 border border-white/5 shadow-2xl relative overflow-hidden">
-          {/* Background Glow */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-pink-600/20 rounded-full blur-3xl -z-10"></div>
-          
-          <div className="flex items-center gap-5">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.5)] border-2 border-[#131422]">
+        {/* Sidebar / Menu List */}
+        <div className="w-full md:w-64 flex-shrink-0">
+          <div className="bg-[#131422] rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
+            
+            {/* Profile Section */}
+            <div className="p-5 flex items-center gap-3 border-b border-white/5">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white font-bold text-lg shadow-lg">
                 {user.avatar ? (
                   <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <span className="text-white text-2xl font-bold">{user.name.charAt(0)}</span>
+                  <span>MG</span>
                 )}
               </div>
-              <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-[#131422]"></div>
+              <div className="overflow-hidden">
+                <h2 className="text-white font-bold text-sm truncate">{user.name}</h2>
+                <p className="text-gray-500 text-[10px] truncate">{user.email}</p>
+              </div>
+            </div>
+
+            {/* Menu Items */}
+            <div className="p-3 space-y-1">
+              {menuItems.map((item, index) => (
+                <Link 
+                  key={index} 
+                  href={item.link}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-medium transition-all ${
+                    item.active 
+                    ? 'bg-pink-600/20 text-pink-500 border border-pink-500/30 shadow-[0_0_10px_rgba(236,72,153,0.1)]' 
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon}></path>
+                  </svg>
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+
+          </div>
+        </div>
+
+        {/* Dashboard Content Area (Right Side) */}
+        <div className="flex-1 space-y-6">
+          <h1 className="text-xl font-bold text-white mb-4">ပြန်လည်ကြိုဆိုပါသည် ။</h1>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 shadow-lg">
+              <p className="text-gray-500 text-[10px] font-bold mb-1">စုစုပေါင်းငွေပေးချေမှု</p>
+              <p className="text-white text-2xl font-bold">0</p>
+            </div>
+            <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 shadow-lg">
+              <p className="text-gray-500 text-[10px] font-bold mb-1">စုစုပေါင်း သုံးစွဲမှု</p>
+              <p className="text-white text-2xl font-bold">0</p>
+            </div>
+            <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 shadow-lg">
+              <p className="text-gray-500 text-[10px] font-bold mb-1">ပျမ်းမျှ / မှားယွင်းမှု</p>
+              <p className="text-white text-2xl font-bold">0</p>
+            </div>
+            <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 shadow-lg">
+              <p className="text-gray-500 text-[10px] font-bold mb-1">ဘဏ္ဍာရေးအကောင့်သစ်</p>
+              <p className="text-white text-2xl font-bold">-</p>
+            </div>
+          </div>
+
+          <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 shadow-lg mt-6">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-white text-sm font-bold">နောက်ဆုံးလာသော ငွေပေးချေမှု</h3>
+              <Link href="/history" className="text-pink-500 text-[10px] hover:underline">အားလုံးကြည့်ရန် →</Link>
             </div>
             
-            <div className="flex-1">
-              <h2 className="text-xl font-bold text-white tracking-wide">{user.name}</h2>
-              <p className="text-gray-400 text-xs mt-0.5">{user.email}</p>
-              <div className="inline-block mt-2 px-2.5 py-1 bg-pink-500/20 border border-pink-500/30 rounded-lg text-pink-400 text-[9px] font-bold uppercase tracking-wider">
-                {user.role}
-              </div>
+            <div className="p-8 text-center bg-[#0a0b14] rounded-2xl border border-white/5">
+               <p className="text-gray-500 text-xs">ငွေပေးချေမှု မရှိပါ သို့မဟုတ် Filter ပြန်လည်သတ်မှတ်ပါ။ →</p>
             </div>
           </div>
-        </div>
-
-        {/* Balance Card */}
-        <div className="bg-gradient-to-r from-pink-600 to-pink-800 rounded-3xl p-6 shadow-[0_10px_30px_rgba(236,72,153,0.3)] text-white relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -z-10 transform translate-x-1/2 -translate-y-1/2"></div>
-          <p className="text-pink-200 text-xs font-medium uppercase tracking-wider mb-1">Total Balance</p>
-          <div className="flex justify-between items-end">
-            <h3 className="text-3xl font-extrabold tracking-tight">K {user.balance.toLocaleString()}</h3>
-            <Link href="/wallet" className="bg-white text-pink-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-pink-50 transition-colors shadow-lg">
-              Top Up
-            </Link>
-          </div>
-        </div>
-
-        {/* Menu List */}
-        <div className="bg-[#131422] rounded-3xl border border-white/5 shadow-xl overflow-hidden divide-y divide-white/5">
           
-          {/* Edit Profile */}
-          <Link href="#" className="flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#0a0b14] flex items-center justify-center text-gray-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-              </div>
-              <span className="text-gray-300 text-sm font-medium">Edit Profile</span>
-            </div>
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-          </Link>
-
-          {/* Transaction History */}
-          <Link href="/history" className="flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#0a0b14] flex items-center justify-center text-gray-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-              </div>
-              <span className="text-gray-300 text-sm font-medium">Transaction History</span>
-            </div>
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-          </Link>
-
-          {/* Help & Support */}
-          <Link href="#" className="flex items-center justify-between p-4 hover:bg-white/[0.02] transition-colors">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-[#0a0b14] flex items-center justify-center text-gray-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-              </div>
-              <span className="text-gray-300 text-sm font-medium">Help & Support</span>
-            </div>
-            <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
-          </Link>
-
-          {/* Logout */}
-          <button className="w-full flex items-center justify-between p-4 hover:bg-red-500/10 transition-colors group">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-500 group-hover:bg-red-500/20 transition-colors">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-              </div>
-              <span className="text-red-500 text-sm font-bold">Logout</span>
-            </div>
-          </button>
-
         </div>
 
       </div>
