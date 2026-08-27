@@ -9,8 +9,11 @@ export default function TopupPage() {
   const params = useParams();
   const id = params?.id as string;
 
+  // Form states
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
+  const [aid, setAid] = useState('');
+  const [serverField, setServerField] = useState('Global');
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
 
@@ -91,35 +94,86 @@ export default function TopupPage() {
     { id: 'ucp_17', name: 'Prime Plus (12 Months)', price: 487800 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // ဂိမ်းအချက်အလက်များကို ချိတ်ဆက်ခြင်း (requireZone: false လျှင် Server No. အကွက် မပေါ်ပါ)
+  // 5. Telegram Packages
+  const telegramPackages = [
+    { id: 'tg_1', name: '50 Stars', price: 3552 }, { id: 'tg_2', name: '75 Stars', price: 5306 },
+    { id: 'tg_3', name: '100 Stars', price: 7058 }, { id: 'tg_4', name: '150 Stars', price: 10587 },
+    { id: 'tg_5', name: '250 Stars', price: 17645 }, { id: 'tg_6', name: '350 Stars', price: 24703 },
+    { id: 'tg_7', name: '500 Stars', price: 35291 }, { id: 'tg_8', name: '750 Stars', price: 52936 },
+    { id: 'tg_9', name: '1K Stars', price: 70582 }, { id: 'tg_10', name: '1.5K Stars', price: 105873 },
+    { id: 'tg_11', name: '2.5K Stars', price: 176454 }, { id: 'tg_12', name: '5K Stars', price: 352908 },
+    { id: 'tg_13', name: '10K Stars', price: 705816 }, { id: 'tg_14', name: '3 months premium', price: 56420 },
+    { id: 'tg_15', name: '6 months premium', price: 75241 }, { id: 'tg_16', name: '12 months premium', price: 136412 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 6. Heartopia Packages
+  const heartopiaPackages = [
+    { id: 'heart_1', name: '20 Heart Diamond', price: 2588 }, { id: 'heart_2', name: '60 Heart Diamond', price: 4895 },
+    { id: 'heart_3', name: '300+20 Heart Diamond', price: 24846 }, { id: 'heart_4', name: '680+50 Heart Diamond', price: 55994 },
+    { id: 'heart_5', name: '1280+90 Heart Diamond', price: 102297 }, { id: 'heart_6', name: '1980+150 Heart Diamond', price: 155703 },
+    { id: 'heart_7', name: '3280+270 Heart Diamond', price: 253623 }, { id: 'heart_8', name: '6480+570 Heart Diamond', price: 498398 },
+    { id: 'heart_9', name: 'GAMG Junior Membership', price: 2681 }, { id: 'heart_10', name: 'GAMG Formal Membership', price: 15057 },
+    { id: 'heart_11', name: 'Fashionwave Gift Box', price: 24846 }, { id: 'heart_12', name: 'Fashionwave Gift Box Upgrade', price: 31102 },
+    { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 7. Smile Coin Packages
+  const smileCoinPackages = [
+    { id: 'smile_1', name: 'Brl 300', price: 25800 },
+    { id: 'smile_2', name: 'Brl 1000', price: 83800 },
+    { id: 'smile_3', name: 'Brl 5000', price: 419000 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // Game Configurations
   const gameConfigs: Record<string, any> = {
     'mobile-legends': {
       name: 'Mobile Legends',
       sub: 'All Server',
       img: '/mlbb.png',
       packages: mlbbPackages,
-      requireZone: true
+      inputType: 'mlbb'
     },
     'magic-chess': {
       name: 'Magic Chess Go Go',
       sub: 'All Server',
       img: '/MCGG.png',
       packages: mcggPackages,
-      requireZone: true
+      inputType: 'mlbb'
     },
     'pubg-uc': {
       name: 'PUBG UC',
       sub: 'Global',
       img: '/pubg.png',
       packages: pubgPackages,
-      requireZone: false
+      inputType: 'pubg'
     },
     'uc-pack': {
       name: 'UC Pack',
       sub: 'Global',
       img: '/Pubgucpack.png',
       packages: ucPackPackages,
-      requireZone: false
+      inputType: 'pubg'
+    },
+    'telegram': {
+      name: 'Telegram Premium',
+      sub: 'Social App',
+      img: '/telegram.png',
+      packages: telegramPackages,
+      inputType: 'username'
+    },
+    'heartopia': {
+      name: 'Heartopia',
+      sub: 'Game Topup',
+      img: '/heartopia.png',
+      packages: heartopiaPackages,
+      inputType: 'heartopia'
+    },
+    'smile-coin': {
+      name: 'Smile coin',
+      sub: 'Game Currency',
+      img: '/smile_coin.png',
+      packages: smileCoinPackages,
+      inputType: 'username'
     }
   };
 
@@ -142,10 +196,22 @@ export default function TopupPage() {
     );
   }
 
-  // Check validation based on game type
-  const isFormValid = game.requireZone 
-    ? (selectedPkg && userId && zoneId && paymentMethod)
-    : (selectedPkg && userId && paymentMethod);
+  // Form validation logic based on inputType
+  const isFormValid = (() => {
+    if (!selectedPkg || !paymentMethod) return false;
+    if (game.inputType === 'mlbb') return userId && zoneId;
+    if (game.inputType === 'pubg') return userId;
+    if (game.inputType === 'username') return userId; // userId represents username here
+    if (game.inputType === 'heartopia') return userId && aid;
+    return false;
+  })();
+
+  const getTargetAccountText = () => {
+    if (!userId) return 'Not filled';
+    if (game.inputType === 'mlbb') return zoneId ? `${userId} (${zoneId})` : userId;
+    if (game.inputType === 'heartopia') return aid ? `UID: ${userId}, AID: ${aid} (${serverField})` : `UID: ${userId}`;
+    return userId;
+  };
 
   return (
     <main className="min-h-screen bg-[#070814] pb-20">
@@ -163,10 +229,10 @@ export default function TopupPage() {
             <p className="text-gray-400 text-sm mt-1">{game.sub}</p>
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
               <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Instant Process
+                Instant Process
               </span>
               <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg> 100% Safe
+                100% Safe
               </span>
             </div>
           </div>
@@ -211,28 +277,31 @@ export default function TopupPage() {
               </div>
             </section>
 
-            {/* Step 02: Dynamic Account Data (Server No. conditional) */}
+            {/* Step 02: Dynamic Account Data Input */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">02</span>
                 <div className="mb-1">
                   <h2 className="text-lg font-bold text-white">Game Account Data</h2>
-                  <p className="text-gray-400 text-[11px]">Make sure your Game ID is correct</p>
+                  <p className="text-gray-400 text-[11px]">Make sure your account details are correct</p>
                 </div>
               </div>
-              <div className="bg-[#131422] p-5 rounded-3xl border border-white/5">
-                <div className={`flex flex-col ${game.requireZone ? 'sm:flex-row' : ''} gap-4 mb-3`}>
-                  <div className={`w-full ${game.requireZone ? 'sm:w-1/2' : 'w-full'}`}>
-                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Player ID <span className="text-red-500">*</span></label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter Player ID" 
-                      className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                      value={userId}
-                      onChange={(e) => setUserId(e.target.value)}
-                    />
-                  </div>
-                  {game.requireZone && (
+
+              <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 space-y-4">
+                
+                {/* Case A: MLBB / Magic Chess (UID & Zone ID) */}
+                {game.inputType === 'mlbb' && (
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="w-full sm:w-1/2">
+                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">ID <span className="text-red-500">*</span></label>
+                      <input 
+                        type="text" 
+                        placeholder="Enter ID" 
+                        className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                        value={userId}
+                        onChange={(e) => setUserId(e.target.value)}
+                      />
+                    </div>
                     <div className="w-full sm:w-1/2">
                       <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Server No. <span className="text-red-500">*</span></label>
                       <input 
@@ -243,12 +312,82 @@ export default function TopupPage() {
                         onChange={(e) => setZoneId(e.target.value)}
                       />
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
+
+                {/* Case B: PUBG & UC Pack (Player ID only) */}
+                {game.inputType === 'pubg' && (
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Player ID <span className="text-red-500">*</span></label>
+                    <input 
+                      type="text" 
+                      placeholder="Enter Player ID" 
+                      className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                {/* Case C: Telegram & Smile Coin (Telegram Username) */}
+                {game.inputType === 'username' && (
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Telegram Username <span className="text-red-500">*</span></label>
+                    <input 
+                      type="text" 
+                      placeholder="ဥပမာ: @username သို့မဟုတ် phone number" 
+                      className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
+                    />
+                  </div>
+                )}
+
+                {/* Case D: Heartopia (UID, Field, AID as requested in image) */}
+                {game.inputType === 'heartopia' && (
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="w-full sm:w-1/2">
+                        <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">UID <span className="text-red-500">*</span></label>
+                        <input 
+                          type="text" 
+                          placeholder="UID" 
+                          className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                          value={userId}
+                          onChange={(e) => setUserId(e.target.value)}
+                        />
+                      </div>
+                      <div className="w-full sm:w-1/2">
+                        <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">FIELD <span className="text-red-500">*</span></label>
+                        <select 
+                          className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                          value={serverField}
+                          onChange={(e) => setServerField(e.target.value)}
+                        >
+                          <option value="Global">Global</option>
+                          <option value="Asia">Asia</option>
+                          <option value="America">America</option>
+                          <option value="Europe">Europe</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">AID <span className="text-red-500">*</span></label>
+                      <input 
+                        type="text" 
+                        placeholder="AID" 
+                        className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
+                        value={aid}
+                        onChange={(e) => setAid(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+
               </div>
             </section>
 
-            {/* Step 03 */}
+            {/* Step 03: Choose Payment Method */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">03</span>
@@ -298,7 +437,7 @@ export default function TopupPage() {
                 <div>
                   <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Target Account</p>
                   <p className="text-white text-xs font-medium italic">
-                    {userId ? (game.requireZone && zoneId ? `${userId} (${zoneId})` : userId) : 'Not filled'}
+                    {getTargetAccountText()}
                   </p>
                 </div>
                 <div>
