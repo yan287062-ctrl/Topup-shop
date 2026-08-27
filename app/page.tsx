@@ -15,7 +15,7 @@ export default function Home() {
 
   return (
     <main 
-      className="min-h-screen relative flex flex-col pb-20"
+      className="min-h-screen relative flex flex-row items-center text-left pb-20"
       style={{
         backgroundImage: "url('/bg.gif')",
         backgroundSize: 'cover',
@@ -38,12 +38,12 @@ export default function Home() {
         </h2>
         
         {/* ဖုန်းတွင် ၂ ကွက်၊ မျက်နှာပြင်ကျယ်လျှင် ၃ ကွက် ပေါ်မည် */}
-        <div className="grid grid-cols-4 gap-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
           {games.map((game, index) => (
             <Link 
               href={game.href} 
               key={index} 
-              className="flex flex-col bg-white rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.5)] transform transition-transform hover:scale-105 active:scale-95"
+              className="flex flex-row items-center text-left bg-[#1a1b2e]/80 border border-white/10 rounded-2xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.5)] transform transition-transform hover:scale-105 active:scale-95"
             >
               {/* အပေါ်တစ်ဝက်: ဂိမ်းပုံ */}
               <div className="h-28 w-full relative bg-gray-200">
@@ -55,8 +55,8 @@ export default function Home() {
               </div>
               
               {/* အောက်တစ်ဝက်: စာသားများ */}
-              <div className="p-3 bg-white">
-                <h3 className="text-gray-900 font-bold text-[13px] truncate">
+              <div className="p-3 bg-[#1a1b2e]/80 border border-white/10">
+                <h3 className="text-white font-bold text-[13px] truncate">
                   {game.name}
                 </h3>
                 <p className="text-gray-500 text-[11px] mt-0.5 truncate">
