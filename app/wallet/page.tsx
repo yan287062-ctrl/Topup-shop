@@ -13,7 +13,6 @@ export default function WalletPage() {
 
   const presetAmounts = [50000, 100000, 200000, 500000, 1000000];
   
-  // ဖိုင်နာမည်များကို Termux တွင်ရှိသော နာမည်အမှန်အတိုင်း ပြင်ဆင်ထားပါသည်
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/wave.png' },
@@ -147,22 +146,16 @@ export default function WalletPage() {
                 </button>
               </div>
 
+              {/* RECENT TOP UPS - Removed Demo Data */}
               <div className="bg-[#131422] p-5 rounded-3xl border border-white/5">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="text-white text-xs font-bold uppercase tracking-wider">Recent Top Ups</h4>
-                  <span className="text-pink-500 text-xs cursor-pointer hover:underline">All →</span>
+                  <Link href="/history" className="text-pink-500 text-xs cursor-pointer hover:underline">All →</Link>
                 </div>
                 
                 <div className="space-y-3">
-                  <div className="bg-[#0a0b14] p-3 rounded-xl border border-white/5 flex justify-between items-center">
-                    <div>
-                      <p className="text-white text-xs font-mono font-bold">DP260825460371AE</p>
-                      <p className="text-gray-500 text-[10px]">25 Aug 2026 00:14</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-white text-xs font-bold">K 5,000</p>
-                      <span className="text-yellow-500 text-[10px] font-medium">Pending</span>
-                    </div>
+                  <div className="bg-[#0a0b14] p-6 rounded-xl border border-white/5 text-center flex flex-col items-center justify-center">
+                    <p className="text-gray-500 text-[10px]">No recent top ups yet.</p>
                   </div>
                 </div>
               </div>
