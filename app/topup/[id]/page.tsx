@@ -10,7 +10,7 @@ export default function TopupPage({ params }: { params: { id: string } }) {
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
 
-  // အစ်ကိုပေးထားသော MLBB ဈေးနှုန်းစာရင်း
+  // MLBB ဈေးနှုန်းစာရင်း
   const mlbbPackages = [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
@@ -35,7 +35,44 @@ export default function TopupPage({ params }: { params: { id: string } }) {
     { id: 'mlbb_41', name: '5532 Diamonds', price: 324734 }, { id: 'mlbb_42', name: '6055 Diamonds', price: 354812 },
     { id: 'mlbb_43', name: '6752 Diamonds', price: 398677 }, { id: 'mlbb_44', name: '7030 Diamonds', price: 415366 },
     { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // Magic Chess Go Go ဈေးနှုန်းစာရင်း
+  const mcggPackages = [
+    { id: 'mcgg_1', name: '10', bonus: '+ 1 Diamonds', price: 900 },
+    { id: 'mcgg_2', name: '20', bonus: '+ 2 Diamonds', price: 1700 },
+    { id: 'mcgg_3', name: '51', bonus: '+ 5 Diamonds', price: 4200 },
+    { id: 'mcgg_4', name: 'Double Dia(50+50)or 55', bonus: 'No bonus', price: 4400 },
+    { id: 'mcgg_5', name: '102', bonus: '+ 10 Diamonds', price: 8300 },
+    { id: 'mcgg_6', name: 'Weekly Card', bonus: 'No bonus', price: 8800 },
+    { id: 'mcgg_7', name: 'Double Dia(150+150)or 165', bonus: 'No bonus', price: 13000 },
+    { id: 'mcgg_8', name: '203', bonus: '+ 20 Diamonds', price: 16600 },
+    { id: 'mcgg_9', name: 'Double Dia(250+250) or 275', bonus: 'No bonus', price: 21500 },
+    { id: 'mcgg_10', name: '303', bonus: '+ 33 Diamonds', price: 24900 },
+    { id: 'mcgg_11', name: '504', bonus: '+ 66 Diamonds', price: 41400 },
+    { id: 'mcgg_12', name: 'Double Dia(500+500)or 565', bonus: 'No bonus', price: 43400 },
+    { id: 'mcgg_13', name: '1007', bonus: '+ 156 Diamonds', price: 82900 },
+    { id: 'mcgg_14', name: '2015', bonus: '+ 383 Diamonds', price: 165700 },
+    { id: 'mcgg_15', name: '5035', bonus: '+ 1007 Diamonds', price: 414100 }
   ];
+
+  // ဂိမ်းအချက်အလက်များကို ချိတ်ဆက်ခြင်း (Dynamic Config)
+  const gameConfigs: Record<string, any> = {
+    'mobile-legends': {
+      name: 'Mobile Legends',
+      sub: 'All Server',
+      img: '/mlbb.png',
+      packages: mlbbPackages
+    },
+    'magic-chess': {
+      name: 'Magic Chess Go Go',
+      sub: 'All Server',
+      img: '/MCGG.png',
+      packages: mcggPackages
+    }
+  };
+
+  const game = gameConfigs[params.id];
 
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', color: 'bg-blue-600' },
@@ -43,6 +80,16 @@ export default function TopupPage({ params }: { params: { id: string } }) {
     { id: 'ayapay', name: 'AYA Pay', color: 'bg-red-600' },
     { id: 'cbpay', name: 'CB Pay', color: 'bg-orange-500' }
   ];
+
+  // ဂိမ်းကို ရှာမတွေ့ပါက
+  if (!game) {
+    return (
+      <main className="min-h-screen bg-[#070814] flex flex-col items-center justify-center">
+        <h1 className="text-white text-2xl font-bold mb-4">Game Not Found</h1>
+        <Link href="/" className="bg-pink-600 text-white px-6 py-2 rounded-full font-medium">Go Back Home</Link>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#070814] pb-20">
@@ -52,13 +99,12 @@ export default function TopupPage({ params }: { params: { id: string } }) {
         
         {/* Banner Section */}
         <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
-          {/* Decorative blur */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl -z-10"></div>
           
-          <img src="/mlbb.png" alt="MLBB" className="w-24 h-24 rounded-2xl shadow-[0_0_20px_rgba(236,72,153,0.3)] object-cover z-10" />
+          <img src={game.img} alt={game.name} className="w-24 h-24 rounded-2xl shadow-[0_0_20px_rgba(236,72,153,0.3)] object-cover z-10" />
           <div className="z-10 text-center md:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">Mobile Legends</h1>
-            <p className="text-gray-400 text-sm mt-1">All Server</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">{game.name}</h1>
+            <p className="text-gray-400 text-sm mt-1">{game.sub}</p>
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
               <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Instant Process
@@ -72,29 +118,27 @@ export default function TopupPage({ params }: { params: { id: string } }) {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Left Column: Steps 01, 02, 03 */}
+          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
             
-            {/* Step 01: Choose Nominal Amount */}
+            {/* Step 01 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">01</span>
                 <div className="mb-1">
                   <h2 className="text-lg font-bold text-white">Choose Nominal Amount</h2>
-                  <p className="text-gray-400 text-[11px]">Pick the Mobile Legends amount you want to top up</p>
+                  <p className="text-gray-400 text-[11px]">Pick the {game.name} amount you want to top up</p>
                 </div>
               </div>
               
-              {/* Tabs */}
               <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
                 <button className="bg-pink-600 text-white px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-[0_0_10px_rgba(236,72,153,0.3)]">Global/Myanmar (မူလဈေး)</button>
                 <button className="bg-[#131422] border border-white/10 text-gray-400 px-5 py-2 rounded-full text-xs font-medium whitespace-nowrap">Indonesia</button>
                 <button className="bg-[#131422] border border-white/10 text-gray-400 px-5 py-2 rounded-full text-xs font-medium whitespace-nowrap">Malaysia</button>
               </div>
 
-              {/* Grid of Packages */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {mlbbPackages.map((pkg) => (
+                {game.packages.map((pkg: any) => (
                   <button
                     key={pkg.id}
                     onClick={() => setSelectedPkg(pkg)}
@@ -110,14 +154,14 @@ export default function TopupPage({ params }: { params: { id: string } }) {
                       </div>
                     )}
                     <div className="text-white font-bold text-sm mb-1">{pkg.name}</div>
-                    <div className="text-gray-500 text-[10px] mb-3">No bonus</div>
+                    <div className="text-gray-500 text-[10px] mb-3">{pkg.bonus}</div>
                     <div className="text-pink-500 font-extrabold text-sm">{pkg.price.toLocaleString()} Ks</div>
                   </button>
                 ))}
               </div>
             </section>
 
-            {/* Step 02: Game Account Data */}
+            {/* Step 02 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">02</span>
@@ -149,14 +193,10 @@ export default function TopupPage({ params }: { params: { id: string } }) {
                     />
                   </div>
                 </div>
-                <p className="text-pink-500/80 text-[11px] cursor-pointer hover:underline flex items-center gap-1">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                  Don't know your User ID? Click here
-                </p>
               </div>
             </section>
 
-            {/* Step 03: Choose Payment Method */}
+            {/* Step 03 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">03</span>
@@ -190,18 +230,17 @@ export default function TopupPage({ params }: { params: { id: string } }) {
                 ))}
               </div>
             </section>
-
           </div>
 
-          {/* Right Column: Order Summary (Sticky Sidebar) */}
+          {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-[#131422] rounded-3xl border border-white/5 p-5 shadow-2xl">
               <h3 className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-3">Order Summary</h3>
               
               <div className="flex items-center gap-3 mb-5">
-                <img src="/mlbb.png" className="w-12 h-12 rounded-xl object-cover" />
+                <img src={game.img} className="w-12 h-12 rounded-xl object-cover" />
                 <div>
-                  <h4 className="text-white font-bold text-sm">Mobile Legends</h4>
+                  <h4 className="text-white font-bold text-sm">{game.name}</h4>
                   <p className="text-pink-500 text-[10px]">
                     {selectedPkg ? selectedPkg.name : 'No amount selected'}
                   </p>
@@ -231,10 +270,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
                 <div className="flex justify-between text-xs">
                   <span className="text-gray-400">Service Fee</span>
                   <span className="text-white">0 Ks</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Promo Discount</span>
-                  <span className="text-pink-500">- 0 Ks</span>
                 </div>
               </div>
 
