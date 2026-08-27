@@ -3,14 +3,18 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
+import { useParams } from 'next/navigation';
 
-export default function TopupPage({ params }: { params: { id: string } }) {
+export default function TopupPage() {
+  const params = useParams();
+  const id = params?.id as string;
+
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
 
-  // MLBB ဈေးနှုန်းစာရင်း
+  // MLBB Packages
   const mlbbPackages = [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
@@ -37,7 +41,7 @@ export default function TopupPage({ params }: { params: { id: string } }) {
     { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // Magic Chess Go Go ဈေးနှုန်းစာရင်း
+  // Magic Chess Packages
   const mcggPackages = [
     { id: 'mcgg_1', name: '10', bonus: '+ 1 Diamonds', price: 900 },
     { id: 'mcgg_2', name: '20', bonus: '+ 2 Diamonds', price: 1700 },
@@ -56,7 +60,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
     { id: 'mcgg_15', name: '5035', bonus: '+ 1007 Diamonds', price: 414100 }
   ];
 
-  // ဂိမ်းအချက်အလက်များကို ချိတ်ဆက်ခြင်း (Dynamic Config)
   const gameConfigs: Record<string, any> = {
     'mobile-legends': {
       name: 'Mobile Legends',
@@ -72,7 +75,7 @@ export default function TopupPage({ params }: { params: { id: string } }) {
     }
   };
 
-  const game = gameConfigs[params.id];
+  const game = gameConfigs[id];
 
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', color: 'bg-blue-600' },
@@ -81,12 +84,12 @@ export default function TopupPage({ params }: { params: { id: string } }) {
     { id: 'cbpay', name: 'CB Pay', color: 'bg-orange-500' }
   ];
 
-  // ဂိမ်းကို ရှာမတွေ့ပါက
   if (!game) {
     return (
-      <main className="min-h-screen bg-[#070814] flex flex-col items-center justify-center">
-        <h1 className="text-white text-2xl font-bold mb-4">Game Not Found</h1>
-        <Link href="/" className="bg-pink-600 text-white px-6 py-2 rounded-full font-medium">Go Back Home</Link>
+      <main className="min-h-screen bg-[#070814] flex flex-col items-center justify-center p-4">
+        <h1 className="text-white text-2xl font-bold mb-2">Game Not Found</h1>
+        <p className="text-gray-400 text-xs mb-6">Requested ID: {id}</p>
+        <Link href="/" className="bg-pink-600 text-white px-6 py-2.5 rounded-full font-medium text-sm">Go Back Home</Link>
       </main>
     );
   }
@@ -96,8 +99,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 mt-2 font-sans">
-        
-        {/* Banner Section */}
         <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl -z-10"></div>
           
@@ -107,21 +108,17 @@ export default function TopupPage({ params }: { params: { id: string } }) {
             <p className="text-gray-400 text-sm mt-1">{game.sub}</p>
             <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
               <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Instant Process
+                Instant Process
               </span>
               <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg> 100% Safe
+                100% Safe
               </span>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
-            
-            {/* Step 01 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">01</span>
@@ -131,12 +128,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
                 </div>
               </div>
               
-              <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
-                <button className="bg-pink-600 text-white px-5 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-[0_0_10px_rgba(236,72,153,0.3)]">Global/Myanmar (မူလဈေး)</button>
-                <button className="bg-[#131422] border border-white/10 text-gray-400 px-5 py-2 rounded-full text-xs font-medium whitespace-nowrap">Indonesia</button>
-                <button className="bg-[#131422] border border-white/10 text-gray-400 px-5 py-2 rounded-full text-xs font-medium whitespace-nowrap">Malaysia</button>
-              </div>
-
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {game.packages.map((pkg: any) => (
                   <button
@@ -161,7 +152,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
               </div>
             </section>
 
-            {/* Step 02 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">02</span>
@@ -196,7 +186,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
               </div>
             </section>
 
-            {/* Step 03 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">03</span>
@@ -206,11 +195,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
                 </div>
               </div>
               
-              <div className="flex gap-2 mb-4">
-                <button className="flex-1 bg-pink-600 text-white py-3 rounded-xl text-xs font-bold shadow-lg">Direct Payment</button>
-                <button className="flex-1 bg-[#131422] border border-white/10 text-gray-400 py-3 rounded-xl text-xs font-bold">Wallet သုံးမည်</button>
-              </div>
-
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {paymentMethods.map((pm) => (
                   <button
@@ -232,7 +216,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
             </section>
           </div>
 
-          {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-[#131422] rounded-3xl border border-white/5 p-5 shadow-2xl">
               <h3 className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-3">Order Summary</h3>
@@ -267,10 +250,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
                   <span className="text-gray-400">Subtotal</span>
                   <span className="text-white">{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</span>
                 </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Service Fee</span>
-                  <span className="text-white">0 Ks</span>
-                </div>
               </div>
 
               <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-6">
@@ -292,7 +271,6 @@ export default function TopupPage({ params }: { params: { id: string } }) {
               </button>
             </div>
           </div>
-
         </div>
       </div>
     </main>

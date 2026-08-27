@@ -2,7 +2,6 @@ import Navbar from '../components/Navbar';
 import Link from 'next/link';
 
 export default function Home() {
-  // အစ်ကို့ Termux ထဲမှာ တကယ်ရှိနေတဲ့ ပုံနာမည်များနှင့် အတိအကျ ပြန်ချိတ်ထားပါသည်
   const games = [
     { id: 'mobile-legends', name: 'Mobile Legend', sub: 'Myanmar (Global)', img: '/mlbb.png' },
     { id: 'magic-chess', name: 'Magic Chess', sub: 'Myanmar (Global)', img: '/MCGG.png' },
@@ -18,18 +17,15 @@ export default function Home() {
       className="min-h-screen pb-28 relative bg-cover bg-center bg-fixed"
       style={{ backgroundImage: "url('/bg.gif')" }}
     >
-      {/* Background ပေါ်မှ စာများထင်းနေစေရန် အမည်းရောင်အလွှာ ခံထားပါသည် */}
       <div className="absolute inset-0 bg-[#070814]/70 z-0"></div>
 
       <div className="relative z-10">
         <Navbar />
 
-        {/* ခေါင်းစဉ် */}
         <div className="max-w-4xl mx-auto px-4 mb-3 mt-4">
           <h2 className="text-gray-200 text-xs sm:text-sm font-medium">ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ:</h2>
         </div>
 
-        {/* ဂိမ်းကတ်များ (၁ တန်းကို ၄ ခု၊ အချိုးကျပြီး သပ်ရပ်သော ပုံစံ) */}
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-4 gap-2 sm:gap-3">
           {games.map((game) => (
             <Link 
