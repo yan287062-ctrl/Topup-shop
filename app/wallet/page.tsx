@@ -10,14 +10,16 @@ export default function WalletPage() {
   const [step, setStep] = useState<'form' | 'detail'>('form');
   const [screenshot, setScreenshot] = useState<string | null>(null);
   const [isUploaded, setIsUploaded] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const presetAmounts = [50000, 100000, 200000, 500000, 1000000];
   
+  // ဖုန်းနံပါတ်နှင့် အမည်အမှန်များကို ပြင်ဆင်ထားပါသည်
   const paymentMethods = [
-    { id: 'kpay', name: 'KBZ Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/kpay.png' },
-    { id: 'wave', name: 'Wave Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/wave.png' },
-    { id: 'ayapay', name: 'AYA Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/ayapay.png' },
-    { id: 'uabpay', name: 'UAB Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/uabpay.png' }
+    { id: 'kpay', name: 'KBZ Pay', acc: '09755008854', holder: 'U Ye Paing Oo', img: '/kpay.png' },
+    { id: 'wave', name: 'Wave Pay', acc: '09967241375', holder: 'U Ye Paing Oo', img: '/wave.png' },
+    { id: 'ayapay', name: 'AYA Pay', acc: '09967241375', holder: 'U Ye Paing Oo', img: '/ayapay.png' },
+    { id: 'uabpay', name: 'UAB Pay', acc: '09967241375', holder: 'U Ye Paing Oo', img: '/uabpay.png' }
   ];
 
   const currentMethodObj = paymentMethods.find(m => m.name === selectedMethod) || paymentMethods[1];
@@ -26,6 +28,12 @@ export default function WalletPage() {
     if (e.target.files && e.target.files[0]) {
       setScreenshot(e.target.files[0].name);
     }
+  };
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000); // ၂ စက္ကန့်အကြာတွင် Copy ပုံစံပြန်ပြောင်းမည်
   };
 
   return (
@@ -146,7 +154,6 @@ export default function WalletPage() {
                 </button>
               </div>
 
-              {/* RECENT TOP UPS - Removed Demo Data */}
               <div className="bg-[#131422] p-5 rounded-3xl border border-white/5">
                 <div className="flex justify-between items-center mb-4">
                   <h4 className="text-white text-xs font-bold uppercase tracking-wider">Recent Top Ups</h4>
@@ -173,15 +180,30 @@ export default function WalletPage() {
               <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Payment Information</h4>
                 <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center mb-1">
                     <span className="text-gray-400">Method</span>
                     <span className="text-white font-medium">{selectedMethod}</span>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center mb-1">
                     <span className="text-gray-400">Send to Account</span>
-                    <span className="text-pink-400 font-mono font-bold">{currentMethodObj.acc}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-pink-400 font-mono font-bold">{currentMethodObj.acc}</span>
+                      
+                      {/* Copy ခလုတ် */}
+                      <button 
+                        onClick={() => handleCopy(currentMethodObj.acc)}
+                        className="p-1.5 rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all"
+                        title="Copy Account Number"
+                      >
+                        {copied ? (
+                          <svg className="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                        ) : (
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        )}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center">
                     <span className="text-gray-400">Account holder</span>
                     <span className="text-white font-medium">{currentMethodObj.holder}</span>
                   </div>
