@@ -38,7 +38,7 @@ export default function Home() {
         </h2>
         
         {/* ဖုန်းတွင် ၂ ကွက်၊ မျက်နှာပြင်ကျယ်လျှင် ၃ ကွက် ပေါ်မည် */}
-        <div className="grid grid-cols-4 gap-2 md:grid-cols-4">
+        <div className="grid grid-cols-4 gap-3 md:grid-cols-4">
           {games.map((game, index) => (
             <Link 
               href={game.href} 
