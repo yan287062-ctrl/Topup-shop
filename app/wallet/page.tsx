@@ -13,12 +13,12 @@ export default function WalletPage() {
 
   const presetAmounts = [50000, 100000, 200000, 500000, 1000000];
   
-  // CB Pay ကို UAB Pay ဖြင့် အစားထိုးပြီး၊ အရောင်များအစား ပုံလင့်ခ်များ (img) ထည့်ထားပါသည်
+  // ဖိုင်နာမည်များကို Termux တွင်ရှိသော နာမည်အမှန်အတိုင်း ပြင်ဆင်ထားပါသည်
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/wave.png' },
-    { id: 'ayapay', name: 'AYA Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/aya.png' },
-    { id: 'uabpay', name: 'UAB Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/uab.png' }
+    { id: 'ayapay', name: 'AYA Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/ayapay.png' },
+    { id: 'uabpay', name: 'UAB Pay', acc: '09777882089', holder: 'Khoon Sint Nay Chi', img: '/uabpay.png' }
   ];
 
   const currentMethodObj = paymentMethods.find(m => m.name === selectedMethod) || paymentMethods[1];
@@ -92,11 +92,9 @@ export default function WalletPage() {
                           : 'bg-[#0a0b14] border-white/10 hover:border-white/30'
                         }`}
                       >
-                        {/* ပုံထည့်ထားသော နေရာ */}
                         <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-white flex items-center justify-center p-1 overflow-hidden shadow-sm">
                           <img src={m.img} alt={m.name} className="w-full h-full object-contain" 
                             onError={(e) => {
-                              // ပုံမရှိပါက နာမည်အစစာလုံးကို ပြမည်
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.parentElement!.innerHTML = `<span class="text-gray-800 font-bold text-xs">${m.name[0]}</span>`;
                             }}
