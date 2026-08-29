@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 
-// Vercel Environment ပြဿနာမရှိစေရန် Key များကို တိုက်ရိုက်ထည့်ထားပါသည်
 const supabaseUrl = 'https://lejfhsuwajmzikmudmcs.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlamZoc3V3YWptemlrbXVkbWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NjA4NzUsImV4cCI6MjEwMzMzNjg3NX0.x3EVXbqCmrq0yiGlKI6GrWadKWU9TuXKs5F3w8uJNQA';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -45,9 +44,6 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
         
         if (data && data.length > 0) {
           setDisplayPackages(data.sort((a, b) => a.price - b.price));
-        } else {
-          // အကယ်၍ Database ထဲမှာ မရှိသေးရင် Error မတက်အောင် လွတ်နေမည်
-          setDisplayPackages([]);
         }
       } catch (error) {
         console.error("Error fetching prices:", error);
@@ -96,15 +92,12 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
     <main className="min-h-screen pb-32 relative bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/bg.gif')" }}>
       <div className="absolute inset-0 bg-[#070b19]/60 backdrop-blur-[2px]"></div>
       <div className="relative z-10 max-w-3xl mx-auto p-4 pt-6 space-y-6">
-        
-        {/* Game Info */}
         <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md border border-white/20 p-4 rounded-2xl">
           <Link href="/" className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl flex items-center justify-center text-white"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg></Link>
           <img src={game.img} alt={game.name} className="w-12 h-12 rounded-lg" />
           <h1 className="text-white font-bold text-lg">{game.name}</h1>
         </div>
 
-        {/* User Input */}
         <div className="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl">
           <div className="flex gap-3">
             <input type="text" placeholder="Player ID" value={playerId} onChange={(e) => setPlayerId(e.target.value)} className="flex-1 bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#00f2fe]" />
@@ -112,13 +105,10 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        {/* Packages Grid */}
         <div className="bg-white/10 backdrop-blur-md border border-white/20 p-5 rounded-2xl">
           <h2 className="text-white font-bold text-sm mb-4">ပမာဏ ရွေးချယ်ပါ</h2>
           {isLoadingPrices ? (
              <div className="text-center text-gray-400 py-10 animate-pulse">ဈေးနှုန်းများ ရယူနေပါသည်...</div>
-          ) : displayPackages.length === 0 ? (
-             <div className="text-center text-gray-500 py-10">Admin မှ ဈေးနှုန်း သတ်မှတ်ထားခြင်း မရှိသေးပါ။</div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {displayPackages.map((pkg: any) => (
@@ -136,7 +126,6 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      {/* Checkout Bar */}
       {selectedPackage && (
         <div className="fixed bottom-0 left-0 w-full bg-[#070b19]/90 backdrop-blur-xl p-4 z-50 flex justify-between items-center border-t border-white/10">
           <div>
