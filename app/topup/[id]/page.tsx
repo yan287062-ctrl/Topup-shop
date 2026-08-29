@@ -8,14 +8,20 @@ const supabaseUrl = 'https://lejfhsuwajmzikmudmcs.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlamZoc3V3YWptemlrbXVkbWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NjA4NzUsImV4cCI6MjEwMzMzNjg3NX0.x3EVXbqCmrq0yiGlKI6GrWadKWU9TuXKs5F3w8uJNQA';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Link ID အဟောင်းနဲ့ အသစ် နှစ်မျိုးလုံး အလုပ်လုပ်အောင် ထည့်ပေးထားသည်
 const gameDataMap: Record<string, any> = {
-  'mobile-legends': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, packages: [] },
-  'magic-chess': { name: 'Magic Chess', img: '/MCGG.png', requireZone: true, packages: [] },
-  'pubg-uc': { name: 'PUBG Mobile', img: '/pubg.png', requireZone: false, packages: [] },
-  'uc-pack': { name: 'UC Pack', img: '/Pubgucpack.png', requireZone: false, packages: [] },
-  'telegram': { name: 'Telegram Premium', img: '/telegram.png', requireZone: false, packages: [] },
-  'heartopia': { name: 'Heartopia', img: '/heartopia.png', requireZone: false, packages: [] },
-  'smile-coin': { name: 'Smile Coin', img: '/smile_coin.png', requireZone: false, packages: [] }
+  'mobile-legends': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, dbCat: 'mlbb' },
+  'mlbb': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, dbCat: 'mlbb' },
+  'magic-chess': { name: 'Magic Chess', img: '/MCGG.png', requireZone: true, dbCat: 'mcgg' },
+  'mcgg': { name: 'Magic Chess', img: '/MCGG.png', requireZone: true, dbCat: 'mcgg' },
+  'pubg-uc': { name: 'PUBG Mobile', img: '/pubg.png', requireZone: false, dbCat: 'pubg' },
+  'pubg': { name: 'PUBG Mobile', img: '/pubg.png', requireZone: false, dbCat: 'pubg' },
+  'uc-pack': { name: 'UC Pack', img: '/Pubgucpack.png', requireZone: false, dbCat: 'ucPack' },
+  'ucPack': { name: 'UC Pack', img: '/Pubgucpack.png', requireZone: false, dbCat: 'ucPack' },
+  'telegram': { name: 'Telegram Premium', img: '/telegram.png', requireZone: false, dbCat: 'telegram' },
+  'heartopia': { name: 'Heartopia', img: '/heartopia.png', requireZone: false, dbCat: 'heartopia' },
+  'smile-coin': { name: 'Smile Coin', img: '/smile_coin.png', requireZone: false, dbCat: 'smileCoin' },
+  'smileCoin': { name: 'Smile Coin', img: '/smile_coin.png', requireZone: false, dbCat: 'smileCoin' }
 };
 
 export default function GameTopupPage({ params }: { params: { id: string } }) {
@@ -31,17 +37,11 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
   const [isLoadingPrices, setIsLoadingPrices] = useState(true);
 
   useEffect(() => {
+    if (!game) return;
     const fetchRealPrices = async () => {
-      const catMap: Record<string, string> = {
-        'mobile-legends': 'mlbb', 'magic-chess': 'mcgg', 'pubg-uc': 'pubg', 
-        'uc-pack': 'ucPack', 'telegram': 'telegram', 'heartopia': 'heartopia', 'smile-coin': 'smileCoin'
-      };
-      const dbCategory = catMap[params.id];
-      
       try {
-        const { data, error } = await supabase.from('game_prices').select('id, price, name, bonus').eq('category', dbCategory);
+        const { data, error } = await supabase.from('game_prices').select('id, price, name, bonus').eq('category', game.dbCat);
         if (error) throw error;
-        
         if (data && data.length > 0) {
           setDisplayPackages(data.sort((a, b) => a.price - b.price));
         }
@@ -52,14 +52,18 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
       }
     };
     fetchRealPrices();
-  }, [params.id]);
+  }, [game]);
 
-  if (!game) return <div className="text-white text-center mt-20">Game not found</div>;
+  if (!game) return (
+    <div className="text-white flex flex-col items-center justify-center min-h-[70vh]">
+      <h1 className="text-2xl font-bold mb-4">Game not found</h1>
+      <Link href="/" className="px-6 py-2 bg-[#00f2fe] text-black rounded-xl font-bold">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</Link>
+    </div>
+  );
 
   const handleCheckout = async () => {
     if (!playerId || (game.requireZone && !zoneId) || !selectedPackage) return alert("Please fill all details!");
     setIsSubmitting(true);
-    
     try {
       const { error } = await supabase.from('orders').insert([{
         game_name: game.name, player_id: playerId, zone_id: zoneId || null,
@@ -109,6 +113,8 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
           <h2 className="text-white font-bold text-sm mb-4">ပမာဏ ရွေးချယ်ပါ</h2>
           {isLoadingPrices ? (
              <div className="text-center text-gray-400 py-10 animate-pulse">ဈေးနှုန်းများ ရယူနေပါသည်...</div>
+          ) : displayPackages.length === 0 ? (
+             <div className="text-center text-gray-400 py-10">Admin မှ ဈေးနှုန်း သတ်မှတ်ထားခြင်း မရှိသေးပါ။</div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {displayPackages.map((pkg: any) => (
