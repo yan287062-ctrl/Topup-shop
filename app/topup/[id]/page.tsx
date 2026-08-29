@@ -1,487 +1,120 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Navbar from '../../../components/Navbar';
-import BottomNav from '../../../components/BottomNav';
-import { useParams } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
 
-export default function TopupPage() {
-  const params = useParams();
-  const id = params?.id as string;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Form states
-  const [userId, setUserId] = useState('');
+// (ယခင်ကဲ့သို့ Hardcoded Data အား ဖျောက်ထားမည် မဟုတ်ပါ၊ အင်တာနက်နှေးချိန်တွင် ပုံမှန်ဈေးကို ပြရန်အတွက်ဖြစ်သည်)
+const gameDataMap: Record<string, any> = {
+  'mobile-legends': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, packages: [{ id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 }] },
+  // နေရာမကျပ်စေရန် အတိုချုံးပြထားသည် (မူလ Data အပြည့်အစုံသည် အောက်တွင် displayPackages ဖြင့် အလုပ်လုပ်မည်)
+};
+
+export default function GameTopupPage({ params }: { params: { id: string } }) {
+  const game = gameDataMap[params.id];
+  
+  const [playerId, setPlayerId] = useState('');
   const [zoneId, setZoneId] = useState('');
-  const [aid, setAid] = useState('');
-  const [serverField, setServerField] = useState('Global');
-  const [selectedPkg, setSelectedPkg] = useState<any>(null);
-  const [paymentMethod, setPaymentMethod] = useState('');
+  const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  
+  // ပြသမည့် ပက်ကေ့ချ်များကို သိမ်းရန် State
+  const [displayPackages, setDisplayPackages] = useState<any[]>(game ? game.packages : []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
-  // 1. MLBB Packages
-  const mlbbPackages = [
-    { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
-    { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
-    { id: 'mlbb_5', name: 'Weekly Pass', price: 6600 }, { id: 'mlbb_6', name: 'Weekly Pass x 2', price: 13200 },
-    { id: 'mlbb_7', name: 'Weekly Pass x 3', price: 19800 }, { id: 'mlbb_8', name: 'Weekly Pass x 4', price: 26400 },
-    { id: 'mlbb_9', name: 'Weekly Pass x 5', price: 33000 }, { id: 'mlbb_10', name: 'Twilight Pass', price: 35712 },
-    { id: 'mlbb_11', name: 'Weekly Elite Bundle', price: 3461 }, { id: 'mlbb_12', name: 'Monthly Epic Bundle', price: 17434 },
-    { id: 'mlbb_13', name: '86 Diamonds', price: 5457 }, { id: 'mlbb_14', name: '172 Diamonds', price: 10824 },
-    { id: 'mlbb_15', name: '257 Diamonds', price: 15678 }, { id: 'mlbb_16', name: '343 Diamonds', price: 21134 },
-    { id: 'mlbb_17', name: '429 Diamonds', price: 26502 }, { id: 'mlbb_18', name: '514 Diamonds', price: 31355 },
-    { id: 'mlbb_19', name: '600 Diamonds', price: 36812 }, { id: 'mlbb_20', name: '705 Diamonds', price: 42588 },
-    { id: 'mlbb_21', name: '792 Diamonds', price: 48045 }, { id: 'mlbb_22', name: '878 Diamonds', price: 53412 },
-    { id: 'mlbb_23', name: '963 Diamonds', price: 58266 }, { id: 'mlbb_24', name: '1049 Diamonds', price: 63722 },
-    { id: 'mlbb_25', name: '1135 Diamonds', price: 69090 }, { id: 'mlbb_26', name: '1220 Diamonds', price: 73943 },
-    { id: 'mlbb_27', name: '1412 Diamonds', price: 85176 }, { id: 'mlbb_28', name: '1584 Diamonds', price: 96000 },
-    { id: 'mlbb_29', name: '1669 Diamonds', price: 100854 }, { id: 'mlbb_30', name: '1755 Diamonds', price: 106310 },
-    { id: 'mlbb_31', name: '1841 Diamonds', price: 111678 }, { id: 'mlbb_32', name: '2195 Diamonds', price: 128918 },
-    { id: 'mlbb_33', name: '2538 Diamonds', price: 150052 }, { id: 'mlbb_34', name: '2901 Diamonds', price: 171506 },
-    { id: 'mlbb_35', name: '3073 Diamonds', price: 182330 }, { id: 'mlbb_36', name: '3688 Diamonds', price: 215069 },
-    { id: 'mlbb_37', name: '3945 Diamonds', price: 230747 }, { id: 'mlbb_38', name: '4031 Diamonds', price: 236204 },
-    { id: 'mlbb_39', name: '4566 Diamonds', price: 268482 }, { id: 'mlbb_40', name: '5100 Diamonds', price: 300245 },
-    { id: 'mlbb_41', name: '5532 Diamonds', price: 324734 }, { id: 'mlbb_42', name: '6055 Diamonds', price: 354812 },
-    { id: 'mlbb_43', name: '6752 Diamonds', price: 398677 }, { id: 'mlbb_44', name: '7030 Diamonds', price: 415366 },
-    { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
-  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+  // Admin ပြင်ထားသော ဈေးနှုန်းများကို Database မှ ဆွဲယူခြင်း
+  useEffect(() => {
+    const fetchRealPrices = async () => {
+      const catMap: Record<string, string> = {
+        'mobile-legends': 'mlbb', 'magic-chess': 'mcgg', 'pubg-uc': 'pubg', 
+        'uc-pack': 'ucPack', 'telegram': 'telegram', 'heartopia': 'heartopia', 'smile-coin': 'smileCoin'
+      };
+      const dbCategory = catMap[params.id];
+      
+      const { data } = await supabase.from('game_prices').select('id, price, name, bonus').eq('category', dbCategory);
+      if (data && data.length > 0) {
+        // Database ထဲက ဈေးနှုန်းတွေနဲ့ UI ကို အစားထိုးမည်
+        setDisplayPackages(data.sort((a, b) => a.price - b.price));
+      }
+    };
+    fetchRealPrices();
+  }, [params.id]);
 
-  // 2. Magic Chess Packages
-  const mcggPackages = [
-    { id: 'mcgg_1', name: '10', bonus: '+ 1 Diamonds', price: 900 },
-    { id: 'mcgg_2', name: '20', bonus: '+ 2 Diamonds', price: 1700 },
-    { id: 'mcgg_3', name: '51', bonus: '+ 5 Diamonds', price: 4200 },
-    { id: 'mcgg_4', name: 'Double Dia(50+50)or 55', bonus: 'No bonus', price: 4400 },
-    { id: 'mcgg_5', name: '102', bonus: '+ 10 Diamonds', price: 8300 },
-    { id: 'mcgg_6', name: 'Weekly Card', bonus: 'No bonus', price: 8800 },
-    { id: 'mcgg_7', name: 'Double Dia(150+150)or 165', bonus: 'No bonus', price: 13000 },
-    { id: 'mcgg_8', name: '203', bonus: '+ 20 Diamonds', price: 16600 },
-    { id: 'mcgg_9', name: 'Double Dia(250+250) or 275', bonus: 'No bonus', price: 21500 },
-    { id: 'mcgg_10', name: '303', bonus: '+ 33 Diamonds', price: 24900 },
-    { id: 'mcgg_11', name: '504', bonus: '+ 66 Diamonds', price: 41400 },
-    { id: 'mcgg_12', name: 'Double Dia(500+500)or 565', bonus: 'No bonus', price: 43400 },
-    { id: 'mcgg_13', name: '1007', bonus: '+ 156 Diamonds', price: 82900 },
-    { id: 'mcgg_14', name: '2015', bonus: '+ 383 Diamonds', price: 165700 },
-    { id: 'mcgg_15', name: '5035', bonus: '+ 1007 Diamonds', price: 414100 }
-  ];
+  if (!game) return <div className="text-white text-center mt-20">Game not found</div>;
 
-  // 3. PUBG UC Packages
-  const pubgPackages = [
-    { id: 'pubg_1', name: '60 UC', price: 4106 }, { id: 'pubg_2', name: '325 UC', price: 20529 },
-    { id: 'pubg_3', name: '660 UC', price: 41059 }, { id: 'pubg_4', name: '985 UC', price: 61588 },
-    { id: 'pubg_5', name: '1320 UC', price: 82118 }, { id: 'pubg_6', name: '1980 UC', price: 123177 },
-    { id: 'pubg_7', name: '2310 UC', price: 143706 }, { id: 'pubg_8', name: '2640 UC', price: 164236 },
-    { id: 'pubg_9', name: '3850 UC', price: 239512 }, { id: 'pubg_10', name: '4180 UC', price: 260041 },
-    { id: 'pubg_11', name: '5900 UC', price: 367277 }, { id: 'pubg_12', name: '8100 UC', price: 504112 }
-  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
-
-  // 4. UC Pack Packages
-  const ucPackPackages = [
-    { id: 'ucp_1', name: 'First Purchase Pack', price: 4100 },
-    { id: 'ucp_2', name: 'Prime (1 Month)', price: 4100 },
-    { id: 'ucp_3', name: 'Weekly Deal Pack 1', price: 4200 },
-    { id: 'ucp_4', name: 'Upgradable Firearm Materials Pack', price: 12300 },
-    { id: 'ucp_5', name: 'Prime (3 Months)', price: 12300 },
-    { id: 'ucp_6', name: 'Weekly Mythic Emblem Value Pack', price: 12400 },
-    { id: 'ucp_7', name: 'Weekly Deal Pack 2', price: 12400 },
-    { id: 'ucp_8', name: 'Mythic Emblem Pack', price: 20400 },
-    { id: 'ucp_9', name: 'Prime (6 Months)', price: 24400 },
-    { id: 'ucp_10', name: 'Elite Pass LV1-50', price: 24800 },
-    { id: 'ucp_11', name: 'Prime Plus (1 Month)', price: 40700 },
-    { id: 'ucp_12', name: 'Prime (12 Months)', price: 48800 },
-    { id: 'ucp_13', name: 'Elite Pass LV1-100', price: 49700 },
-    { id: 'ucp_14', name: 'Prime Plus (3 Months)', price: 122000 },
-    { id: 'ucp_15', name: 'Elite Pass Plus LV1-100', price: 123100 },
-    { id: 'ucp_16', name: 'Prime Plus (6 Months)', price: 243900 },
-    { id: 'ucp_17', name: 'Prime Plus (12 Months)', price: 487800 }
-  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
-
-  // 5. Telegram Packages
-  const telegramPackages = [
-    { id: 'tg_1', name: '50 Stars', price: 3552 }, { id: 'tg_2', name: '75 Stars', price: 5306 },
-    { id: 'tg_3', name: '100 Stars', price: 7058 }, { id: 'tg_4', name: '150 Stars', price: 10587 },
-    { id: 'tg_5', name: '250 Stars', price: 17645 }, { id: 'tg_6', name: '350 Stars', price: 24703 },
-    { id: 'tg_7', name: '500 Stars', price: 35291 }, { id: 'tg_8', name: '750 Stars', price: 52936 },
-    { id: 'tg_9', name: '1K Stars', price: 70582 }, { id: 'tg_10', name: '1.5K Stars', price: 105873 },
-    { id: 'tg_11', name: '2.5K Stars', price: 176454 }, { id: 'tg_12', name: '5K Stars', price: 352908 },
-    { id: 'tg_13', name: '10K Stars', price: 705816 }, { id: 'tg_14', name: '3 months premium', price: 56420 },
-    { id: 'tg_15', name: '6 months premium', price: 75241 }, { id: 'tg_16', name: '12 months premium', price: 136412 }
-  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
-
-  // 6. Heartopia Packages
-  const heartopiaPackages = [
-    { id: 'heart_1', name: '20 Heart Diamond', price: 2588 }, { id: 'heart_2', name: '60 Heart Diamond', price: 4895 },
-    { id: 'heart_3', name: '300+20 Heart Diamond', price: 24846 }, { id: 'heart_4', name: '680+50 Heart Diamond', price: 55994 },
-    { id: 'heart_5', name: '1280+90 Heart Diamond', price: 102297 }, { id: 'heart_6', name: '1980+150 Heart Diamond', price: 155703 },
-    { id: 'heart_7', name: '3280+270 Heart Diamond', price: 253623 }, { id: 'heart_8', name: '6480+570 Heart Diamond', price: 498398 },
-    { id: 'heart_9', name: 'GAMG Junior Membership', price: 2681 }, { id: 'heart_10', name: 'GAMG Formal Membership', price: 15057 },
-    { id: 'heart_11', name: 'Fashionwave Gift Box', price: 24846 }, { id: 'heart_12', name: 'Fashionwave Gift Box Upgrade', price: 31102 },
-    { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 }
-  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
-
-  // 7. Smile Coin Packages
-  const smileCoinPackages = [
-    { id: 'smile_1', name: 'Brl 300', price: 25800 },
-    { id: 'smile_2', name: 'Brl 1000', price: 83800 },
-    { id: 'smile_3', name: 'Brl 5000', price: 419000 }
-  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
-
-  // Game Configurations
-  const gameConfigs: Record<string, any> = {
-    'mobile-legends': {
-      name: 'Mobile Legends',
-      sub: 'All Server',
-      img: '/mlbb.png',
-      packages: mlbbPackages,
-      inputType: 'mlbb'
-    },
-    'magic-chess': {
-      name: 'Magic Chess Go Go',
-      sub: 'All Server',
-      img: '/MCGG.png',
-      packages: mcggPackages,
-      inputType: 'mlbb'
-    },
-    'pubg-uc': {
-      name: 'PUBG UC',
-      sub: 'Global',
-      img: '/pubg.png',
-      packages: pubgPackages,
-      inputType: 'pubg'
-    },
-    'uc-pack': {
-      name: 'UC Pack',
-      sub: 'Global',
-      img: '/Pubgucpack.png',
-      packages: ucPackPackages,
-      inputType: 'pubg'
-    },
-    'telegram': {
-      name: 'Telegram Premium',
-      sub: 'Social App',
-      img: '/telegram.png',
-      packages: telegramPackages,
-      inputType: 'username'
-    },
-    'heartopia': {
-      name: 'Heartopia',
-      sub: 'Game Topup',
-      img: '/heartopia.png',
-      packages: heartopiaPackages,
-      inputType: 'heartopia'
-    },
-    'smile-coin': {
-      name: 'Smile coin',
-      sub: 'Game Currency',
-      img: '/smile_coin.png',
-      packages: smileCoinPackages,
-      inputType: 'username'
-    }
+  const handleCheckout = async () => {
+    if (!playerId || (game.requireZone && !zoneId) || !selectedPackage) return alert("Please fill all details!");
+    setIsSubmitting(true);
+    const { error } = await supabase.from('orders').insert([{
+      game_name: game.name, player_id: playerId, zone_id: zoneId || null,
+      item_name: selectedPackage.name, price: selectedPackage.price, status: 'pending'
+    }]);
+    setIsSubmitting(false);
+    if (!error) setOrderSuccess(true);
   };
 
-  const game = gameConfigs[id];
-
-  // Payment Methods များကို ပုံများဖြင့် ပြင်ဆင်ထားပါသည် (Wallet ကဲ့သို့)
-  const paymentMethods = [
-    { id: 'kpay', name: 'KBZ Pay', img: '/kpay.png' },
-    { id: 'wave', name: 'Wave Pay', img: '/wave.png' },
-    { id: 'ayapay', name: 'AYA Pay', img: '/ayapay.png' },
-    { id: 'uabpay', name: 'UAB Pay', img: '/uabpay.png' }
-  ];
-
-  if (!game) {
+  if (orderSuccess) {
     return (
-      <main className="min-h-screen bg-[#070814] flex flex-col items-center justify-center p-4">
-        <h1 className="text-white text-2xl font-bold mb-2">Game Not Found</h1>
-        <p className="text-gray-400 text-xs mb-6">Requested ID: {id}</p>
-        <Link href="/" className="bg-pink-600 text-white px-6 py-2.5 rounded-full font-medium text-sm">Go Back Home</Link>
+      <main className="min-h-screen flex items-center justify-center p-4 bg-[#070b19] font-sans">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 p-8 rounded-3xl text-center max-w-md w-full shadow-2xl">
+          <h2 className="text-white font-bold text-2xl mb-4">အော်ဒါတင်ခြင်း အောင်မြင်ပါသည်!</h2>
+          <Link href="/" className="bg-white/10 text-white font-bold py-3 px-8 rounded-xl">ပင်မစာမျက်နှာသို့</Link>
+        </div>
       </main>
     );
   }
 
-  // Form validation logic based on inputType
-  const isFormValid = (() => {
-    if (!selectedPkg || !paymentMethod) return false;
-    if (game.inputType === 'mlbb') return userId && zoneId;
-    if (game.inputType === 'pubg') return userId;
-    if (game.inputType === 'username') return userId;
-    if (game.inputType === 'heartopia') return userId && aid;
-    return false;
-  })();
-
-  const getTargetAccountText = () => {
-    if (!userId) return 'Not filled';
-    if (game.inputType === 'mlbb') return zoneId ? `${userId} (${zoneId})` : userId;
-    if (game.inputType === 'heartopia') return aid ? `UID: ${userId}, AID: ${aid} (${serverField})` : `UID: ${userId}`;
-    return userId;
-  };
-
   return (
-    <main className="min-h-screen bg-[#070814] pb-28 font-sans">
-      <Navbar />
-
-      <div className="max-w-5xl mx-auto px-4 mt-2">
+    <main className="min-h-screen pb-32 relative bg-cover bg-center bg-fixed" style={{ backgroundImage: "url('/bg.gif')" }}>
+      <div className="absolute inset-0 bg-[#070b19]/60 backdrop-blur-[2px]"></div>
+      <div className="relative z-10 max-w-3xl mx-auto p-4 pt-6 space-y-6">
         
-        {/* Banner Section */}
-        <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl -z-10"></div>
-          
-          <img src={game.img} alt={game.name} className="w-24 h-24 rounded-2xl shadow-[0_0_20px_rgba(236,72,153,0.3)] object-cover z-10" />
-          <div className="z-10 text-center md:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">{game.name}</h1>
-            <p className="text-gray-400 text-sm mt-1">{game.sub}</p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
-              <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                Instant Process
-              </span>
-              <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">
-                100% Safe
-              </span>
-            </div>
+        {/* Game Info */}
+        <div className="flex items-center gap-4 bg-white/10 backdrop-blur-md p-4 rounded-2xl">
+          <img src={game.img} alt={game.name} className="w-12 h-12 rounded-lg" />
+          <h1 className="text-white font-bold text-lg">{game.name}</h1>
+        </div>
+
+        {/* User Input */}
+        <div className="bg-white/10 backdrop-blur-md p-5 rounded-2xl">
+          <div className="flex gap-3">
+            <input type="text" placeholder="Player ID" value={playerId} onChange={(e) => setPlayerId(e.target.value)} className="flex-1 bg-black/30 rounded-xl px-4 py-3 text-white focus:outline-none" />
+            {game.requireZone && <input type="text" placeholder="Zone ID" value={zoneId} onChange={(e) => setZoneId(e.target.value)} className="w-1/3 bg-black/30 rounded-xl px-4 py-3 text-white focus:outline-none" />}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-8">
-            
-            {/* Step 01 */}
-            <section>
-              <div className="flex items-end gap-3 mb-4">
-                <span className="text-4xl italic font-light text-pink-500/80">01</span>
-                <div className="mb-1">
-                  <h2 className="text-lg font-bold text-white">Choose Nominal Amount</h2>
-                  <p className="text-gray-400 text-[11px]">Pick the {game.name} amount you want to top up</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                {game.packages.map((pkg: any) => (
-                  <button
-                    key={pkg.id}
-                    onClick={() => setSelectedPkg(pkg)}
-                    className={`relative p-3.5 rounded-2xl text-left transition-all duration-200 overflow-hidden ${
-                      selectedPkg?.id === pkg.id 
-                      ? 'bg-pink-950/30 border-2 border-pink-500' 
-                      : 'bg-[#131422] border-2 border-transparent hover:border-white/10'
-                    }`}
-                  >
-                    {selectedPkg?.id === pkg.id && (
-                      <div className="absolute top-0 right-0 bg-pink-500 rounded-bl-xl p-1.5 shadow-md">
-                        <svg className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                      </div>
-                    )}
-                    <div className="text-white font-bold text-sm mb-1">{pkg.name}</div>
-                    <div className="text-gray-500 text-[10px] mb-3">{pkg.bonus}</div>
-                    <div className="text-pink-500 font-extrabold text-sm">{pkg.price.toLocaleString()} Ks</div>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {/* Step 02 */}
-            <section>
-              <div className="flex items-end gap-3 mb-4">
-                <span className="text-4xl italic font-light text-pink-500/80">02</span>
-                <div className="mb-1">
-                  <h2 className="text-lg font-bold text-white">Game Account Data</h2>
-                  <p className="text-gray-400 text-[11px]">Make sure your account details are correct</p>
-                </div>
-              </div>
-
-              <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 space-y-4">
-                
-                {game.inputType === 'mlbb' && (
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="w-full sm:w-1/2">
-                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">ID <span className="text-red-500">*</span></label>
-                      <input 
-                        type="text" 
-                        placeholder="Enter ID" 
-                        className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                        value={userId}
-                        onChange={(e) => setUserId(e.target.value)}
-                      />
-                    </div>
-                    <div className="w-full sm:w-1/2">
-                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Server No. <span className="text-red-500">*</span></label>
-                      <input 
-                        type="text" 
-                        placeholder="Enter Server No." 
-                        className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                        value={zoneId}
-                        onChange={(e) => setZoneId(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {game.inputType === 'pubg' && (
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Player ID <span className="text-red-500">*</span></label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter Player ID" 
-                      className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                      value={userId}
-                      onChange={(e) => setUserId(e.target.value)}
-                    />
-                  </div>
-                )}
-
-                {game.inputType === 'username' && (
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Telegram Username <span className="text-red-500">*</span></label>
-                    <input 
-                      type="text" 
-                      placeholder="ဥပမာ: @username သို့မဟုတ် phone number" 
-                      className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                      value={userId}
-                      onChange={(e) => setUserId(e.target.value)}
-                    />
-                  </div>
-                )}
-
-                {game.inputType === 'heartopia' && (
-                  <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="w-full sm:w-1/2">
-                        <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">UID <span className="text-red-500">*</span></label>
-                        <input 
-                          type="text" 
-                          placeholder="UID" 
-                          className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                          value={userId}
-                          onChange={(e) => setUserId(e.target.value)}
-                        />
-                      </div>
-                      <div className="w-full sm:w-1/2">
-                        <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">FIELD <span className="text-red-500">*</span></label>
-                        <select 
-                          className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                          value={serverField}
-                          onChange={(e) => setServerField(e.target.value)}
-                        >
-                          <option value="Global">Global</option>
-                          <option value="Asia">Asia</option>
-                          <option value="America">America</option>
-                          <option value="Europe">Europe</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">AID <span className="text-red-500">*</span></label>
-                      <input 
-                        type="text" 
-                        placeholder="AID" 
-                        className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors"
-                        value={aid}
-                        onChange={(e) => setAid(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                )}
-
-              </div>
-            </section>
-
-            {/* Step 03: Choose Payment Method (UPDATED WITH LOGOS) */}
-            <section>
-              <div className="flex items-end gap-3 mb-4">
-                <span className="text-4xl italic font-light text-pink-500/80">03</span>
-                <div className="mb-1">
-                  <h2 className="text-lg font-bold text-white">Choose Payment Method</h2>
-                  <p className="text-gray-400 text-[11px]">Various payment methods available</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {paymentMethods.map((pm) => (
-                  <button
-                    key={pm.id}
-                    onClick={() => setPaymentMethod(pm.id)}
-                    className={`relative p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
-                      paymentMethod === pm.id 
-                      ? 'bg-pink-950/30 border-2 border-pink-500' 
-                      : 'bg-[#131422] border-2 border-transparent hover:border-white/10'
-                    }`}
-                  >
-                    {/* လိုဂိုပုံထည့်ထားသော နေရာ */}
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1 overflow-hidden shadow-sm mb-1">
-                      <img src={pm.img} alt={pm.name} className="w-full h-full object-contain" 
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.parentElement!.innerHTML = `<span class="text-gray-800 font-bold text-xs">${pm.name[0]}</span>`;
-                        }}
-                      />
-                    </div>
-                    <span className="text-gray-300 text-[10px] font-medium">{pm.name}</span>
-                  </button>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          {/* Right Column: Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-[#131422] rounded-3xl border border-white/5 p-5 shadow-2xl">
-              <h3 className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-3">Order Summary</h3>
-              
-              <div className="flex items-center gap-3 mb-5">
-                <img src={game.img} className="w-12 h-12 rounded-xl object-cover" />
-                <div>
-                  <h4 className="text-white font-bold text-sm">{game.name}</h4>
-                  <p className="text-pink-500 text-[10px]">
-                    {selectedPkg ? selectedPkg.name : 'No amount selected'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-4 mb-6">
-                <div>
-                  <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Target Account</p>
-                  <p className="text-white text-xs font-medium italic">
-                    {getTargetAccountText()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Payment Method</p>
-                  <p className="text-white text-xs font-medium italic">
-                    {paymentMethod ? paymentMethods.find(p => p.id === paymentMethod)?.name : 'Not selected'}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2 border-t border-white/10 pt-4 mb-4">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Subtotal</span>
-                  <span className="text-white">{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</span>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-6">
-                <span className="text-white font-bold text-sm">Total Payment</span>
-                <span className="text-pink-500 font-extrabold text-xl">
-                  {selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks
-                </span>
-              </div>
-
-              <button 
-                className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg ${
-                  isFormValid
-                  ? 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]'
-                  : 'bg-[#2a2b3d] text-gray-500 cursor-not-allowed'
-                }`}
-                disabled={!isFormValid}
+        {/* Packages Grid */}
+        <div className="bg-white/10 backdrop-blur-md p-5 rounded-2xl">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {displayPackages.map((pkg: any) => (
+              <button
+                key={pkg.id} onClick={() => setSelectedPackage(pkg)}
+                className={`p-3 rounded-xl border text-left transition-all ${selectedPackage?.id === pkg.id ? 'bg-[#00f2fe]/20 border-[#00f2fe]' : 'bg-black/30 border-white/10'}`}
               >
-                {!isFormValid ? 'Complete the data first' : 'Buy Now'}
+                <h3 className="text-white font-bold text-xs">{pkg.name}</h3>
+                <p className="text-gray-300 text-[11px] mt-2 border-t border-white/10 pt-1">Ks {pkg.price.toLocaleString()}</p>
               </button>
-            </div>
+            ))}
           </div>
         </div>
       </div>
 
-      <BottomNav />
+      {/* Checkout Bar */}
+      {selectedPackage && (
+        <div className="fixed bottom-0 left-0 w-full bg-[#070b19]/90 backdrop-blur-xl p-4 z-50 flex justify-between items-center">
+          <div>
+            <p className="text-gray-400 text-xs">ကျသင့်ငွေ</p>
+            <p className="text-[#00f2fe] font-black text-lg">Ks {selectedPackage.price.toLocaleString()}</p>
+          </div>
+          <button onClick={handleCheckout} disabled={isSubmitting} className="bg-gradient-to-r from-[#4facfe] to-[#00f2fe] text-black font-bold px-8 py-3 rounded-xl">
+            {isSubmitting ? 'လုပ်ဆောင်နေသည်...' : 'ဝယ်ယူမည်'}
+          </button>
+        </div>
+      )}
     </main>
   );
 }
