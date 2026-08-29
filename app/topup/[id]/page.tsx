@@ -7,7 +7,6 @@ import BottomNav from '../../../components/BottomNav';
 import { useParams } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 
-// Supabase ချိတ်ဆက်ခြင်း
 const supabaseUrl = 'https://lejfhsuwajmzikmudmcs.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlamZoc3V3YWptemlrbXVkbWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NjA4NzUsImV4cCI6MjEwMzMzNjg3NX0.x3EVXbqCmrq0yiGlKI6GrWadKWU9TuXKs5F3w8uJNQA';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -17,63 +16,168 @@ export default function TopupPage() {
   const rawId = (params?.id as string) || '';
   const id = rawId.toLowerCase();
 
-  // Form states
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
   const [aid, setAid] = useState('');
   const [serverField, setServerField] = useState('Global');
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
-  
-  // Database States
-  const [displayPackages, setDisplayPackages] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
-  const [isLoadingPrices, setIsLoadingPrices] = useState(true);
 
-  // Game Configurations (UI Layout အတွက်သာ၊ Packages အလွတ်ထားမည်)
+  // 1. MLBB Packages (Fallback)
+  const mlbbPackages = [
+    { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
+    { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
+    { id: 'mlbb_5', name: 'Weekly Pass', price: 6600 }, { id: 'mlbb_6', name: 'Weekly Pass x 2', price: 13200 },
+    { id: 'mlbb_7', name: 'Weekly Pass x 3', price: 19800 }, { id: 'mlbb_8', name: 'Weekly Pass x 4', price: 26400 },
+    { id: 'mlbb_9', name: 'Weekly Pass x 5', price: 33000 }, { id: 'mlbb_10', name: 'Twilight Pass', price: 35712 },
+    { id: 'mlbb_11', name: 'Weekly Elite Bundle', price: 3461 }, { id: 'mlbb_12', name: 'Monthly Epic Bundle', price: 17434 },
+    { id: 'mlbb_13', name: '86 Diamonds', price: 5457 }, { id: 'mlbb_14', name: '172 Diamonds', price: 10824 },
+    { id: 'mlbb_15', name: '257 Diamonds', price: 15678 }, { id: 'mlbb_16', name: '343 Diamonds', price: 21134 },
+    { id: 'mlbb_17', name: '429 Diamonds', price: 26502 }, { id: 'mlbb_18', name: '514 Diamonds', price: 31355 },
+    { id: 'mlbb_19', name: '600 Diamonds', price: 36812 }, { id: 'mlbb_20', name: '705 Diamonds', price: 42588 },
+    { id: 'mlbb_21', name: '792 Diamonds', price: 48045 }, { id: 'mlbb_22', name: '878 Diamonds', price: 53412 },
+    { id: 'mlbb_23', name: '963 Diamonds', price: 58266 }, { id: 'mlbb_24', name: '1049 Diamonds', price: 63722 },
+    { id: 'mlbb_25', name: '1135 Diamonds', price: 69090 }, { id: 'mlbb_26', name: '1220 Diamonds', price: 73943 },
+    { id: 'mlbb_27', name: '1412 Diamonds', price: 85176 }, { id: 'mlbb_28', name: '1584 Diamonds', price: 96000 },
+    { id: 'mlbb_29', name: '1669 Diamonds', price: 100854 }, { id: 'mlbb_30', name: '1755 Diamonds', price: 106310 },
+    { id: 'mlbb_31', name: '1841 Diamonds', price: 111678 }, { id: 'mlbb_32', name: '2195 Diamonds', price: 128918 },
+    { id: 'mlbb_33', name: '2538 Diamonds', price: 150052 }, { id: 'mlbb_34', name: '2901 Diamonds', price: 171506 },
+    { id: 'mlbb_35', name: '3073 Diamonds', price: 182330 }, { id: 'mlbb_36', name: '3688 Diamonds', price: 215069 },
+    { id: 'mlbb_37', name: '3945 Diamonds', price: 230747 }, { id: 'mlbb_38', name: '4031 Diamonds', price: 236204 },
+    { id: 'mlbb_39', name: '4566 Diamonds', price: 268482 }, { id: 'mlbb_40', name: '5100 Diamonds', price: 300245 },
+    { id: 'mlbb_41', name: '5532 Diamonds', price: 324734 }, { id: 'mlbb_42', name: '6055 Diamonds', price: 354812 },
+    { id: 'mlbb_43', name: '6752 Diamonds', price: 398677 }, { id: 'mlbb_44', name: '7030 Diamonds', price: 415366 },
+    { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 2. Magic Chess Packages (Fallback)
+  const mcggPackages = [
+    { id: 'mcgg_1', name: '10', bonus: '+ 1 Diamonds', price: 900 },
+    { id: 'mcgg_2', name: '20', bonus: '+ 2 Diamonds', price: 1700 },
+    { id: 'mcgg_3', name: '51', bonus: '+ 5 Diamonds', price: 4200 },
+    { id: 'mcgg_4', name: 'Double Dia(50+50)or 55', bonus: 'No bonus', price: 4400 },
+    { id: 'mcgg_5', name: '102', bonus: '+ 10 Diamonds', price: 8300 },
+    { id: 'mcgg_6', name: 'Weekly Card', bonus: 'No bonus', price: 8800 },
+    { id: 'mcgg_7', name: 'Double Dia(150+150)or 165', bonus: 'No bonus', price: 13000 },
+    { id: 'mcgg_8', name: '203', bonus: '+ 20 Diamonds', price: 16600 },
+    { id: 'mcgg_9', name: 'Double Dia(250+250) or 275', bonus: 'No bonus', price: 21500 },
+    { id: 'mcgg_10', name: '303', bonus: '+ 33 Diamonds', price: 24900 },
+    { id: 'mcgg_11', name: '504', bonus: '+ 66 Diamonds', price: 41400 },
+    { id: 'mcgg_12', name: 'Double Dia(500+500)or 565', bonus: 'No bonus', price: 43400 },
+    { id: 'mcgg_13', name: '1007', bonus: '+ 156 Diamonds', price: 82900 },
+    { id: 'mcgg_14', name: '2015', bonus: '+ 383 Diamonds', price: 165700 },
+    { id: 'mcgg_15', name: '5035', bonus: '+ 1007 Diamonds', price: 414100 }
+  ];
+
+  // 3. PUBG UC Packages (Fallback)
+  const pubgPackages = [
+    { id: 'pubg_1', name: '60 UC', price: 4106 }, { id: 'pubg_2', name: '325 UC', price: 20529 },
+    { id: 'pubg_3', name: '660 UC', price: 41059 }, { id: 'pubg_4', name: '985 UC', price: 61588 },
+    { id: 'pubg_5', name: '1320 UC', price: 82118 }, { id: 'pubg_6', name: '1980 UC', price: 123177 },
+    { id: 'pubg_7', name: '2310 UC', price: 143706 }, { id: 'pubg_8', name: '2640 UC', price: 164236 },
+    { id: 'pubg_9', name: '3850 UC', price: 239512 }, { id: 'pubg_10', name: '4180 UC', price: 260041 },
+    { id: 'pubg_11', name: '5900 UC', price: 367277 }, { id: 'pubg_12', name: '8100 UC', price: 504112 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 4. UC Pack Packages (Fallback)
+  const ucPackPackages = [
+    { id: 'ucp_1', name: 'First Purchase Pack', price: 4100 },
+    { id: 'ucp_2', name: 'Prime (1 Month)', price: 4100 },
+    { id: 'ucp_3', name: 'Weekly Deal Pack 1', price: 4200 },
+    { id: 'ucp_4', name: 'Upgradable Firearm Materials Pack', price: 12300 },
+    { id: 'ucp_5', name: 'Prime (3 Months)', price: 12300 },
+    { id: 'ucp_6', name: 'Weekly Mythic Emblem Value Pack', price: 12400 },
+    { id: 'ucp_7', name: 'Weekly Deal Pack 2', price: 12400 },
+    { id: 'ucp_8', name: 'Mythic Emblem Pack', price: 20400 },
+    { id: 'ucp_9', name: 'Prime (6 Months)', price: 24400 },
+    { id: 'ucp_10', name: 'Elite Pass LV1-50', price: 24800 },
+    { id: 'ucp_11', name: 'Prime Plus (1 Month)', price: 40700 },
+    { id: 'ucp_12', name: 'Prime (12 Months)', price: 48800 },
+    { id: 'ucp_13', name: 'Elite Pass LV1-100', price: 49700 },
+    { id: 'ucp_14', name: 'Prime Plus (3 Months)', price: 122000 },
+    { id: 'ucp_15', name: 'Elite Pass Plus LV1-100', price: 123100 },
+    { id: 'ucp_16', name: 'Prime Plus (6 Months)', price: 243900 },
+    { id: 'ucp_17', name: 'Prime Plus (12 Months)', price: 487800 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 5. Telegram Packages (Fallback)
+  const telegramPackages = [
+    { id: 'tg_1', name: '50 Stars', price: 3552 }, { id: 'tg_2', name: '75 Stars', price: 5306 },
+    { id: 'tg_3', name: '100 Stars', price: 7058 }, { id: 'tg_4', name: '150 Stars', price: 10587 },
+    { id: 'tg_5', name: '250 Stars', price: 17645 }, { id: 'tg_6', name: '350 Stars', price: 24703 },
+    { id: 'tg_7', name: '500 Stars', price: 35291 }, { id: 'tg_8', name: '750 Stars', price: 52936 },
+    { id: 'tg_9', name: '1K Stars', price: 70582 }, { id: 'tg_10', name: '1.5K Stars', price: 105873 },
+    { id: 'tg_11', name: '2.5K Stars', price: 176454 }, { id: 'tg_12', name: '5K Stars', price: 352908 },
+    { id: 'tg_13', name: '10K Stars', price: 705816 }, { id: 'tg_14', name: '3 months premium', price: 56420 },
+    { id: 'tg_15', name: '6 months premium', price: 75241 }, { id: 'tg_16', name: '12 months premium', price: 136412 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 6. Heartopia Packages (Fallback)
+  const heartopiaPackages = [
+    { id: 'heart_1', name: '20 Heart Diamond', price: 2588 }, { id: 'heart_2', name: '60 Heart Diamond', price: 4895 },
+    { id: 'heart_3', name: '300+20 Heart Diamond', price: 24846 }, { id: 'heart_4', name: '680+50 Heart Diamond', price: 55994 },
+    { id: 'heart_5', name: '1280+90 Heart Diamond', price: 102297 }, { id: 'heart_6', name: '1980+150 Heart Diamond', price: 155703 },
+    { id: 'heart_7', name: '3280+270 Heart Diamond', price: 253623 }, { id: 'heart_8', name: '6480+570 Heart Diamond', price: 498398 },
+    { id: 'heart_9', name: 'GAMG Junior Membership', price: 2681 }, { id: 'heart_10', name: 'GAMG Formal Membership', price: 15057 },
+    { id: 'heart_11', name: 'Fashionwave Gift Box', price: 24846 }, { id: 'heart_12', name: 'Fashionwave Gift Box Upgrade', price: 31102 },
+    { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 7. Smile Coin Packages (Fallback)
+  const smileCoinPackages = [
+    { id: 'smile_1', name: 'Brl 300', price: 25800 },
+    { id: 'smile_2', name: 'Brl 1000', price: 83800 },
+    { id: 'smile_3', name: 'Brl 5000', price: 419000 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // Game Configurations
   const gameConfigs: Record<string, any> = {
-    'mobile-legends': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', inputType: 'mlbb', dbCat: 'mlbb' },
-    'mobile-legends-(mlbb)': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', inputType: 'mlbb', dbCat: 'mlbb' },
-    'mlbb': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', inputType: 'mlbb', dbCat: 'mlbb' },
+    'mobile-legends': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
+    'mobile-legends-(mlbb)': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
+    'mlbb': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
     
-    'magic-chess': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', inputType: 'mlbb', dbCat: 'mcgg' },
-    'mcgg': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', inputType: 'mlbb', dbCat: 'mcgg' },
+    'magic-chess': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
+    'mcgg': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
     
-    'pubg-mobile': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', inputType: 'pubg', dbCat: 'pubg' },
-    'pubg': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', inputType: 'pubg', dbCat: 'pubg' },
-    'pubg-uc': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', inputType: 'pubg', dbCat: 'pubg' },
+    'pubg-mobile': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
+    'pubg': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
+    'pubg-uc': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
     
-    'uc-packs': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', inputType: 'pubg', dbCat: 'ucPack' },
-    'uc-pack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', inputType: 'pubg', dbCat: 'ucPack' },
-    'ucpack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', inputType: 'pubg', dbCat: 'ucPack' },
+    'uc-packs': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
+    'uc-pack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
+    'ucpack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
     
-    'telegram-premium': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', inputType: 'username', dbCat: 'telegram' },
-    'telegram': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', inputType: 'username', dbCat: 'telegram' },
+    'telegram-premium': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
+    'telegram': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
     
-    'heartopia': { name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', inputType: 'heartopia', dbCat: 'heartopia' },
+    'heartopia': { name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', packages: heartopiaPackages, inputType: 'heartopia', dbCat: 'heartopia' },
     
-    'smile-coin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', inputType: 'username', dbCat: 'smileCoin' },
-    'smilecoin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', inputType: 'username', dbCat: 'smileCoin' }
+    'smile-coin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', packages: smileCoinPackages, inputType: 'username', dbCat: 'smileCoin' },
+    'smilecoin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', packages: smileCoinPackages, inputType: 'username', dbCat: 'smileCoin' }
   };
-  
-  // ဝင်လာတဲ့ ID ကို အသေအချာရှာမည်
+
   const game = gameConfigs[id] || Object.values(gameConfigs).find(g => id.includes(g.dbCat.toLowerCase()));
 
-  // Database မှ ဈေးနှုန်းများ အလိုအလျောက် ဆွဲယူခြင်း
+  // ဈေးနှုန်း Data ကို သိမ်းရန် State (မူလတန်ဖိုးကို Fallback packages အဖြစ် ချက်ချင်းထားပေးမည်)
+  const [displayPackages, setDisplayPackages] = useState<any[]>(game ? game.packages : []);
+
+  // နောက်ကွယ်မှ Database ကို လှမ်းစစ်ပြီး ဈေးအသစ်ရှိပါက အလိုအလျောက် ပြောင်းပေးမည်
   useEffect(() => {
     if (!game) return;
+    setDisplayPackages(game.packages || []); // Fallback ကို အရင်ပြထားမည်
+    
     const fetchRealPrices = async () => {
       try {
         const { data, error } = await supabase.from('game_prices').select('*').eq('category', game.dbCat);
         if (error) throw error;
         if (data && data.length > 0) {
+          // Database မှ ဈေးနှုန်း အောင်မြင်စွာရပါက အစားထိုးပြသမည်
           setDisplayPackages(data.sort((a, b) => Number(a.price) - Number(b.price)));
         }
       } catch (error) {
         console.error("Error fetching prices:", error);
-      } finally {
-        setIsLoadingPrices(false);
       }
     };
     fetchRealPrices();
@@ -112,9 +216,6 @@ export default function TopupPage() {
     return userId;
   };
 
-  // -----------------------------------------------------
-  // Database သို့ အော်ဒါတင်ခြင်း (Supabase) အသစ်ထည့်ထားသည်
-  // -----------------------------------------------------
   const handleCheckout = async () => {
     if (!isFormValid) return;
     setIsSubmitting(true);
@@ -152,10 +253,10 @@ export default function TopupPage() {
     );
   }
 
-  // ဒီအောက်ပိုင်းက အစ်ကို့ရဲ့ Original UI ကြီးအတိုင်း တစ်စက်ကလေးမှ မထိပါ
   return (
     <main className="min-h-screen bg-[#070814] pb-28 font-sans">
       <Navbar />
+
       <div className="max-w-5xl mx-auto px-4 mt-2">
         {/* Banner Section */}
         <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
@@ -185,9 +286,7 @@ export default function TopupPage() {
                 </div>
               </div>
 
-              {isLoadingPrices ? (
-                <div className="text-center text-pink-500 py-10 animate-pulse font-bold">Loading Packages...</div>
-              ) : displayPackages.length === 0 ? (
+              {displayPackages.length === 0 ? (
                 <div className="text-center text-gray-500 py-10">No items available yet.</div>
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -238,18 +337,21 @@ export default function TopupPage() {
                     </div>
                   </div>
                 )}
+
                 {game.inputType === 'pubg' && (
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Player ID <span className="text-red-500">*</span></label>
                     <input type="text" placeholder="Enter Player ID" className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                   </div>
                 )}
+
                 {game.inputType === 'username' && (
                   <div>
                     <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Telegram Username <span className="text-red-500">*</span></label>
                     <input type="text" placeholder="ဥပမာ: @username သို့မဟုတ် phone number" className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                   </div>
                 )}
+
                 {game.inputType === 'heartopia' && (
                   <div className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-4">
@@ -352,7 +454,6 @@ export default function TopupPage() {
                 </span>
               </div>
               
-              {/* Buy Now Button with handleCheckout */}
               <button
                 onClick={handleCheckout}
                 disabled={!isFormValid || isSubmitting}
