@@ -8,24 +8,36 @@ const supabaseUrl = 'https://lejfhsuwajmzikmudmcs.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlamZoc3V3YWptemlrbXVkbWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NjA4NzUsImV4cCI6MjEwMzMzNjg3NX0.x3EVXbqCmrq0yiGlKI6GrWadKWU9TuXKs5F3w8uJNQA';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Link ID အဟောင်းနဲ့ အသစ် နှစ်မျိုးလုံး အလုပ်လုပ်အောင် ထည့်ပေးထားသည်
+// ဖြစ်နိုင်သမျှ Link ID ပုံစံအားလုံးကို ထည့်သွင်းထားပါသည်
 const gameDataMap: Record<string, any> = {
   'mobile-legends': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, dbCat: 'mlbb' },
+  'mobile-legends-(mlbb)': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, dbCat: 'mlbb' },
   'mlbb': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, dbCat: 'mlbb' },
+  
   'magic-chess': { name: 'Magic Chess', img: '/MCGG.png', requireZone: true, dbCat: 'mcgg' },
   'mcgg': { name: 'Magic Chess', img: '/MCGG.png', requireZone: true, dbCat: 'mcgg' },
-  'pubg-uc': { name: 'PUBG Mobile', img: '/pubg.png', requireZone: false, dbCat: 'pubg' },
+  
+  'pubg-mobile': { name: 'PUBG Mobile', img: '/pubg.png', requireZone: false, dbCat: 'pubg' },
   'pubg': { name: 'PUBG Mobile', img: '/pubg.png', requireZone: false, dbCat: 'pubg' },
+  'pubg-uc': { name: 'PUBG Mobile', img: '/pubg.png', requireZone: false, dbCat: 'pubg' },
+  
+  'uc-packs': { name: 'UC Pack', img: '/Pubgucpack.png', requireZone: false, dbCat: 'ucPack' },
   'uc-pack': { name: 'UC Pack', img: '/Pubgucpack.png', requireZone: false, dbCat: 'ucPack' },
-  'ucPack': { name: 'UC Pack', img: '/Pubgucpack.png', requireZone: false, dbCat: 'ucPack' },
+  'ucpack': { name: 'UC Pack', img: '/Pubgucpack.png', requireZone: false, dbCat: 'ucPack' },
+  
+  'telegram-premium': { name: 'Telegram Premium', img: '/telegram.png', requireZone: false, dbCat: 'telegram' },
   'telegram': { name: 'Telegram Premium', img: '/telegram.png', requireZone: false, dbCat: 'telegram' },
+  
   'heartopia': { name: 'Heartopia', img: '/heartopia.png', requireZone: false, dbCat: 'heartopia' },
+  
   'smile-coin': { name: 'Smile Coin', img: '/smile_coin.png', requireZone: false, dbCat: 'smileCoin' },
-  'smileCoin': { name: 'Smile Coin', img: '/smile_coin.png', requireZone: false, dbCat: 'smileCoin' }
+  'smilecoin': { name: 'Smile Coin', img: '/smile_coin.png', requireZone: false, dbCat: 'smileCoin' }
 };
 
 export default function GameTopupPage({ params }: { params: { id: string } }) {
-  const game = gameDataMap[params.id];
+  // ဝင်လာတဲ့ ID ကို စာလုံးအသေး (lowercase) ပြောင်းပြီး အသေအချာ ရှာမည်
+  const paramId = params.id ? params.id.toLowerCase() : '';
+  const game = gameDataMap[paramId] || Object.values(gameDataMap).find(g => paramId.includes(g.dbCat.toLowerCase()));
   
   const [playerId, setPlayerId] = useState('');
   const [zoneId, setZoneId] = useState('');
@@ -54,12 +66,20 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
     fetchRealPrices();
   }, [game]);
 
-  if (!game) return (
-    <div className="text-white flex flex-col items-center justify-center min-h-[70vh]">
-      <h1 className="text-2xl font-bold mb-4">Game not found</h1>
-      <Link href="/" className="px-6 py-2 bg-[#00f2fe] text-black rounded-xl font-bold">ပင်မစာမျက်နှာသို့ ပြန်သွားမည်</Link>
-    </div>
-  );
+  // အကယ်၍ ရှာမတွေ့သေးရင် ပြမည့် UI
+  if (!game) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[#070b19] font-sans">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Game not found</h1>
+          <p className="text-gray-400 mb-6">ID: {paramId}</p>
+          <Link href="/" className="px-6 py-3 bg-[#00f2fe]/20 text-[#00f2fe] border border-[#00f2fe]/50 rounded-xl font-bold hover:bg-[#00f2fe]/30">
+            ပင်မစာမျက်နှာသို့ ပြန်သွားမည်
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   const handleCheckout = async () => {
     if (!playerId || (game.requireZone && !zoneId) || !selectedPackage) return alert("Please fill all details!");
