@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation'; // <-- လင့်ခ်နာမည်ကို ယူရန် အသစ်ထည့်ထားသည်
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = 'https://lejfhsuwajmzikmudmcs.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlamZoc3V3YWptemlrbXVkbWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NjA4NzUsImV4cCI6MjEwMzMzNjg3NX0.x3EVXbqCmrq0yiGlKI6GrWadKWU9TuXKs5F3w8uJNQA';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// ဖြစ်နိုင်သမျှ Link ID ပုံစံအားလုံးကို ထည့်သွင်းထားပါသည်
 const gameDataMap: Record<string, any> = {
   'mobile-legends': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, dbCat: 'mlbb' },
   'mobile-legends-(mlbb)': { name: 'Mobile Legends', img: '/mlbb.png', requireZone: true, dbCat: 'mlbb' },
@@ -34,9 +34,11 @@ const gameDataMap: Record<string, any> = {
   'smilecoin': { name: 'Smile Coin', img: '/smile_coin.png', requireZone: false, dbCat: 'smileCoin' }
 };
 
-export default function GameTopupPage({ params }: { params: { id: string } }) {
-  // ဝင်လာတဲ့ ID ကို စာလုံးအသေး (lowercase) ပြောင်းပြီး အသေအချာ ရှာမည်
-  const paramId = params.id ? params.id.toLowerCase() : '';
+export default function GameTopupPage() {
+  const params = useParams(); // Next.js အသစ်တွင် မှန်ကန်စွာ ID ဖမ်းယူနည်း
+  const rawId = (params?.id as string) || '';
+  const paramId = rawId.toLowerCase();
+  
   const game = gameDataMap[paramId] || Object.values(gameDataMap).find(g => paramId.includes(g.dbCat.toLowerCase()));
   
   const [playerId, setPlayerId] = useState('');
@@ -66,13 +68,12 @@ export default function GameTopupPage({ params }: { params: { id: string } }) {
     fetchRealPrices();
   }, [game]);
 
-  // အကယ်၍ ရှာမတွေ့သေးရင် ပြမည့် UI
   if (!game) {
     return (
       <main className="min-h-screen flex items-center justify-center bg-[#070b19] font-sans">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Game not found</h1>
-          <p className="text-gray-400 mb-6">ID: {paramId}</p>
+          <p className="text-gray-400 mb-6">ID: {paramId || 'No ID detected'}</p>
           <Link href="/" className="px-6 py-3 bg-[#00f2fe]/20 text-[#00f2fe] border border-[#00f2fe]/50 rounded-xl font-bold hover:bg-[#00f2fe]/30">
             ပင်မစာမျက်နှာသို့ ပြန်သွားမည်
           </Link>
