@@ -5,11 +5,7 @@ import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
 import BottomNav from '../../../components/BottomNav';
 import { useParams } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://lejfhsuwajmzikmudmcs.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlamZoc3V3YWptemlrbXVkbWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NjA4NzUsImV4cCI6MjEwMzMzNjg3NX0.x3EVXbqCmrq0yiGlKI6GrWadKWU9TuXKs5F3w8uJNQA';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '../../../lib/supabase'; 
 
 export default function TopupPage() {
   const params = useParams();
@@ -22,10 +18,23 @@ export default function TopupPage() {
   const [serverField, setServerField] = useState('Global');
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Payment Modal & Order States
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [slipFile, setSlipFile] = useState<File | null>(null);
+  const [walletPhone, setWalletPhone] = useState(''); // Wallet အတွက် ဖုန်းနံပါတ်
+  const [isUploading, setIsUploading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
-  // 1. MLBB Packages (Fallback)
+  // Admin Accounts for Payment 
+  const adminAccounts: Record<string, {name: string, phone: string}> = {
+    kpay: { name: 'Paing Gyi', phone: '09755008854' },
+    wave: { name: 'Paing Gyi', phone: '09967241375' },
+    ayapay: { name: 'Paing Gyi', phone: '09967241375' },
+    uabpay: { name: 'Paing Gyi', phone: '09967241375' }
+  };
+
+  // 1. MLBB Packages
   const mlbbPackages = [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
@@ -52,7 +61,7 @@ export default function TopupPage() {
     { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 2. Magic Chess Packages (Fallback)
+  // 2. Magic Chess Packages
   const mcggPackages = [
     { id: 'mcgg_1', name: '10', bonus: '+ 1 Diamonds', price: 900 },
     { id: 'mcgg_2', name: '20', bonus: '+ 2 Diamonds', price: 1700 },
@@ -71,7 +80,7 @@ export default function TopupPage() {
     { id: 'mcgg_15', name: '5035', bonus: '+ 1007 Diamonds', price: 414100 }
   ];
 
-  // 3. PUBG UC Packages (Fallback)
+  // 3. PUBG UC Packages
   const pubgPackages = [
     { id: 'pubg_1', name: '60 UC', price: 4106 }, { id: 'pubg_2', name: '325 UC', price: 20529 },
     { id: 'pubg_3', name: '660 UC', price: 41059 }, { id: 'pubg_4', name: '985 UC', price: 61588 },
@@ -81,28 +90,20 @@ export default function TopupPage() {
     { id: 'pubg_11', name: '5900 UC', price: 367277 }, { id: 'pubg_12', name: '8100 UC', price: 504112 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 4. UC Pack Packages (Fallback)
+  // 4. UC Pack Packages
   const ucPackPackages = [
-    { id: 'ucp_1', name: 'First Purchase Pack', price: 4100 },
-    { id: 'ucp_2', name: 'Prime (1 Month)', price: 4100 },
-    { id: 'ucp_3', name: 'Weekly Deal Pack 1', price: 4200 },
-    { id: 'ucp_4', name: 'Upgradable Firearm Materials Pack', price: 12300 },
-    { id: 'ucp_5', name: 'Prime (3 Months)', price: 12300 },
-    { id: 'ucp_6', name: 'Weekly Mythic Emblem Value Pack', price: 12400 },
-    { id: 'ucp_7', name: 'Weekly Deal Pack 2', price: 12400 },
-    { id: 'ucp_8', name: 'Mythic Emblem Pack', price: 20400 },
-    { id: 'ucp_9', name: 'Prime (6 Months)', price: 24400 },
-    { id: 'ucp_10', name: 'Elite Pass LV1-50', price: 24800 },
-    { id: 'ucp_11', name: 'Prime Plus (1 Month)', price: 40700 },
-    { id: 'ucp_12', name: 'Prime (12 Months)', price: 48800 },
-    { id: 'ucp_13', name: 'Elite Pass LV1-100', price: 49700 },
-    { id: 'ucp_14', name: 'Prime Plus (3 Months)', price: 122000 },
-    { id: 'ucp_15', name: 'Elite Pass Plus LV1-100', price: 123100 },
-    { id: 'ucp_16', name: 'Prime Plus (6 Months)', price: 243900 },
+    { id: 'ucp_1', name: 'First Purchase Pack', price: 4100 }, { id: 'ucp_2', name: 'Prime (1 Month)', price: 4100 },
+    { id: 'ucp_3', name: 'Weekly Deal Pack 1', price: 4200 }, { id: 'ucp_4', name: 'Upgradable Firearm Materials Pack', price: 12300 },
+    { id: 'ucp_5', name: 'Prime (3 Months)', price: 12300 }, { id: 'ucp_6', name: 'Weekly Mythic Emblem Value Pack', price: 12400 },
+    { id: 'ucp_7', name: 'Weekly Deal Pack 2', price: 12400 }, { id: 'ucp_8', name: 'Mythic Emblem Pack', price: 20400 },
+    { id: 'ucp_9', name: 'Prime (6 Months)', price: 24400 }, { id: 'ucp_10', name: 'Elite Pass LV1-50', price: 24800 },
+    { id: 'ucp_11', name: 'Prime Plus (1 Month)', price: 40700 }, { id: 'ucp_12', name: 'Prime (12 Months)', price: 48800 },
+    { id: 'ucp_13', name: 'Elite Pass LV1-100', price: 49700 }, { id: 'ucp_14', name: 'Prime Plus (3 Months)', price: 122000 },
+    { id: 'ucp_15', name: 'Elite Pass Plus LV1-100', price: 123100 }, { id: 'ucp_16', name: 'Prime Plus (6 Months)', price: 243900 },
     { id: 'ucp_17', name: 'Prime Plus (12 Months)', price: 487800 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 5. Telegram Packages (Fallback)
+  // 5. Telegram Packages
   const telegramPackages = [
     { id: 'tg_1', name: '50 Stars', price: 3552 }, { id: 'tg_2', name: '75 Stars', price: 5306 },
     { id: 'tg_3', name: '100 Stars', price: 7058 }, { id: 'tg_4', name: '150 Stars', price: 10587 },
@@ -114,7 +115,7 @@ export default function TopupPage() {
     { id: 'tg_15', name: '6 months premium', price: 75241 }, { id: 'tg_16', name: '12 months premium', price: 136412 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 6. Heartopia Packages (Fallback)
+  // 6. Heartopia Packages
   const heartopiaPackages = [
     { id: 'heart_1', name: '20 Heart Diamond', price: 2588 }, { id: 'heart_2', name: '60 Heart Diamond', price: 4895 },
     { id: 'heart_3', name: '300+20 Heart Diamond', price: 24846 }, { id: 'heart_4', name: '680+50 Heart Diamond', price: 55994 },
@@ -125,7 +126,7 @@ export default function TopupPage() {
     { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 7. Smile Coin Packages (Fallback)
+  // 7. Smile Coin Packages
   const smileCoinPackages = [
     { id: 'smile_1', name: 'Brl 300', price: 25800 },
     { id: 'smile_2', name: 'Brl 1000', price: 83800 },
@@ -137,43 +138,33 @@ export default function TopupPage() {
     'mobile-legends': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
     'mobile-legends-(mlbb)': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
     'mlbb': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
-    
     'magic-chess': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
     'mcgg': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
-    
     'pubg-mobile': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
     'pubg': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
     'pubg-uc': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
-    
     'uc-packs': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
     'uc-pack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
     'ucpack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
-    
     'telegram-premium': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
     'telegram': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
-    
     'heartopia': { name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', packages: heartopiaPackages, inputType: 'heartopia', dbCat: 'heartopia' },
-    
     'smile-coin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', packages: smileCoinPackages, inputType: 'username', dbCat: 'smileCoin' },
     'smilecoin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', packages: smileCoinPackages, inputType: 'username', dbCat: 'smileCoin' }
   };
 
   const game = gameConfigs[id] || Object.values(gameConfigs).find(g => id.includes(g.dbCat.toLowerCase()));
-
-  // ဈေးနှုန်း Data ကို သိမ်းရန် State (မူလတန်ဖိုးကို Fallback packages အဖြစ် ချက်ချင်းထားပေးမည်)
   const [displayPackages, setDisplayPackages] = useState<any[]>(game ? game.packages : []);
 
-  // နောက်ကွယ်မှ Database ကို လှမ်းစစ်ပြီး ဈေးအသစ်ရှိပါက အလိုအလျောက် ပြောင်းပေးမည်
   useEffect(() => {
     if (!game) return;
-    setDisplayPackages(game.packages || []); // Fallback ကို အရင်ပြထားမည်
+    setDisplayPackages(game.packages || []);
     
     const fetchRealPrices = async () => {
       try {
         const { data, error } = await supabase.from('game_prices').select('*').eq('category', game.dbCat);
         if (error) throw error;
         if (data && data.length > 0) {
-          // Database မှ ဈေးနှုန်း အောင်မြင်စွာရပါက အစားထိုးပြသမည်
           setDisplayPackages(data.sort((a, b) => Number(a.price) - Number(b.price)));
         }
       } catch (error) {
@@ -183,11 +174,13 @@ export default function TopupPage() {
     fetchRealPrices();
   }, [game]);
 
+  // Wallet ငွေပေးချေစနစ်ကို ပေါင်းထည့်ထားပါသည်
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', img: '/wave.png' },
     { id: 'ayapay', name: 'AYA Pay', img: '/ayapay.png' },
-    { id: 'uabpay', name: 'UAB Pay', img: '/uabpay.png' }
+    { id: 'uabpay', name: 'UAB Pay', img: '/uabpay.png' },
+    { id: 'wallet', name: 'Wallet', img: '/wallet.png' }
   ];
 
   if (!game) {
@@ -216,49 +209,90 @@ export default function TopupPage() {
     return userId;
   };
 
-  const handleCheckout = async () => {
+  const openPaymentModal = () => {
     if (!isFormValid) return;
-    setIsSubmitting(true);
-    
-    try {
-      const { error } = await supabase.from('orders').insert([{
-        game_name: game.name, 
-        player_id: userId, 
-        zone_id: zoneId || null,
-        item_name: selectedPkg.name, 
-        price: selectedPkg.price, 
-        status: 'pending'
-      }]);
-      if (error) throw error;
-      setOrderSuccess(true);
-    } catch (error: any) {
-      alert("Error placing order: " + error.message);
-    } finally {
-      setIsSubmitting(false);
-    }
+    setShowPaymentModal(true);
   };
 
-  if (orderSuccess) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-[#070814] p-4 text-white">
-        <div className="bg-[#131422] p-8 rounded-3xl text-center max-w-md w-full border border-white/5 shadow-2xl">
-          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,197,94,0.3)]">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
-          </div>
-          <h2 className="font-bold text-2xl mb-2">Order Successful!</h2>
-          <p className="text-gray-400 text-sm mb-8">Admin will process your order shortly.</p>
-          <Link href="/" className="inline-block bg-pink-600 text-white font-bold py-3.5 px-8 rounded-xl w-full shadow-[0_0_15px_rgba(236,72,153,0.4)] hover:bg-pink-500 transition-colors">Return Home</Link>
-        </div>
-      </main>
-    );
-  }
+  const confirmOrder = async () => {
+    setIsUploading(true);
+    
+    try {
+      let publicUrl = null;
+
+      // Wallet ရွေးချယ်ထားပါက အကောင့်မှ ငွေဖြတ်မည်
+      if (paymentMethod === 'wallet') {
+        if (!walletPhone) {
+          alert("Wallet ဖြင့်ဝယ်ရန် သင့်ဖုန်းနံပါတ်ကို ထည့်ပေးပါ။");
+          setIsUploading(false);
+          return;
+        }
+
+        const { data: walletData, error: walletError } = await supabase
+          .from('users_wallet')
+          .select('balance')
+          .eq('phone', walletPhone)
+          .single();
+        
+        if (walletError || !walletData) {
+          alert("Wallet အကောင့် မတွေ့ပါ သို့မဟုတ် ဖုန်းနံပါတ် မှားယွင်းနေပါသည်။");
+          setIsUploading(false);
+          return;
+        }
+
+        if (walletData.balance < selectedPkg.price) {
+          alert("သင့် Wallet တွင် ငွေလုံလောက်မှု မရှိပါ။ ကျေးဇူးပြု၍ ငွေအရင်ဖြည့်ပါ။");
+          setIsUploading(false);
+          return;
+        }
+
+        // Wallet ထဲမှ ပိုက်ဆံဖြတ်ခြင်း
+        const newBalance = walletData.balance - selectedPkg.price;
+        await supabase.from('users_wallet').update({ balance: newBalance }).eq('phone', walletPhone);
+      } 
+      // တခြား ဘဏ်/Pay များရွေးချယ်ထားပါက Screenshot တင်မည်
+      else {
+        if (!slipFile) {
+          alert("ကျေးဇူးပြု၍ ငွေလွှဲပြေစာ (Screenshot) အရင်တင်ပေးပါ။");
+          setIsUploading(false);
+          return;
+        }
+        const fileExt = slipFile.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage.from('receipts').upload(fileName, slipFile);
+        if (uploadError) throw uploadError;
+        const { data } = supabase.storage.from('receipts').getPublicUrl(fileName);
+        publicUrl = data.publicUrl;
+      }
+
+      // Order ကို Database (Admin Panel) သို့ ပို့ခြင်း
+      const { error: insertError } = await supabase.from('orders').insert([{
+        game_name: game.name,
+        player_id: userId,
+        zone_id: zoneId || null,
+        item_name: selectedPkg.name,
+        price: selectedPkg.price,
+        payment_method: paymentMethod,
+        slip_url: publicUrl,
+        status: 'pending'
+      }]);
+
+      if (insertError) throw insertError;
+      
+      setShowPaymentModal(false);
+      setOrderSuccess(true);
+    } catch (error: any) {
+      alert("Error processing order: " + error.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-[#070814] pb-28 font-sans">
       <Navbar />
 
       <div className="max-w-5xl mx-auto px-4 mt-2">
-        {/* Banner Section */}
         <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl -z-10"></div>
           <img src={game.img} alt={game.name} className="w-24 h-24 rounded-2xl shadow-[0_0_20px_rgba(236,72,153,0.3)] object-cover z-10" />
@@ -273,10 +307,8 @@ export default function TopupPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
             
-            {/* Step 01 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">01</span>
@@ -314,7 +346,6 @@ export default function TopupPage() {
               )}
             </section>
 
-            {/* Step 02 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">02</span>
@@ -378,7 +409,6 @@ export default function TopupPage() {
               </div>
             </section>
 
-            {/* Step 03 */}
             <section>
               <div className="flex items-end gap-3 mb-4">
                 <span className="text-4xl italic font-light text-pink-500/80">03</span>
@@ -388,12 +418,12 @@ export default function TopupPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 {paymentMethods.map((pm) => (
                   <button
                     key={pm.id}
                     onClick={() => setPaymentMethod(pm.id)}
-                    className={`relative p-4 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
+                    className={`relative p-3 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
                       paymentMethod === pm.id
                       ? 'bg-pink-950/30 border-2 border-pink-500'
                       : 'bg-[#131422] border-2 border-transparent hover:border-white/10'
@@ -403,18 +433,17 @@ export default function TopupPage() {
                       <img src={pm.img} alt={pm.name} className="w-full h-full object-contain"
                         onError={(e) => {
                           e.currentTarget.style.display = 'none';
-                          e.currentTarget.parentElement!.innerHTML = `<span class="text-gray-800 font-bold text-xs">${pm.name[0]}</span>`;
+                          e.currentTarget.parentElement!.innerHTML = `<span class="text-gray-800 font-bold text-xs">${pm.name.charAt(0)}</span>`;
                         }}
                       />
                     </div>
-                    <span className="text-gray-300 text-[10px] font-medium">{pm.name}</span>
+                    <span className="text-gray-300 text-[10px] font-medium text-center">{pm.name}</span>
                   </button>
                 ))}
               </div>
             </section>
           </div>
 
-          {/* Right Column: Order Summary */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-[#131422] rounded-3xl border border-white/5 p-5 shadow-2xl">
               <h3 className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-3">Order Summary</h3>
@@ -455,21 +484,112 @@ export default function TopupPage() {
               </div>
               
               <button
-                onClick={handleCheckout}
-                disabled={!isFormValid || isSubmitting}
+                onClick={openPaymentModal}
+                disabled={!isFormValid}
                 className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg ${
-                  isFormValid && !isSubmitting
+                  isFormValid
                   ? 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]'
                   : 'bg-[#2a2b3d] text-gray-500 cursor-not-allowed'
                 }`}
               >
-                {isSubmitting ? 'Processing...' : (!isFormValid ? 'Complete the data first' : 'Buy Now')}
+                {!isFormValid ? 'Complete the data first' : 'Buy Now'}
               </button>
             </div>
           </div>
         </div>
       </div>
       <BottomNav />
+
+      {/* Payment Upload Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
+          <div className="bg-[#131422] p-6 rounded-3xl border border-white/10 w-full max-w-md shadow-2xl relative">
+            <button onClick={() => setShowPaymentModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">✕</button>
+            
+            <h3 className="text-xl font-bold text-white mb-2">ငွေပေးချေရန်</h3>
+            
+            {paymentMethod === 'wallet' ? (
+              <p className="text-gray-400 text-xs mb-5">သင့် Wallet အကောင့် (ဖုန်းနံပါတ်) ကို ရိုက်ထည့်ပါ။</p>
+            ) : (
+              <p className="text-gray-400 text-xs mb-5">အောက်ပါအကောင့်သို့ ငွေလွှဲပြီး ပြေစာ (Screenshot) တင်ပေးပါ။</p>
+            )}
+
+            {paymentMethod !== 'wallet' && (
+              <div className="bg-[#0a0b14] p-5 rounded-2xl border border-white/5 mb-5 shadow-inner">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-500 text-xs uppercase font-bold tracking-wider">Pay To:</span>
+                  <span className="text-pink-500 font-bold text-sm uppercase bg-pink-500/10 px-3 py-1 rounded-full">{paymentMethod}</span>
+                </div>
+                <div className="text-white text-2xl font-bold tracking-widest mt-2">{adminAccounts[paymentMethod]?.phone}</div>
+                <div className="text-gray-400 text-sm mt-1">အမည်: {adminAccounts[paymentMethod]?.name}</div>
+                
+                <div className="flex justify-between items-end mt-4 pt-4 border-t border-white/10">
+                  <span className="text-gray-500 text-xs">ကျသင့်ငွေ</span>
+                  <span className="text-pink-500 font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
+                </div>
+              </div>
+            )}
+
+            {paymentMethod === 'wallet' ? (
+              <div className="mb-6">
+                <label className="block text-gray-300 text-xs font-bold mb-3 uppercase tracking-wider">Wallet ဖုန်းနံပါတ် ထည့်ပါ <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  placeholder="ဥပမာ: 09123456789"
+                  value={walletPhone}
+                  onChange={(e) => setWalletPhone(e.target.value)}
+                  className="w-full bg-[#0a0b14] border border-white/20 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500"
+                />
+                <div className="flex justify-between items-end mt-4 pt-4 border-t border-white/10">
+                  <span className="text-gray-500 text-xs">ဖြတ်တောက်မည့်ငွေ</span>
+                  <span className="text-pink-500 font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-6">
+                <label className="block text-gray-300 text-xs font-bold mb-3 uppercase tracking-wider">ငွေလွှဲပြေစာ (Screenshot) ရွေးရန် <span className="text-red-500">*</span></label>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={(e) => setSlipFile(e.target.files?.[0] || null)} 
+                  className="w-full text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-pink-600/20 file:text-pink-400 hover:file:bg-pink-600/30 cursor-pointer border border-dashed border-white/20 rounded-xl p-2" 
+                />
+              </div>
+            )}
+
+            <button 
+              onClick={confirmOrder} 
+              disabled={isUploading || (paymentMethod !== 'wallet' && !slipFile)} 
+              className={`w-full py-4 rounded-xl font-bold text-sm transition-all shadow-lg ${
+                (!slipFile && paymentMethod !== 'wallet') || isUploading 
+                ? 'bg-[#2a2b3d] text-gray-500 cursor-not-allowed' 
+                : 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]'
+              }`}
+            >
+              {isUploading ? 'Processing...' : (paymentMethod === 'wallet' ? 'Confirm Wallet Payment' : 'Confirm Order & Upload')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* မျက်နှာပြင်အပြည့်အစား ပြောင်းလဲလိုက်သော Success Popup သေးသေးလေး */}
+      {orderSuccess && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm transition-opacity duration-300">
+          <div className="bg-[#131422] p-8 rounded-3xl text-center max-w-sm w-full border border-white/10 shadow-[0_0_40px_rgba(236,72,153,0.15)] transform scale-100 animate-pulse">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h2 className="font-bold text-xl mb-2 text-white">Order Successful!</h2>
+            <p className="text-gray-400 text-xs mb-6">Admin will process your order shortly.</p>
+            <Link href="/" className="inline-block bg-pink-600 text-white font-bold py-3 px-8 rounded-xl w-full shadow-[0_0_15px_rgba(236,72,153,0.4)] hover:bg-pink-500 transition-colors text-sm">
+              Return Home
+            </Link>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
+
+
