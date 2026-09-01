@@ -3,18 +3,21 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
+import { supabase } from '../../lib/supabase'; // Supabase ကို ချိတ်ဆက်ခြင်း
 
 export default function WalletPage() {
+  const [phone, setPhone] = useState(''); // ဖုန်းနံပါတ် မှတ်ရန်
   const [amount, setAmount] = useState<number>(50000);
   const [selectedMethod, setSelectedMethod] = useState('Wave Pay');
   const [step, setStep] = useState<'form' | 'detail'>('form');
-  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [slipFile, setSlipFile] = useState<File | null>(null); // Screenshot ဖိုင်မှတ်ရန်
+  const [isUploading, setIsUploading] = useState(false); // Upload တင်နေစဉ် Loading ပြရန်
   const [isUploaded, setIsUploaded] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const presetAmounts = [50000, 100000, 200000, 500000, 1000000];
   
-  // ဖုန်းနံပါတ်နှင့် အမည်အမှန်များကို ပြင်ဆင်ထားပါသည်
+  // ဖုန်းနံပါတ်နှင့် အမည်အမှန်များ
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', acc: '09755008854', holder: 'U Ye Paing Oo', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', acc: '09967241375', holder: 'U Ye Paing Oo', img: '/wave.png' },
@@ -26,14 +29,54 @@ export default function WalletPage() {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setScreenshot(e.target.files[0].name);
+      setSlipFile(e.target.files[0]); // ပုံဖိုင်ကို သိမ်းမည်
     }
   };
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // ၂ စက္ကန့်အကြာတွင် Copy ပုံစံပြန်ပြောင်းမည်
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Database ထဲသို့ ငွေဖြည့်မှတ်တမ်း ပို့မည့် လုပ်ဆောင်ချက်
+  const submitTopup = async () => {
+    if (!slipFile) {
+      alert("ကျေးဇူးပြု၍ ငွေလွှဲပြေစာ (Screenshot) တင်ပေးပါ။");
+      return;
+    }
+    
+    setIsUploading(true);
+    
+    try {
+      // 1. ပုံကို Supabase Storage ပေါ်တင်မည်
+      const fileExt = slipFile.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage.from('receipts').upload(fileName, slipFile);
+
+      if (uploadError) throw uploadError;
+
+      // 2. ပုံရဲ့ URL ကို ယူမည်
+      const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(fileName);
+
+      // 3. Admin Panel မြင်ရအောင် wallet_history ဇယားထဲ Data ထည့်မည်
+      const { error: insertError } = await supabase.from('wallet_history').insert([{
+        phone: phone,
+        amount: amount,
+        type: 'topup',
+        status: 'pending',
+        slip_url: publicUrl
+      }]);
+
+      if (insertError) throw insertError;
+      
+      setIsUploaded(true);
+      alert("ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ Admin မှ စစ်ဆေးပြီးပါက သင့် Wallet သို့ ငွေဝင်လာပါမည်။");
+    } catch (error: any) {
+      alert("Error: " + error.message);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -49,6 +92,19 @@ export default function WalletPage() {
               <div className="bg-[#131422] p-6 rounded-3xl border border-white/5 shadow-2xl">
                 <h1 className="text-xl font-bold text-white mb-1">Top Up Balance</h1>
                 <p className="text-gray-400 text-xs mb-6">Top up your account balance using available payment methods.</p>
+
+                {/* Phone Number Section (Admin သိရန်) */}
+                <div className="mb-6">
+                  <label className="text-xs font-bold text-gray-300 block mb-2">Your Phone Number <span className="text-red-500">*</span></label>
+                  <p className="text-[10px] text-gray-400 mb-2">Wallet ဖွင့်ထားသော သင့်ဖုန်းနံပါတ် ထည့်ပါ။</p>
+                  <input 
+                    type="text" 
+                    placeholder="e.g., 09123456789"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full bg-[#0a0b14] border border-white/10 rounded-2xl px-4 py-3 text-white text-sm font-bold focus:outline-none focus:border-pink-500"
+                  />
+                </div>
 
                 {/* Amount Section */}
                 <div className="mb-6">
@@ -123,12 +179,12 @@ export default function WalletPage() {
                 
                 <div className="space-y-3 mb-6 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Balance to add</span>
-                    <span className="text-white font-bold">K {amount.toLocaleString()}</span>
+                    <span className="text-gray-400">Account Phone</span>
+                    <span className="text-white font-bold">{phone || '-'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Admin fee</span>
-                    <span className="text-white">K 0</span>
+                    <span className="text-gray-400">Balance to add</span>
+                    <span className="text-white font-bold">K {amount.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Method</span>
@@ -143,29 +199,17 @@ export default function WalletPage() {
 
                 <button 
                   onClick={() => setStep('detail')}
-                  disabled={amount < 3000}
+                  disabled={amount < 3000 || !phone}
                   className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg ${
-                    amount >= 3000 
+                    (amount >= 3000 && phone)
                     ? 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]' 
                     : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  Confirm Top Up
+                  {!phone ? 'Enter Phone Number First' : 'Confirm Top Up'}
                 </button>
               </div>
 
-              <div className="bg-[#131422] p-5 rounded-3xl border border-white/5">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-white text-xs font-bold uppercase tracking-wider">Recent Top Ups</h4>
-                  <Link href="/history" className="text-pink-500 text-xs cursor-pointer hover:underline">All →</Link>
-                </div>
-                
-                <div className="space-y-3">
-                  <div className="bg-[#0a0b14] p-6 rounded-xl border border-white/5 text-center flex flex-col items-center justify-center">
-                    <p className="text-gray-500 text-[10px]">No recent top ups yet.</p>
-                  </div>
-                </div>
-              </div>
             </div>
 
           </div>
@@ -189,7 +233,6 @@ export default function WalletPage() {
                     <div className="flex items-center gap-2">
                       <span className="text-pink-400 font-mono font-bold">{currentMethodObj.acc}</span>
                       
-                      {/* Copy ခလုတ် */}
                       <button 
                         onClick={() => handleCopy(currentMethodObj.acc)}
                         className="p-1.5 rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all"
@@ -224,61 +267,28 @@ export default function WalletPage() {
                     <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
                   </label>
                   <span className="text-gray-400 text-xs truncate max-w-xs">
-                    {screenshot ? screenshot : 'No file chosen'}
+                    {slipFile ? slipFile.name : 'No file chosen'}
                   </span>
                 </div>
 
                 <button 
-                  onClick={() => setIsUploaded(true)}
+                  onClick={submitTopup}
+                  disabled={isUploaded || isUploading || !slipFile}
                   className={`w-full mt-4 py-3 rounded-xl font-bold text-xs transition-all ${
                     isUploaded 
-                    ? 'bg-green-600 text-white' 
-                    : 'bg-pink-600 hover:bg-pink-500 text-white shadow-[0_0_10px_rgba(236,72,153,0.4)]'
+                    ? 'bg-green-600 text-white cursor-not-allowed' 
+                    : (!slipFile || isUploading)
+                      ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                      : 'bg-pink-600 hover:bg-pink-500 text-white shadow-[0_0_10px_rgba(236,72,153,0.4)]'
                   }`}
                 >
-                  {isUploaded ? 'Proof Uploaded Successfully ✓' : 'Upload Proof'}
+                  {isUploading ? 'Uploading...' : (isUploaded ? 'Proof Uploaded Successfully ✓' : 'Upload Proof & Request')}
                 </button>
-              </div>
-
-              <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
-                <h4 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Order Summary</h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Invoice</span>
-                    <span className="text-white font-mono">DP260825460371AE</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Item</span>
-                    <span className="text-white">Top Up Balance</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Balance Amount</span>
-                    <span className="text-white">K {amount.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
-                <h4 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Payment Summary</h4>
-                <div className="space-y-2 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Method</span>
-                    <span className="text-white">{selectedMethod}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Status</span>
-                    <span className="text-yellow-500 font-bold">Waiting</span>
-                  </div>
-                  <div className="flex justify-between border-t border-white/10 pt-3 mt-3">
-                    <span className="text-white font-bold">Total</span>
-                    <span className="text-pink-500 font-extrabold text-base">K {amount.toLocaleString()}</span>
-                  </div>
-                </div>
               </div>
 
               <div className="flex gap-3">
                 <button 
-                  onClick={() => setStep('form')}
+                  onClick={() => { setStep('form'); setIsUploaded(false); setSlipFile(null); }}
                   className="flex-1 bg-[#1a1b2e] hover:bg-[#25273c] text-white py-3 rounded-xl text-xs font-bold border border-white/10 text-center"
                 >
                   Top Up Again
