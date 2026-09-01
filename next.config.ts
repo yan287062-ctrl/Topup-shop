@@ -1,7 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: '/api/supabase/:path*',
+        destination: 'https://lejfhsuwajmzikmudmcs.supabase.co/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
