@@ -575,15 +575,18 @@ export default function TopupPage() {
       {/* မျက်နှာပြင်အပြည့်အစား ပြောင်းလဲလိုက်သော Success Popup သေးသေးလေး */}
       {orderSuccess && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm transition-opacity duration-300">
-          <div className="bg-[#131422] p-8 rounded-3xl text-center max-w-sm w-full border border-white/10 shadow-[0_0_40px_rgba(236,72,153,0.15)] transform scale-100 animate-pulse">
+          <div className="bg-[#131422] p-8 rounded-3xl text-center max-w-sm w-full border border-white/10 shadow-[0_0_40px_rgba(236,72,153,0.15)] transform scale-100">
             <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
             <h2 className="font-bold text-xl mb-2 text-white">Order Successful!</h2>
             <p className="text-gray-400 text-xs mb-6">Admin will process your order shortly.</p>
-            <Link href="/" className="inline-block bg-pink-600 text-white font-bold py-3 px-8 rounded-xl w-full shadow-[0_0_15px_rgba(236,72,153,0.4)] hover:bg-pink-500 transition-colors text-sm">
+            <button 
+              onClick={() => window.location.href = '/'} 
+              className="inline-block bg-pink-600 text-white font-bold py-3 px-8 rounded-xl w-full shadow-[0_0_15px_rgba(236,72,153,0.4)] hover:bg-pink-500 transition-colors text-sm"
+            >
               Return Home
-            </Link>
+            </button>
           </div>
         </div>
       )}
@@ -591,5 +594,3 @@ export default function TopupPage() {
     </main>
   );
 }
-
-
