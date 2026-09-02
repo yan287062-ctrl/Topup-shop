@@ -22,9 +22,20 @@ export default function TopupPage() {
   // Payment Modal & Order States
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [slipFile, setSlipFile] = useState<File | null>(null);
-  const [walletPhone, setWalletPhone] = useState(''); // Wallet အတွက် ဖုန်းနံပါတ်
+  const [userEmail, setUserEmail] = useState(''); // ဖုန်းနံပါတ်အစား Email ကို အသုံးပြုပါမည်
   const [isUploading, setIsUploading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+
+  // User ၏ Email ကို အလိုအလျောက် ရယူရန်
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      }
+    };
+    fetchUser();
+  }, []);
 
   // Admin Accounts for Payment 
   const adminAccounts: Record<string, {name: string, phone: string}> = {
@@ -174,7 +185,6 @@ export default function TopupPage() {
     fetchRealPrices();
   }, [game]);
 
-  // Wallet ငွေပေးချေစနစ်ကို ပေါင်းထည့်ထားပါသည်
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', img: '/wave.png' },
@@ -220,10 +230,10 @@ export default function TopupPage() {
     try {
       let publicUrl = null;
 
-      // Wallet ရွေးချယ်ထားပါက အကောင့်မှ ငွေဖြတ်မည်
+      // Wallet ရွေးချယ်ထားပါက ဖုန်းနံပါတ်အစား Email ကို အသုံးပြုပြီး ငွေဖြတ်မည်
       if (paymentMethod === 'wallet') {
-        if (!walletPhone) {
-          alert("Wallet ဖြင့်ဝယ်ရန် သင့်ဖုန်းနံပါတ်ကို ထည့်ပေးပါ။");
+        if (!userEmail) {
+          alert("Wallet ဖြင့်ဝယ်ရန် အကောင့်ဝင် (Login) ထားရန် လိုအပ်ပါသည်။");
           setIsUploading(false);
           return;
         }
@@ -231,11 +241,11 @@ export default function TopupPage() {
         const { data: walletData, error: walletError } = await supabase
           .from('users_wallet')
           .select('balance')
-          .eq('phone', walletPhone)
+          .eq('email', userEmail)
           .single();
         
         if (walletError || !walletData) {
-          alert("Wallet အကောင့် မတွေ့ပါ သို့မဟုတ် ဖုန်းနံပါတ် မှားယွင်းနေပါသည်။");
+          alert("Wallet အကောင့် မတွေ့ပါ သို့မဟုတ် ငွေဖြည့်သွင်းထားခြင်း မရှိသေးပါ။");
           setIsUploading(false);
           return;
         }
@@ -246,9 +256,9 @@ export default function TopupPage() {
           return;
         }
 
-        // Wallet ထဲမှ ပိုက်ဆံဖြတ်ခြင်း
+        // Wallet ထဲမှ ပိုက်ဆံဖြတ်ခြင်း (email ကိုအသုံးပြု၍)
         const newBalance = walletData.balance - selectedPkg.price;
-        await supabase.from('users_wallet').update({ balance: newBalance }).eq('phone', walletPhone);
+        await supabase.from('users_wallet').update({ balance: newBalance }).eq('email', userEmail);
       } 
       // တခြား ဘဏ်/Pay များရွေးချယ်ထားပါက Screenshot တင်မည်
       else {
@@ -509,7 +519,7 @@ export default function TopupPage() {
             <h3 className="text-xl font-bold text-white mb-2">ငွေပေးချေရန်</h3>
             
             {paymentMethod === 'wallet' ? (
-              <p className="text-gray-400 text-xs mb-5">သင့် Wallet အကောင့် (ဖုန်းနံပါတ်) ကို ရိုက်ထည့်ပါ။</p>
+              <p className="text-gray-400 text-xs mb-5">သင့် Wallet ဖြင့် အလိုအလျောက် ပေးချေပါမည်။</p>
             ) : (
               <p className="text-gray-400 text-xs mb-5">အောက်ပါအကောင့်သို့ ငွေလွှဲပြီး ပြေစာ (Screenshot) တင်ပေးပါ။</p>
             )}
@@ -532,14 +542,10 @@ export default function TopupPage() {
 
             {paymentMethod === 'wallet' ? (
               <div className="mb-6">
-                <label className="block text-gray-300 text-xs font-bold mb-3 uppercase tracking-wider">Wallet ဖုန်းနံပါတ် ထည့်ပါ <span className="text-red-500">*</span></label>
-                <input 
-                  type="text" 
-                  placeholder="ဥပမာ: 09123456789"
-                  value={walletPhone}
-                  onChange={(e) => setWalletPhone(e.target.value)}
-                  className="w-full bg-[#0a0b14] border border-white/20 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500"
-                />
+                <label className="block text-gray-300 text-xs font-bold mb-3 uppercase tracking-wider">Your Account Email</label>
+                <div className="w-full bg-[#131422] border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-bold opacity-80 cursor-not-allowed shadow-inner">
+                  {userEmail || 'Please Login First'}
+                </div>
                 <div className="flex justify-between items-end mt-4 pt-4 border-t border-white/10">
                   <span className="text-gray-500 text-xs">ဖြတ်တောက်မည့်ငွေ</span>
                   <span className="text-pink-500 font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
