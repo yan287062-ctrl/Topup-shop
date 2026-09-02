@@ -6,7 +6,7 @@ import Navbar from '../../components/Navbar';
 import { supabase } from '../../lib/supabase';
 
 export default function WalletPage() {
-  const [phone, setPhone] = useState('');
+  const [userEmail, setUserEmail] = useState<string>(''); // ဖုန်းနံပါတ်အစား Email ကိုသုံးမည်
   const [amount, setAmount] = useState<number>(50000);
   const [selectedMethod, setSelectedMethod] = useState('Wave Pay');
   const [step, setStep] = useState<'form' | 'detail'>('form');
@@ -16,12 +16,18 @@ export default function WalletPage() {
   const [copied, setCopied] = useState(false);
   const [invoiceCopied, setInvoiceCopied] = useState(false);
 
-  // အလိုအလျောက် ထုတ်ပေးထားသော Invoice Code (ဥပမာ: DP260827C5F67A96)
   const [invoiceCode, setInvoiceCode] = useState('');
 
-  // စာမျက်နှာ စတင်ပွင့်သည်နှင့် Invoice Code အသစ်တစ်ခု ဖန်တီးမည်
   useEffect(() => {
     generateInvoiceCode();
+    // လက်ရှိ Login ဝင်ထားသော User ၏ Email ကို အလိုအလျောက် ယူမည်
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      }
+    };
+    fetchUser();
   }, []);
 
   const generateInvoiceCode = () => {
@@ -78,14 +84,14 @@ export default function WalletPage() {
 
       const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(fileName);
 
-      // Database ထဲသို့ Invoice Code ကိုပါ ထည့်သွင်းသိမ်းဆည်းမည်
+      // Database ထဲသို့ phone အစား email ကို သိမ်းဆည်းမည်
       const { error: insertError } = await supabase.from('wallet_history').insert([{
-        phone: phone,
+        email: userEmail, // <--- ဖုန်းနံပါတ်အစား Email ကို ထည့်သွင်းလိုက်ပါပြီ
         amount: amount,
         type: selectedMethod,
         status: 'pending',
         slip_url: publicUrl,
-        invoice_code: invoiceCode // <--- Invoice Code အသစ်ထည့်သွင်းခြင်း
+        invoice_code: invoiceCode
       }]);
 
       if (insertError) throw insertError;
@@ -113,18 +119,15 @@ export default function WalletPage() {
                 <h1 className="text-xl font-bold text-white mb-1">Top Up Balance</h1>
                 <p className="text-gray-400 text-xs mb-6">Top up your account balance using available payment methods.</p>
 
-                {/* Phone Number & Invoice Code Section */}
+                {/* Email & Invoice Code Section (Phone ကို ဖယ်ရှားလိုက်ပါပြီ) */}
                 <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
-                  <label className="text-xs font-bold text-gray-300 block mb-2">Your Phone Number <span className="text-red-500">*</span></label>
-                  <p className="text-[10px] text-gray-400 mb-3">Wallet ဖွင့်ထားသော သင့်ဖုန်းနံပါတ် ထည့်ပါ။</p>
+                  <label className="text-xs font-bold text-gray-300 block mb-2">Your Account Email</label>
+                  <p className="text-[10px] text-gray-400 mb-3">ဤအကောင့်ထဲသို့ ငွေဖြည့်သွင်းမည်ဖြစ်ပါသည်။</p>
                   
-                  <input 
-                    type="text" 
-                    placeholder="e.g., 09123456789"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-[#131422] border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-bold focus:outline-none focus:border-pink-500 mb-4"
-                  />
+                  {/* အလိုအလျောက် ယူထားသော Email ကို ပြသမည့် အကွက် */}
+                  <div className="w-full bg-[#131422] border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-bold mb-4 opacity-80 cursor-not-allowed">
+                    {userEmail || 'Loading email...'}
+                  </div>
 
                   {/* Invoice Code ပြသမည့် အကွက် */}
                   <label className="text-xs font-bold text-gray-300 block mb-2">Invoice Code (ဘောက်ချာကုဒ်)</label>
@@ -217,8 +220,9 @@ export default function WalletPage() {
                 
                 <div className="space-y-3 mb-6 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">Account Phone</span>
-                    <span className="text-white font-bold">{phone || '-'}</span>
+                    <span className="text-gray-400">Account Email</span>
+                    {/* ဖုန်းနံပါတ်အစား Email ကို ပြသမည့်နေရာ */}
+                    <span className="text-white font-bold">{userEmail || 'Not logged in'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Invoice Code</span>
@@ -241,14 +245,14 @@ export default function WalletPage() {
 
                 <button 
                   onClick={() => setStep('detail')}
-                  disabled={amount < 3000 || !phone}
+                  disabled={amount < 3000 || !userEmail}
                   className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg ${
-                    (amount >= 3000 && phone)
+                    (amount >= 3000 && userEmail)
                     ? 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]' 
                     : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                   }`}
                 >
-                  {!phone ? 'Enter Phone Number First' : 'Confirm Top Up'}
+                  {!userEmail ? 'Please Login First' : 'Confirm Top Up'}
                 </button>
               </div>
 
@@ -338,7 +342,7 @@ export default function WalletPage() {
                     setStep('form'); 
                     setIsUploaded(false); 
                     setSlipFile(null); 
-                    generateInvoiceCode(); // ငွေဖြည့်အသစ်အတွက် ကုဒ်အသစ်ပြန်ထုတ်မည်
+                    generateInvoiceCode(); 
                   }}
                   className="flex-1 bg-[#1a1b2e] hover:bg-[#25273c] text-white py-3 rounded-xl text-xs font-bold border border-white/10 text-center"
                 >
