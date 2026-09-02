@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { supabase } from '../lib/supabase'; // Supabase ချိတ်ဆက်ခြင်း
+import { supabase } from '../../lib/supabase'; // <-- ဒီနေရာမှာ ../../ လို့ အမှန်ပြင်ထားပါသည်
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
