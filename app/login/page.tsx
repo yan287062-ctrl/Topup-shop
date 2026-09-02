@@ -8,17 +8,13 @@ export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
- // Google ဖြင့် Login ဝင်မည့် လုပ်ဆောင်ချက် (ပိုမိုသေချာအောင် ပြင်ဆင်ထားသည်)
-  const handleGoogleLogin = async () => {
+const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://painggyishop.vercel.app/', // <--- လင့်ခ်အမှန်ကို အသေတပ်ထားပါသည်
-          queryParams: {
-            prompt: 'consent', // <--- Google ကို အကောင့်ပြန်ရွေးခိုင်းပြီး အတင်းပြန်လွှတ်ခိုင်းသည့်စနစ်
-          },
+          redirectTo: 'https://painggyishop.vercel.app',
         }
       });
       if (error) throw error;
@@ -27,7 +23,6 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
-
   return (
     <main className="min-h-screen bg-[#070814] flex flex-col items-center justify-center p-4 relative overflow-hidden font-sans">
       
