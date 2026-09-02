@@ -14,7 +14,10 @@ export default function Navbar() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
-        fetchBalance(session.user.email); // ဖုန်းနံပါတ်အစား Email ဖြင့် တိုက်ရိုက်ရှာမည်
+        // TypeScript Error မတက်စေရန် Email ရှိမှသာ လှမ်းခေါ်မည်
+        if (session.user.email) {
+          fetchBalance(session.user.email); 
+        }
       }
     };
     getSession();
@@ -22,7 +25,10 @@ export default function Navbar() {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(session.user);
-        fetchBalance(session.user.email);
+        // TypeScript Error မတက်စေရန် Email ရှိမှသာ လှမ်းခေါ်မည်
+        if (session.user.email) {
+          fetchBalance(session.user.email);
+        }
       } else {
         setUser(null);
         setBalance(0);
@@ -34,8 +40,8 @@ export default function Navbar() {
 
   // Email ဖြင့် Balance ရှာမည့် Function
   const fetchBalance = async (userEmail: string) => {
+    if (!userEmail) return; // Email မရှိပါက ဆက်မလုပ်ရန် တားထားသည်
     try {
-      // Database ထဲက users_wallet table တွင် email ဖြင့် တိုက်ရိုက်တိုက်စစ်မည်
       const { data, error } = await supabase
         .from('users_wallet')
         .select('balance')
@@ -54,7 +60,8 @@ export default function Navbar() {
     window.location.reload(); 
   };
 
-  const getUserInitials = (name: string, email: string) => {
+  // TypeScript Error မတက်စေရန် parameters များကို optional (?) ပြောင်းထားသည်
+  const getUserInitials = (name?: string, email?: string) => {
     if (name) return name.substring(0, 2).toUpperCase();
     if (email) return email.substring(0, 2).toUpperCase();
     return 'PG';
