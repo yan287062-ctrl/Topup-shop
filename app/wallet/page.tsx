@@ -1,23 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
-import { supabase } from '../../lib/supabase'; // Supabase ကို ချိတ်ဆက်ခြင်း
+import { supabase } from '../../lib/supabase';
 
 export default function WalletPage() {
-  const [phone, setPhone] = useState(''); // ဖုန်းနံပါတ် မှတ်ရန်
+  const [phone, setPhone] = useState('');
   const [amount, setAmount] = useState<number>(50000);
   const [selectedMethod, setSelectedMethod] = useState('Wave Pay');
   const [step, setStep] = useState<'form' | 'detail'>('form');
-  const [slipFile, setSlipFile] = useState<File | null>(null); // Screenshot ဖိုင်မှတ်ရန်
-  const [isUploading, setIsUploading] = useState(false); // Upload တင်နေစဉ် Loading ပြရန်
+  const [slipFile, setSlipFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [isUploaded, setIsUploaded] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [invoiceCopied, setInvoiceCopied] = useState(false);
+
+  // အလိုအလျောက် ထုတ်ပေးထားသော Invoice Code (ဥပမာ: DP260827C5F67A96)
+  const [invoiceCode, setInvoiceCode] = useState('');
+
+  // စာမျက်နှာ စတင်ပွင့်သည်နှင့် Invoice Code အသစ်တစ်ခု ဖန်တီးမည်
+  useEffect(() => {
+    generateInvoiceCode();
+  }, []);
+
+  const generateInvoiceCode = () => {
+    const date = new Date();
+    const year = date.getFullYear().toString().slice(-2);
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const randomHex = Math.random().toString(16).substring(2, 10).toUpperCase();
+    setInvoiceCode(`DP${year}${month}${day}${randomHex}`);
+  };
 
   const presetAmounts = [50000, 100000, 200000, 500000, 1000000];
   
-  // ဖုန်းနံပါတ်နှင့် အမည်အမှန်များ
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', acc: '09755008854', holder: 'U Ye Paing Oo', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', acc: '09967241375', holder: 'U Ye Paing Oo', img: '/wave.png' },
@@ -29,17 +46,21 @@ export default function WalletPage() {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSlipFile(e.target.files[0]); // ပုံဖိုင်ကို သိမ်းမည်
+      setSlipFile(e.target.files[0]);
     }
   };
 
-  const handleCopy = (text: string) => {
+  const handleCopy = (text: string, type: 'acc' | 'invoice') => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (type === 'acc') {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } else {
+      setInvoiceCopied(true);
+      setTimeout(() => setInvoiceCopied(false), 2000);
+    }
   };
 
-  // Database ထဲသို့ ငွေဖြည့်မှတ်တမ်း ပို့မည့် လုပ်ဆောင်ချက်
   const submitTopup = async () => {
     if (!slipFile) {
       alert("ကျေးဇူးပြု၍ ငွေလွှဲပြေစာ (Screenshot) တင်ပေးပါ။");
@@ -49,29 +70,28 @@ export default function WalletPage() {
     setIsUploading(true);
     
     try {
-      // 1. ပုံကို Supabase Storage ပေါ်တင်မည်
       const fileExt = slipFile.name.split('.').pop();
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const { data: uploadData, error: uploadError } = await supabase.storage.from('receipts').upload(fileName, slipFile);
 
       if (uploadError) throw uploadError;
 
-      // 2. ပုံရဲ့ URL ကို ယူမည်
       const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(fileName);
 
-      // 3. Admin Panel မြင်ရအောင် wallet_history ဇယားထဲ Data ထည့်မည်
+      // Database ထဲသို့ Invoice Code ကိုပါ ထည့်သွင်းသိမ်းဆည်းမည်
       const { error: insertError } = await supabase.from('wallet_history').insert([{
         phone: phone,
         amount: amount,
-        type: 'topup',
+        type: selectedMethod,
         status: 'pending',
-        slip_url: publicUrl
+        slip_url: publicUrl,
+        invoice_code: invoiceCode // <--- Invoice Code အသစ်ထည့်သွင်းခြင်း
       }]);
 
       if (insertError) throw insertError;
       
       setIsUploaded(true);
-      alert("ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ Admin မှ စစ်ဆေးပြီးပါက သင့် Wallet သို့ ငွေဝင်လာပါမည်။");
+      alert("ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ ဤဘောက်ချာကုဒ် (" + invoiceCode + ") ဖြင့် သင့်မှတ်တမ်းကို ပြန်ရှာနိုင်ပါသည်။");
     } catch (error: any) {
       alert("Error: " + error.message);
     } finally {
@@ -93,17 +113,35 @@ export default function WalletPage() {
                 <h1 className="text-xl font-bold text-white mb-1">Top Up Balance</h1>
                 <p className="text-gray-400 text-xs mb-6">Top up your account balance using available payment methods.</p>
 
-                {/* Phone Number Section (Admin သိရန်) */}
-                <div className="mb-6">
+                {/* Phone Number & Invoice Code Section */}
+                <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
                   <label className="text-xs font-bold text-gray-300 block mb-2">Your Phone Number <span className="text-red-500">*</span></label>
-                  <p className="text-[10px] text-gray-400 mb-2">Wallet ဖွင့်ထားသော သင့်ဖုန်းနံပါတ် ထည့်ပါ။</p>
+                  <p className="text-[10px] text-gray-400 mb-3">Wallet ဖွင့်ထားသော သင့်ဖုန်းနံပါတ် ထည့်ပါ။</p>
+                  
                   <input 
                     type="text" 
                     placeholder="e.g., 09123456789"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-[#0a0b14] border border-white/10 rounded-2xl px-4 py-3 text-white text-sm font-bold focus:outline-none focus:border-pink-500"
+                    className="w-full bg-[#131422] border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-bold focus:outline-none focus:border-pink-500 mb-4"
                   />
+
+                  {/* Invoice Code ပြသမည့် အကွက် */}
+                  <label className="text-xs font-bold text-gray-300 block mb-2">Invoice Code (ဘောက်ချာကုဒ်)</label>
+                  <p className="text-[10px] text-pink-500 mb-2">ငွေဖြည့်မှတ်တမ်း ပြန်လည်ရှာဖွေရာတွင် အသုံးပြုရန်။</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-[#131422] border border-white/10 rounded-xl px-4 py-3 text-pink-400 font-mono text-sm tracking-wider shadow-inner">
+                      {invoiceCode}
+                    </div>
+                    <button 
+                      onClick={() => handleCopy(invoiceCode, 'invoice')}
+                      className={`px-4 py-3 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                        invoiceCopied ? 'bg-green-600 text-white' : 'bg-pink-600 hover:bg-pink-500 text-white'
+                      }`}
+                    >
+                      {invoiceCopied ? 'Copied ✓' : 'Copy Code'}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Amount Section */}
@@ -183,12 +221,16 @@ export default function WalletPage() {
                     <span className="text-white font-bold">{phone || '-'}</span>
                   </div>
                   <div className="flex justify-between">
+                    <span className="text-gray-400">Invoice Code</span>
+                    <span className="text-pink-400 font-mono font-medium">{invoiceCode}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-gray-400">Balance to add</span>
                     <span className="text-white font-bold">K {amount.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Method</span>
-                    <span className="text-pink-400 font-medium">{selectedMethod}</span>
+                    <span className="text-white font-medium">{selectedMethod}</span>
                   </div>
                 </div>
 
@@ -223,7 +265,11 @@ export default function WalletPage() {
 
               <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
                 <h4 className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-3">Payment Information</h4>
-                <div className="space-y-2 text-xs">
+                <div className="space-y-3 text-xs">
+                  <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span className="text-gray-400">Invoice Code</span>
+                    <span className="text-pink-400 font-mono font-bold tracking-wider">{invoiceCode}</span>
+                  </div>
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-gray-400">Method</span>
                     <span className="text-white font-medium">{selectedMethod}</span>
@@ -231,10 +277,10 @@ export default function WalletPage() {
                   <div className="flex justify-between items-center mb-1">
                     <span className="text-gray-400">Send to Account</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-pink-400 font-mono font-bold">{currentMethodObj.acc}</span>
+                      <span className="text-white font-mono font-bold">{currentMethodObj.acc}</span>
                       
                       <button 
-                        onClick={() => handleCopy(currentMethodObj.acc)}
+                        onClick={() => handleCopy(currentMethodObj.acc, 'acc')}
                         className="p-1.5 rounded-md bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-all"
                         title="Copy Account Number"
                       >
@@ -288,7 +334,12 @@ export default function WalletPage() {
 
               <div className="flex gap-3">
                 <button 
-                  onClick={() => { setStep('form'); setIsUploaded(false); setSlipFile(null); }}
+                  onClick={() => { 
+                    setStep('form'); 
+                    setIsUploaded(false); 
+                    setSlipFile(null); 
+                    generateInvoiceCode(); // ငွေဖြည့်အသစ်အတွက် ကုဒ်အသစ်ပြန်ထုတ်မည်
+                  }}
                   className="flex-1 bg-[#1a1b2e] hover:bg-[#25273c] text-white py-3 rounded-xl text-xs font-bold border border-white/10 text-center"
                 >
                   Top Up Again
