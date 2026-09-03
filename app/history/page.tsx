@@ -40,11 +40,11 @@ export default function HistoryPage() {
         .select('*')
         .or(`player_id.eq.${searchTerm},invoice_code.eq.${searchTerm}`);
 
-      // ၂။ Wallet ငွေဖြည့်မှတ်တမ်းများ ရှာခြင်း (ဖုန်းနံပါတ် သို့မဟုတ် Invoice Code ဖြင့် ရှာမည်)
+      // ၂။ Wallet ငွေဖြည့်မှတ်တမ်းများ ရှာခြင်း (Phone အစား Email သို့မဟုတ် Invoice Code ဖြင့် ရှာမည်)
       const { data: walletData } = await supabase
         .from('wallet_history')
         .select('*')
-        .or(`phone.eq.${searchTerm},invoice_code.eq.${searchTerm}`);
+        .or(`email.eq.${searchTerm},invoice_code.eq.${searchTerm}`); // <--- ဒီနေရာလေးကို email အဖြစ် ပြင်လိုက်ပါပြီ
 
       let combined: any[] = [];
 
@@ -116,7 +116,7 @@ export default function HistoryPage() {
             <form onSubmit={handleSearch} className="relative w-full md:w-1/2 flex gap-2">
               <input 
                 type="text" 
-                placeholder="Invoice Code, Game ID (သို့) ဖုန်းနံပါတ် ဖြင့်ရှာပါ..." 
+                placeholder="Invoice Code, Game ID (သို့) Email ဖြင့်ရှာပါ..." 
                 className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-2.5 text-white text-xs focus:outline-none focus:border-pink-500 transition-colors"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -170,7 +170,7 @@ export default function HistoryPage() {
               </div>
               <h3 className="text-white text-base font-bold mb-2">မှတ်တမ်း ရှာဖွေရန်</h3>
               <p className="text-gray-500 text-xs max-w-xs leading-relaxed">
-                သင်ဝယ်ယူထားသော မှတ်တမ်းများကို ကြည့်ရှုရန် အပေါ်က အကွက်တွင် သင်၏ Invoice Code, Game ID (သို့) ဖုန်းနံပါတ်ကို ရိုက်ထည့်ပြီး ရှာဖွေပါ။
+                သင်ဝယ်ယူထားသော မှတ်တမ်းများကို ကြည့်ရှုရန် အပေါ်က အကွက်တွင် သင်၏ Invoice Code, Game ID (သို့) Email ကို ရိုက်ထည့်ပြီး ရှာဖွေပါ။
               </p>
             </div>
           ) : displayData.length > 0 ? (
