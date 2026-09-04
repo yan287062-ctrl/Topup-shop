@@ -22,7 +22,7 @@ export default function TopupPage() {
   // Payment Modal & Order States
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [slipFile, setSlipFile] = useState<File | null>(null);
-  const [userEmail, setUserEmail] = useState(''); // ဖုန်းနံပါတ်အစား Email ကို အသုံးပြုပါမည်
+  const [userEmail, setUserEmail] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
@@ -230,7 +230,7 @@ export default function TopupPage() {
     try {
       let publicUrl = null;
 
-      // Wallet ရွေးချယ်ထားပါက ဖုန်းနံပါတ်အစား Email ကို အသုံးပြုပြီး ငွေဖြတ်မည်
+      // ====== Wallet ရွေးချယ်ထားပါက (Error ကို ရှင်းလင်းစွာ ဖြေရှင်းထားသော အပိုင်း) ======
       if (paymentMethod === 'wallet') {
         if (!userEmail) {
           alert("Wallet ဖြင့်ဝယ်ရန် အကောင့်ဝင် (Login) ထားရန် လိုအပ်ပါသည်။");
@@ -238,29 +238,52 @@ export default function TopupPage() {
           return;
         }
 
-        const { data: walletData, error: walletError } = await supabase
+        // Email ရှိ Space အပိုများကို ဖြတ်ထုတ်ခြင်း
+        const cleanEmail = userEmail.trim();
+
+        // ilike အသုံးပြု၍ အကြီးအသေး မှားယွင်းမှုများကို အလိုအလျောက် ဖြေရှင်းပေးခြင်း
+        const { data: walletList, error: walletError } = await supabase
           .from('users_wallet')
           .select('balance')
-          .eq('email', userEmail)
-          .single();
+          .ilike('email', cleanEmail);
         
-        if (walletError || !walletData) {
+        // Database နှင့် မချိတ်ဆက်မိပါက (Network Error) 
+        if (walletError) {
+          alert("Database Error (ခဏစောင့်ပြီး ပြန်ဝယ်ကြည့်ပါ): " + walletError.message);
+          setIsUploading(false);
+          return;
+        }
+
+        // Wallet အကောင့် မတွေ့ပါက
+        if (!walletList || walletList.length === 0) {
           alert("Wallet အကောင့် မတွေ့ပါ သို့မဟုတ် ငွေဖြည့်သွင်းထားခြင်း မရှိသေးပါ။");
           setIsUploading(false);
           return;
         }
 
-        if (walletData.balance < selectedPkg.price) {
+        const walletData = walletList[0];
+
+        // ငွေလုံလောက်မှု ရှိ/မရှိ စစ်ဆေးခြင်း
+        if (Number(walletData.balance) < Number(selectedPkg.price)) {
           alert("သင့် Wallet တွင် ငွေလုံလောက်မှု မရှိပါ။ ကျေးဇူးပြု၍ ငွေအရင်ဖြည့်ပါ။");
           setIsUploading(false);
           return;
         }
 
-        // Wallet ထဲမှ ပိုက်ဆံဖြတ်ခြင်း (email ကိုအသုံးပြု၍)
-        const newBalance = walletData.balance - selectedPkg.price;
-        await supabase.from('users_wallet').update({ balance: newBalance }).eq('email', userEmail);
+        // Wallet ထဲမှ ပိုက်ဆံဖြတ်ခြင်း
+        const newBalance = Number(walletData.balance) - Number(selectedPkg.price);
+        const { error: updateError } = await supabase
+          .from('users_wallet')
+          .update({ balance: newBalance })
+          .ilike('email', cleanEmail);
+
+        if (updateError) {
+          alert("ငွေဖြတ်ရာတွင် အမှားအယွင်းဖြစ်နေပါသည်: " + updateError.message);
+          setIsUploading(false);
+          return;
+        }
       } 
-      // တခြား ဘဏ်/Pay များရွေးချယ်ထားပါက Screenshot တင်မည်
+      // ====== တခြား ဘဏ်/Pay များရွေးချယ်ထားပါက Screenshot တင်မည် ======
       else {
         if (!slipFile) {
           alert("ကျေးဇူးပြု၍ ငွေလွှဲပြေစာ (Screenshot) အရင်တင်ပေးပါ။");
