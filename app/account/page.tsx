@@ -1,15 +1,32 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import BottomNav from '../../components/BottomNav';
+import { supabase } from '@/lib/supabase'; // သင့် supabase လမ်းကြောင်း မှန်ကန်မှုရှိမရှိ စစ်ဆေးပါ
 
 export default function AccountPage() {
-  const user = {
-    name: 'Mibb Game',
-    email: 'gamer2040@gmail.com',
-    avatar: '', 
-  };
+  // Supabase မှ User Data ယူရန် State များ
+  const [userName, setUserName] = useState('Loading...');
+  const [userEmail, setUserEmail] = useState('Loading...');
+  const [userAvatar, setUserAvatar] = useState('');
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserEmail(user.email || 'No Email');
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+        setUserName(name);
+        setUserAvatar(user.user_metadata?.avatar_url || '');
+      } else {
+        setUserName('Guest');
+        setUserEmail('Not logged in');
+      }
+    };
+    fetchUser();
+  }, []);
 
   const menuItems = [
     { name: 'ပထမ', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', link: '/' },
@@ -34,15 +51,15 @@ export default function AccountPage() {
             
             <div className="p-5 flex items-center gap-3 border-b border-white/5">
               <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white font-bold text-lg shadow-lg">
-                {user.avatar ? (
-                  <img src={user.avatar} alt="Profile" className="w-full h-full object-cover" />
+                {userAvatar ? (
+                  <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <span>MG</span>
+                  <span className="uppercase">{userName.substring(0, 2)}</span>
                 )}
               </div>
               <div className="overflow-hidden">
-                <h2 className="text-white font-bold text-sm truncate">{user.name}</h2>
-                <p className="text-gray-500 text-[10px] truncate">{user.email}</p>
+                <h2 className="text-white font-bold text-sm truncate capitalize">{userName}</h2>
+                <p className="text-gray-500 text-[10px] truncate">{userEmail}</p>
               </div>
             </div>
 
