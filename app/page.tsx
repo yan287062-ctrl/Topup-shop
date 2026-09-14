@@ -52,7 +52,114 @@ export default function Home() {
             </Link>
           ))}
         </div>
-      </div>
-    </main>
-  );
-}
+
+        {/* ==================== 1. How it Works (3 Steps) ==================== */}
+        <div className="max-w-5xl mx-auto px-4 mt-20">
+          <h2 className="text-3xl font-bold text-white mb-2">Simple, <span className="text-pink-500 italic">no drama.</span></h2>
+          <p className="text-gray-400 text-sm mb-8">No account registration, no app download. Top up directly from the browser, all done in under a minute.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-[#131422] p-8 rounded-3xl border border-white/5 shadow-lg relative overflow-hidden transition hover:border-pink-500/30">
+               <div className="text-6xl font-bold text-pink-500/10 absolute top-4 right-4 italic">01</div>
+               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Pick game & amount</h3>
+               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Browse our products. Choose Diamonds, UC, or Crystals to fit your needs.</p>
+            </div>
+            
+            <div className="bg-[#131422] p-8 rounded-3xl border border-white/5 shadow-lg relative overflow-hidden transition hover:border-pink-500/30">
+               <div className="text-6xl font-bold text-pink-500/10 absolute top-4 right-4 italic">02</div>
+               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Enter account ID</h3>
+               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Enter your User ID & Server ID for games, or phone number for credit. That's all we need.</p>
+            </div>
+
+            <div className="bg-[#131422] p-8 rounded-3xl border border-white/5 shadow-lg relative overflow-hidden transition hover:border-pink-500/30">
+               <div className="text-6xl font-bold text-pink-500/10 absolute top-4 right-4 italic">03</div>
+               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Pay & done</h3>
+               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Pick from payment methods. Once payment is confirmed, items go straight into your game account.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ==================== 2. Statistics (Numbers) ==================== */}
+        <div className="max-w-5xl mx-auto px-4 mt-20 flex flex-col md:flex-row gap-10 items-center">
+          <div className="w-full md:w-2/5">
+            <h2 className="text-4xl font-bold text-white mb-4 leading-tight">The numbers <br/><span className="text-pink-500 italic">speak honestly.</span></h2>
+            <p className="text-gray-400 text-sm leading-relaxed">From climbing to Mythic to grinding Genshin events — thousands of gamers trust us for fast, safe top-ups at consistently low prices.</p>
+            <button className="mt-6 bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(236,72,153,0.4)] transition">Top up now</button>
+          </div>
+          
+          <div className="w-full md:w-3/5 grid grid-cols-2 gap-px bg-white/5 border border-white/5 rounded-3xl overflow-hidden">
+             <div className="bg-[#131422] p-8">
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Users</p>
+                <h4 className="text-4xl font-bold text-white">1,234<span className="text-pink-500 text-xl align-top">+</span></h4>
+                <p className="text-gray-600 text-[10px] mt-2">23% growth this month</p>
+             </div>
+             <div className="bg-[#131422] p-8">
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Products</p>
+                <h4 className="text-4xl font-bold text-white">2,053<span className="text-pink-500 text-xl align-top">+</span></h4>
+                <p className="text-gray-600 text-[10px] mt-2">all popular games</p>
+             </div>
+             <div className="bg-[#131422] p-8">
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Successful Sales</p>
+                <h4 className="text-4xl font-bold text-white">1,476<span className="text-pink-500 text-xl align-top">+</span></h4>
+                <p className="text-gray-600 text-[10px] mt-2">all time completed orders</p>
+             </div>
+             <div className="bg-[#131422] p-8">
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Delivered</p>
+                <h4 className="text-4xl font-bold text-white">1,047<span className="text-pink-500 text-xl align-top">s</span></h4>
+                <p className="text-gray-600 text-[10px] mt-2">from payment to account</p>
+             </div>
+          </div>
+        </div>
+
+        {/* ==================== 3. FAQ Section ==================== */}
+        <div className="max-w-3xl mx-auto px-4 mt-24">
+          <h2 className="text-3xl font-bold text-white text-center mb-10">Things users <span className="text-pink-500 italic">ask often.</span></h2>
+          <div className="space-y-4">
+             {/* FAQ 1 */}
+             <details className="bg-[#131422] rounded-2xl border border-white/5 group overflow-hidden cursor-pointer">
+                <summary className="p-6 text-sm font-medium text-white flex justify-between items-center list-none outline-none">
+                   ငွေမဖြည့်ဘဲ တိုက်ရိုက်ဝယ်လို့ရနိုင်လား?
+                   <span className="text-pink-500 text-2xl group-open:rotate-45 transition-transform duration-300">+</span>
+                </summary>
+                <div className="px-6 pb-6 text-gray-400 text-xs leading-relaxed">
+                   ရပါတယ်။ KPay, Wave Money တို့ဖြင့် ငွေလွှဲပြေစာ (Screenshot) တင်ပြီး တိုက်ရိုက် ဝယ်ယူနိုင်ပါတယ်။ အက်မင်မှ စစ်ဆေးပြီး မိနစ်ပိုင်းအတွင်း စိန်ရောက်ရှိပါမည်။
+                </div>
+             </details>
+             
+             {/* FAQ 2 */}
+             <details className="bg-[#131422] rounded-2xl border border-white/5 group overflow-hidden cursor-pointer">
+                <summary className="p-6 text-sm font-medium text-white flex justify-between items-center list-none outline-none">
+                   Wallet ငွေဖြည့်ချင်ရင် ဘယ်အချိန်ကနေ ဘယ်အချိန်အတွင်း ဖြည့်လို့ရလဲ
+                   <span className="text-pink-500 text-2xl group-open:rotate-45 transition-transform duration-300">+</span>
+                </summary>
+                <div className="px-6 pb-6 text-gray-400 text-xs leading-relaxed">
+                   Website မှတဆင့် 24 နာရီ အချိန်မရွေး ငွေဖြည့်သွင်းနိုင်ပါတယ်။ Wallet ထဲတွင် ငွေရှိပါက Auto Bot မှ စိန်ကို ချက်ချင်း (Auto) လွှဲပေးသွားမည် ဖြစ်ပါသည်။
+                </div>
+             </details>
+
+             {/* FAQ 3 */}
+             <details className="bg-[#131422] rounded-2xl border border-white/5 group overflow-hidden cursor-pointer">
+                <summary className="p-6 text-sm font-medium text-white flex justify-between items-center list-none outline-none">
+                   Owner ကိုဘယ်လိုဆက်သွယ်ရမလဲ
+                   <span className="text-pink-500 text-2xl group-open:rotate-45 transition-transform duration-300">+</span>
+                </summary>
+                <div className="px-6 pb-6 text-gray-400 text-xs leading-relaxed">
+                   အခက်အခဲ တစ်စုံတစ်ရာ ရှိပါက Telegram Bot သို့မဟုတ် Page Messenger မှတဆင့် အချိန်မရွေး ဆက်သွယ် မေးမြန်းနိုင်ပါသည်။
+                </div>
+             </details>
+          </div>
+        </div>
+
+        {/* ==================== 4. Footer ==================== */}
+        <footer className="max-w-5xl mx-auto px-4 mt-24 pt-12 border-t border-white/5 pb-28 md:pb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            <div className="col-span-1 md:col-span-1">
+               <h3 className="text-xl font-bold text-white mb-4">PAING GYI <span className="text-pink-500">SHOP</span></h3>
+               <p className="text-gray-400 text-xs leading-relaxed mb-4">Fast, reliable, and automated gaming top-ups for your favorite titles. Buy premium subscriptions, secure digital products, and get instant delivery 24/7.</p>
+            </div>
+            
+            <div>
+               <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Navigation</h4>
+               <ul className="space-y-3 text-gray-400 text-sm">
+                 <li><Link href="/" className="hover:text-pink-500 transition">Home</Link></li>
+                 <li><Link
