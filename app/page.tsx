@@ -36,7 +36,6 @@ export default function Home() {
               href={`/topup/${game.id}`}
               className="bg-white/10 backdrop-blur-md border border-white/20 shadow-lg rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:bg-white/20 hover:border-[#00f2fe]/50 flex flex-col group"
             >
-              {/* ပုံကို လေးထောင့်အပြည့်ပေါ်စေရန် Padding များကို ဖြုတ်လိုက်ပါပြီ */}
               <div className="w-full h-16 sm:h-20 relative bg-black/40">
                 <img 
                   src={game.img} 
@@ -115,7 +114,6 @@ export default function Home() {
         <div className="max-w-3xl mx-auto px-4 mt-24">
           <h2 className="text-3xl font-bold text-white text-center mb-10">Things users <span className="text-pink-500 italic">ask often.</span></h2>
           <div className="space-y-4">
-             {/* FAQ 1 */}
              <details className="bg-[#131422] rounded-2xl border border-white/5 group overflow-hidden cursor-pointer">
                 <summary className="p-6 text-sm font-medium text-white flex justify-between items-center list-none outline-none">
                    ငွေမဖြည့်ဘဲ တိုက်ရိုက်ဝယ်လို့ရနိုင်လား?
@@ -126,7 +124,6 @@ export default function Home() {
                 </div>
              </details>
              
-             {/* FAQ 2 */}
              <details className="bg-[#131422] rounded-2xl border border-white/5 group overflow-hidden cursor-pointer">
                 <summary className="p-6 text-sm font-medium text-white flex justify-between items-center list-none outline-none">
                    Wallet ငွေဖြည့်ချင်ရင် ဘယ်အချိန်ကနေ ဘယ်အချိန်အတွင်း ဖြည့်လို့ရလဲ
@@ -137,7 +134,6 @@ export default function Home() {
                 </div>
              </details>
 
-             {/* FAQ 3 */}
              <details className="bg-[#131422] rounded-2xl border border-white/5 group overflow-hidden cursor-pointer">
                 <summary className="p-6 text-sm font-medium text-white flex justify-between items-center list-none outline-none">
                    Owner ကိုဘယ်လိုဆက်သွယ်ရမလဲ
@@ -162,4 +158,40 @@ export default function Home() {
                <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Navigation</h4>
                <ul className="space-y-3 text-gray-400 text-sm">
                  <li><Link href="/" className="hover:text-pink-500 transition">Home</Link></li>
-                 <li><Link
+                 <li><Link href="#" className="hover:text-pink-500 transition">All Games</Link></li>
+                 <li><Link href="/history" className="hover:text-pink-500 transition">Track Order</Link></li>
+               </ul>
+            </div>
+            
+            <div>
+               <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Help</h4>
+               <ul className="space-y-3 text-gray-400 text-sm">
+                 <li><Link href="#" className="hover:text-pink-500 transition">Help Center</Link></li>
+                 <li><Link href="#" className="hover:text-pink-500 transition">Contact Us</Link></li>
+                 <li><Link href="#" className="hover:text-pink-500 transition">Terms & Conditions</Link></li>
+               </ul>
+            </div>
+            
+            <div>
+               <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Payment</h4>
+               <div className="flex flex-wrap gap-2">
+                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">KPay</span>
+                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">Wave Money</span>
+                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">AYA Pay</span>
+               </div>
+               <p className="text-gray-500 text-[10px] mt-4 flex items-center gap-1">
+                 <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                 Encrypted secure transactions
+               </p>
+            </div>
+          </div>
+          
+          <div className="text-center text-gray-600 text-[10px]">
+             © 2026 Paing Gyi Game Store. All rights reserved.
+          </div>
+        </footer>
+
+      </div>
+    </main>
+  );
+}
