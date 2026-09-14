@@ -2,6 +2,12 @@ import Navbar from '../components/Navbar';
 import Link from 'next/link';
 
 export default function Home() {
+  // နောက်ပိုင်း Supabase နဲ့ ချိတ်ရင် ဒီနေရာမှာ Data လှမ်းယူရုံပဲ
+  const totalUsers = "500+"; 
+  const totalProducts = "15+";
+  const successOrders = "1,200+";
+  const avgDeliveryTime = "5s";
+
   const games = [
     { id: 'mobile-legends', name: 'Mobile Legend', sub: 'Myanmar (Global)', img: '/mlbb.png' },
     { id: 'magic-chess', name: 'Magic Chess', sub: 'Myanmar (Global)', img: '/MCGG.png' },
@@ -54,26 +60,26 @@ export default function Home() {
 
         {/* ==================== 1. How it Works (3 Steps) ==================== */}
         <div className="max-w-5xl mx-auto px-4 mt-20">
-          <h2 className="text-3xl font-bold text-white mb-2">Simple, <span className="text-pink-500 italic">no drama.</span></h2>
-          <p className="text-gray-400 text-sm mb-8">No account registration, no app download. Top up directly from the browser, all done in under a minute.</p>
+          <h2 className="text-3xl font-bold text-white mb-2">Fully Automated. <span className="text-pink-500 italic">Instant Delivery.</span></h2>
+          <p className="text-gray-400 text-sm mb-8">Powered by our advanced auto-bot system. No waiting time, top up directly and get your diamonds in seconds.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-[#131422] p-8 rounded-3xl border border-white/5 shadow-lg relative overflow-hidden transition hover:border-pink-500/30">
                <div className="text-6xl font-bold text-pink-500/10 absolute top-4 right-4 italic">01</div>
-               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Pick game & amount</h3>
-               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Browse our products. Choose Diamonds, UC, or Crystals to fit your needs.</p>
+               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Select Your Game</h3>
+               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Choose Mobile Legends, PUBG, or any other supported game. Select the diamond package you need.</p>
             </div>
             
             <div className="bg-[#131422] p-8 rounded-3xl border border-white/5 shadow-lg relative overflow-hidden transition hover:border-pink-500/30">
                <div className="text-6xl font-bold text-pink-500/10 absolute top-4 right-4 italic">02</div>
-               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Enter account ID</h3>
-               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Enter your User ID & Server ID for games, or phone number for credit. That's all we need.</p>
+               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Enter Game ID</h3>
+               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Carefully input your User ID & Zone ID. Our system will automatically verify your account before processing.</p>
             </div>
 
             <div className="bg-[#131422] p-8 rounded-3xl border border-white/5 shadow-lg relative overflow-hidden transition hover:border-pink-500/30">
                <div className="text-6xl font-bold text-pink-500/10 absolute top-4 right-4 italic">03</div>
-               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Pay & done</h3>
-               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Pick from payment methods. Once payment is confirmed, items go straight into your game account.</p>
+               <h3 className="text-lg font-bold text-white mb-3 relative z-10">Auto Processing</h3>
+               <p className="text-gray-400 text-xs relative z-10 leading-relaxed">Once you confirm the payment from your wallet, our bot completes the order in less than 5 seconds.</p>
             </div>
           </div>
         </div>
@@ -81,36 +87,40 @@ export default function Home() {
         {/* ==================== 2. Statistics (Numbers) ==================== */}
         <div className="max-w-5xl mx-auto px-4 mt-20 flex flex-col md:flex-row gap-10 items-center">
           <div className="w-full md:w-2/5">
-            <h2 className="text-4xl font-bold text-white mb-4 leading-tight">The numbers <br/><span className="text-pink-500 italic">speak honestly.</span></h2>
-            <p className="text-gray-400 text-sm leading-relaxed">From climbing to Mythic to grinding Genshin events — thousands of gamers trust us for fast, safe top-ups at consistently low prices.</p>
-            <button className="mt-6 bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(236,72,153,0.4)] transition">Top up now</button>
+            <h2 className="text-4xl font-bold text-white mb-4 leading-tight">Trust the <br/><span className="text-pink-500 italic">System.</span></h2>
+            <p className="text-gray-400 text-sm leading-relaxed">We provide a secure, fast, and automated gaming top-up experience. Thousands of gamers trust Paing Gyi Shop for their daily needs.</p>
+            <Link href="#games">
+              <button className="mt-6 bg-pink-500 hover:bg-pink-600 text-white text-sm font-bold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(236,72,153,0.4)] transition">
+                Top up now
+              </button>
+            </Link>
           </div>
           
           <div className="w-full md:w-3/5 grid grid-cols-2 gap-px bg-white/5 border border-white/5 rounded-3xl overflow-hidden">
              <div className="bg-[#131422] p-8">
-                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Users</p>
-                <h4 className="text-4xl font-bold text-white">1,234<span className="text-pink-500 text-xl align-top">+</span></h4>
-                <p className="text-gray-600 text-[10px] mt-2">23% growth this month</p>
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Active Users</p>
+                <h4 className="text-4xl font-bold text-white">{totalUsers}</h4>
+                <p className="text-gray-600 text-[10px] mt-2">registered on our platform</p>
              </div>
              <div className="bg-[#131422] p-8">
-                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Products</p>
-                <h4 className="text-4xl font-bold text-white">2,053<span className="text-pink-500 text-xl align-top">+</span></h4>
-                <p className="text-gray-600 text-[10px] mt-2">all popular games</p>
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Supported Products</p>
+                <h4 className="text-4xl font-bold text-white">{totalProducts}</h4>
+                <p className="text-gray-600 text-[10px] mt-2">games & services available</p>
              </div>
              <div className="bg-[#131422] p-8">
-                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Successful Sales</p>
-                <h4 className="text-4xl font-bold text-white">1,476<span className="text-pink-500 text-xl align-top">+</span></h4>
-                <p className="text-gray-600 text-[10px] mt-2">all time completed orders</p>
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Successful Orders</p>
+                <h4 className="text-4xl font-bold text-white">{successOrders}</h4>
+                <p className="text-gray-600 text-[10px] mt-2">processed automatically</p>
              </div>
              <div className="bg-[#131422] p-8">
-                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Delivered</p>
-                <h4 className="text-4xl font-bold text-white">1,047<span className="text-pink-500 text-xl align-top">s</span></h4>
-                <p className="text-gray-600 text-[10px] mt-2">from payment to account</p>
+                <p className="text-gray-500 text-[10px] font-bold uppercase tracking-wider mb-2">Avg. Delivery Time</p>
+                <h4 className="text-4xl font-bold text-white">{avgDeliveryTime}</h4>
+                <p className="text-gray-600 text-[10px] mt-2">via auto-bot system</p>
              </div>
           </div>
         </div>
 
-        {/* ==================== 3. FAQ Section ==================== */}
+        {/* ==================== 3. FAQ Section (မြန်မာလို) ==================== */}
         <div className="max-w-3xl mx-auto px-4 mt-24">
           <h2 className="text-3xl font-bold text-white text-center mb-10">Things users <span className="text-pink-500 italic">ask often.</span></h2>
           <div className="space-y-4">
@@ -151,14 +161,14 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             <div className="col-span-1 md:col-span-1">
                <h3 className="text-xl font-bold text-white mb-4">PAING GYI <span className="text-pink-500">SHOP</span></h3>
-               <p className="text-gray-400 text-xs leading-relaxed mb-4">Fast, reliable, and automated gaming top-ups for your favorite titles. Buy premium subscriptions, secure digital products, and get instant delivery 24/7.</p>
+               <p className="text-gray-400 text-xs leading-relaxed mb-4">Fast, reliable, and automated gaming top-ups. Buy premium subscriptions and get instant delivery 24/7 with our Auto-bot.</p>
             </div>
             
             <div>
                <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Navigation</h4>
                <ul className="space-y-3 text-gray-400 text-sm">
                  <li><Link href="/" className="hover:text-pink-500 transition">Home</Link></li>
-                 <li><Link href="#" className="hover:text-pink-500 transition">All Games</Link></li>
+                 <li><Link href="/account" className="hover:text-pink-500 transition">My Account</Link></li>
                  <li><Link href="/history" className="hover:text-pink-500 transition">Track Order</Link></li>
                </ul>
             </div>
@@ -166,18 +176,18 @@ export default function Home() {
             <div>
                <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Help</h4>
                <ul className="space-y-3 text-gray-400 text-sm">
-                 <li><Link href="#" className="hover:text-pink-500 transition">Help Center</Link></li>
-                 <li><Link href="#" className="hover:text-pink-500 transition">Contact Us</Link></li>
+                 <li><Link href="#" className="hover:text-pink-500 transition">Telegram Support</Link></li>
+                 <li><Link href="#" className="hover:text-pink-500 transition">Facebook Page</Link></li>
                  <li><Link href="#" className="hover:text-pink-500 transition">Terms & Conditions</Link></li>
                </ul>
             </div>
             
             <div>
-               <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Payment</h4>
+               <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Payment Methods</h4>
                <div className="flex flex-wrap gap-2">
-                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">KPay</span>
-                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">Wave Money</span>
-                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">AYA Pay</span>
+                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">KBZ Pay</span>
+                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">Wave Pay</span>
+                  <span className="bg-[#131422] border border-white/10 text-xs text-gray-300 px-3 py-1.5 rounded-md">Website Wallet</span>
                </div>
                <p className="text-gray-500 text-[10px] mt-4 flex items-center gap-1">
                  <svg className="w-3 h-3 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
