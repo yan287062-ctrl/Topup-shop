@@ -14,7 +14,6 @@ export default function Navbar() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
-        // TypeScript Error မတက်စေရန် Email ရှိမှသာ လှမ်းခေါ်မည်
         if (session.user.email) {
           fetchBalance(session.user.email); 
         }
@@ -25,7 +24,6 @@ export default function Navbar() {
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setUser(session.user);
-        // TypeScript Error မတက်စေရန် Email ရှိမှသာ လှမ်းခေါ်မည်
         if (session.user.email) {
           fetchBalance(session.user.email);
         }
@@ -38,9 +36,8 @@ export default function Navbar() {
     return () => { authListener.subscription.unsubscribe(); };
   }, []);
 
-  // Email ဖြင့် Balance ရှာမည့် Function
   const fetchBalance = async (userEmail: string) => {
-    if (!userEmail) return; // Email မရှိပါက ဆက်မလုပ်ရန် တားထားသည်
+    if (!userEmail) return; 
     try {
       const { data, error } = await supabase
         .from('users_wallet')
@@ -60,7 +57,6 @@ export default function Navbar() {
     window.location.reload(); 
   };
 
-  // TypeScript Error မတက်စေရန် parameters များကို optional (?) ပြောင်းထားသည်
   const getUserInitials = (name?: string, email?: string) => {
     if (name) return name.substring(0, 2).toUpperCase();
     if (email) return email.substring(0, 2).toUpperCase();
@@ -69,7 +65,8 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="w-full flex items-center justify-between px-4 py-4 md:px-8 bg-[#070814]/80 backdrop-blur-md sticky top-0 z-50">
+      {/* 🌟 ပြင်ဆင်ထားသော နေရာ: fixed အစား sticky ပြောင်းပြီး အောက်ကို mb-8 ဖြင့် တွန်းထားပါသည် */}
+      <nav className="sticky top-4 mx-auto w-[92%] max-w-6xl flex items-center justify-between px-4 py-3 md:px-8 bg-[#070814]/80 backdrop-blur-md z-50 rounded-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] mb-8">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
             <img src="/logo.png" alt="Paing Gyi Shop" className="w-full h-full object-cover" 
