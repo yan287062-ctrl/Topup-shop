@@ -6,8 +6,9 @@ import Navbar from '../../components/Navbar';
 import { supabase } from '../../lib/supabase';
 
 export default function WalletPage() {
-  const [userEmail, setUserEmail] = useState<string>(''); // ဖုန်းနံပါတ်အစား Email ကိုသုံးမည်
-  const [amount, setAmount] = useState<number>(50000);
+  const [userEmail, setUserEmail] = useState<string>(''); 
+  // ပြင်ဆင်ချက် ၁: number အပြင် string ပါ လက်ခံအောင် ပြောင်းပြီး၊ မူလတန်ဖိုးကို 50000 ထားသည်
+  const [amount, setAmount] = useState<number | string>(50000); 
   const [selectedMethod, setSelectedMethod] = useState('Wave Pay');
   const [step, setStep] = useState<'form' | 'detail'>('form');
   const [slipFile, setSlipFile] = useState<File | null>(null);
@@ -20,7 +21,6 @@ export default function WalletPage() {
 
   useEffect(() => {
     generateInvoiceCode();
-    // လက်ရှိ Login ဝင်ထားသော User ၏ Email ကို အလိုအလျောက် ယူမည်
     const fetchUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
@@ -73,6 +73,13 @@ export default function WalletPage() {
       return;
     }
     
+    // ပြင်ဆင်ချက် ၃: amount ကို Database ထဲ ထည့်ခါနီးမှာ number အဖြစ် သေချာပြောင်းသည်
+    const numericAmount = Number(amount) || 0;
+    if (numericAmount < 3000) {
+      alert("အနည်းဆုံး ၃,၀၀၀ ကျပ် ဖြည့်သွင်းရပါမည်။");
+      return;
+    }
+
     setIsUploading(true);
     
     try {
@@ -84,10 +91,9 @@ export default function WalletPage() {
 
       const { data: { publicUrl } } = supabase.storage.from('receipts').getPublicUrl(fileName);
 
-      // Database ထဲသို့ phone အစား email ကို သိမ်းဆည်းမည်
       const { error: insertError } = await supabase.from('wallet_history').insert([{
-        email: userEmail, // <--- ဖုန်းနံပါတ်အစား Email ကို ထည့်သွင်းလိုက်ပါပြီ
-        amount: amount,
+        email: userEmail,
+        amount: numericAmount, 
         type: selectedMethod,
         status: 'pending',
         slip_url: publicUrl,
@@ -119,17 +125,14 @@ export default function WalletPage() {
                 <h1 className="text-xl font-bold text-white mb-1">Top Up Balance</h1>
                 <p className="text-gray-400 text-xs mb-6">Top up your account balance using available payment methods.</p>
 
-                {/* Email & Invoice Code Section (Phone ကို ဖယ်ရှားလိုက်ပါပြီ) */}
                 <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
                   <label className="text-xs font-bold text-gray-300 block mb-2">Your Account Email</label>
                   <p className="text-[10px] text-gray-400 mb-3">ဤအကောင့်ထဲသို့ ငွေဖြည့်သွင်းမည်ဖြစ်ပါသည်။</p>
                   
-                  {/* အလိုအလျောက် ယူထားသော Email ကို ပြသမည့် အကွက် */}
                   <div className="w-full bg-[#131422] border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-bold mb-4 opacity-80 cursor-not-allowed">
                     {userEmail || 'Loading email...'}
                   </div>
 
-                  {/* Invoice Code ပြသမည့် အကွက် */}
                   <label className="text-xs font-bold text-gray-300 block mb-2">Invoice Code (ဘောက်ချာကုဒ်)</label>
                   <p className="text-[10px] text-pink-500 mb-2">ငွေဖြည့်မှတ်တမ်း ပြန်လည်ရှာဖွေရာတွင် အသုံးပြုရန်။</p>
                   <div className="flex items-center gap-2">
@@ -158,7 +161,11 @@ export default function WalletPage() {
                       type="number" 
                       min="3000"
                       value={amount}
-                      onChange={(e) => setAmount(Number(e.target.value))}
+                      onChange={(e) => {
+                        // ပြင်ဆင်ချက် ၂: အလွတ်ဖြစ်ရင် အလွတ်ထားမယ်၊ မဟုတ်ရင် နံပါတ်ပြောင်းမယ်
+                        const val = e.target.value;
+                        setAmount(val === '' ? '' : Number(val));
+                      }}
                       className="w-full bg-[#0a0b14] border border-white/10 rounded-2xl pl-10 pr-4 py-3 text-white text-lg font-bold focus:outline-none focus:border-pink-500"
                     />
                   </div>
@@ -221,7 +228,6 @@ export default function WalletPage() {
                 <div className="space-y-3 mb-6 text-xs">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Account Email</span>
-                    {/* ဖုန်းနံပါတ်အစား Email ကို ပြသမည့်နေရာ */}
                     <span className="text-white font-bold">{userEmail || 'Not logged in'}</span>
                   </div>
                   <div className="flex justify-between">
@@ -230,7 +236,7 @@ export default function WalletPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Balance to add</span>
-                    <span className="text-white font-bold">K {amount.toLocaleString()}</span>
+                    <span className="text-white font-bold">K {Number(amount).toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-400">Method</span>
@@ -240,14 +246,15 @@ export default function WalletPage() {
 
                 <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-6">
                   <span className="text-white font-bold text-sm">Total to pay</span>
-                  <span className="text-pink-500 font-extrabold text-lg">K {amount.toLocaleString()}</span>
+                  <span className="text-pink-500 font-extrabold text-lg">K {Number(amount).toLocaleString()}</span>
                 </div>
 
                 <button 
                   onClick={() => setStep('detail')}
-                  disabled={amount < 3000 || !userEmail}
+                  // amount ကို Number အဖြစ်ပြောင်းပြီး စစ်ဆေးသည်
+                  disabled={Number(amount) < 3000 || !userEmail}
                   className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg ${
-                    (amount >= 3000 && userEmail)
+                    (Number(amount) >= 3000 && userEmail)
                     ? 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]' 
                     : 'bg-gray-800 text-gray-500 cursor-not-allowed'
                   }`}
@@ -255,7 +262,6 @@ export default function WalletPage() {
                   {!userEmail ? 'Please Login First' : 'Confirm Top Up'}
                 </button>
               </div>
-
             </div>
 
           </div>
@@ -302,7 +308,7 @@ export default function WalletPage() {
                   </div>
                   <div className="flex justify-between border-t border-white/10 pt-3 mt-3">
                     <span className="text-white font-bold">Total to pay</span>
-                    <span className="text-pink-500 font-extrabold text-base">K {amount.toLocaleString()}</span>
+                    <span className="text-pink-500 font-extrabold text-base">K {Number(amount).toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -343,6 +349,8 @@ export default function WalletPage() {
                     setIsUploaded(false); 
                     setSlipFile(null); 
                     generateInvoiceCode(); 
+                    // အသစ်ပြန်စရင် amount ကို ပြန်ရှင်းပေးမယ်
+                    setAmount(""); 
                   }}
                   className="flex-1 bg-[#1a1b2e] hover:bg-[#25273c] text-white py-3 rounded-xl text-xs font-bold border border-white/10 text-center"
                 >
