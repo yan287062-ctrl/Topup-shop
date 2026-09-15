@@ -51,14 +51,15 @@ export default function BottomNav() {
         <span className={`text-[9px] font-bold transition-colors duration-300 ${pathname === '/history' ? 'text-pink-400' : 'text-[#8a92a6] group-hover:text-gray-300'}`}>History</span>
       </Link>
 
-      {/* 3. Wallet (ဒုတိယပုံထဲက ကတ်ထွက်နေတဲ့ ပုံစံအသစ်) */}
+      {/* 3. Wallet (မင်းပြတဲ့ပုံစံ အတိအကျ) */}
       <Link href="/wallet" className="relative flex flex-col items-center justify-center w-[60px] group transition-transform duration-300 hover:scale-105">
         <svg 
-          className={`w-[22px] h-[22px] mb-1 transition-all duration-300 ${pathname === '/wallet' ? 'drop-shadow-[0_0_8px_rgba(236,72,153,0.6)]' : 'text-[#8a92a6] group-hover:text-gray-300'}`} 
+          className={`w-[24px] h-[24px] mb-1 transition-all duration-300 ${pathname === '/wallet' ? 'drop-shadow-[0_0_8px_rgba(236,72,153,0.6)]' : 'text-[#8a92a6] group-hover:text-gray-300'}`} 
           fill={pathname === '/wallet' ? "url(#active-gradient)" : "currentColor"} 
           viewBox="0 0 24 24"
         >
-          <path d="M19 7h-1V5.5A1.5 1.5 0 0 0 16.5 4h-9A1.5 1.5 0 0 0 6 5.5V7H5c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-2-1.5V7H7V5.5C7 5.22 7.22 5 7.5 5h9c.28 0 .5.22.5.5zM17 15h-3v-2h3v2z" />
+          {/* အတိအကျတူမယ့် Wallet Icon Path */}
+          <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 4.99L4 6h16zm0 12H4V8l8 5 8-5v10z"/>
         </svg>
         <span className={`text-[9px] font-bold transition-colors duration-300 ${pathname === '/wallet' ? 'text-pink-400' : 'text-[#8a92a6] group-hover:text-gray-300'}`}>Wallet</span>
       </Link>
