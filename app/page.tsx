@@ -19,31 +19,29 @@ export default function Home() {
 
   return (
     <main
-      // Background ကို #03045E သုံးထားပေမယ့် အရမ်းမရင့်အောင် အောက်က အလွှာနဲ့ နုပေးထားတယ်
       className="min-h-screen pb-28 relative bg-[#03045E] font-sans"
     >
-      {/* အမည်းရောင် (Black) ဖိထားတာကို ဖြုတ်လိုက်ပြီး Royal Blue (#023E8A) ကို အလင်းဖျော့ဖျော့လေးနဲ့ အပေါ်ကနေ ဖြာဆင်းလာအောင် လုပ်ပေးလိုက်တယ် (မျက်စိပိုအေးသွားမယ်) */}
+      {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#023E8A]/40 to-transparent backdrop-blur-[2px] z-0"></div>
       
-      {/* 3. Highlights Glow Effect (#00B4D8) */}
+      {/* Glow Effect */}
       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-[#00B4D8]/15 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
       <div className="relative z-10">
         <Navbar />
 
         <div className="max-w-4xl mx-auto px-4 mb-3 mt-4">
-          {/* 4. Text Color (#CAF0F8) */}
           <h2 className="text-[#CAF0F8] text-xs sm:text-sm font-semibold tracking-wide">
             ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ:
           </h2>
         </div>
 
+        {/* ==================== Games List ==================== */}
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-4 gap-2 sm:gap-3">
           {games.map((game) => (
             <Link
               key={game.id}
               href={`/topup/${game.id}`}
-              // Main Brand Color (#023E8A) ကို Card Background အဖြစ်သုံးမယ် 
               className="bg-[#023E8A]/80 backdrop-blur-md border border-[#00B4D8]/30 shadow-[0_4px_15px_rgba(2,62,138,0.5)] rounded-xl overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:bg-[#023E8A] hover:border-[#00B4D8]/60 flex flex-col group"
             >
               <div className="w-full h-16 sm:h-20 relative bg-[#03045E]">
@@ -56,7 +54,6 @@ export default function Home() {
               
               <div className="p-1.5 sm:p-2 flex flex-col justify-between flex-1 bg-[#023E8A] border-t border-[#00B4D8]/20">
                 <h3 className="text-white font-bold text-[9px] sm:text-[11px] truncate">{game.name}</h3>
-                {/* 3. Highlights (#00B4D8) */}
                 <p className="text-[#00B4D8] font-medium text-[7px] sm:text-[9px] truncate mt-0.5">{game.sub}</p>
               </div>
             </Link>
@@ -69,7 +66,6 @@ export default function Home() {
           <p className="text-[#CAF0F8]/80 text-sm mb-8">Powered by our advanced auto-bot system. No waiting time, top up directly and get your diamonds in seconds.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Card တွေအတွက် Main Brand (#023E8A) */}
             <div className="bg-[#023E8A] p-8 rounded-3xl border border-[#00B4D8]/20 shadow-xl relative overflow-hidden transition hover:border-[#00B4D8]/50">
                <div className="text-6xl font-bold text-[#00B4D8]/10 absolute top-4 right-4 italic">01</div>
                <h3 className="text-lg font-bold text-white mb-3 relative z-10">Select Your Game</h3>
@@ -96,7 +92,6 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-white mb-4 leading-tight">Trust the <br/><span className="text-[#00B4D8] italic">System.</span></h2>
             <p className="text-[#CAF0F8]/80 text-sm leading-relaxed">We provide a secure, fast, and automated gaming top-up experience. Thousands of gamers trust Paing Gyi Shop for their daily needs.</p>
             <Link href="#games">
-              {/* 5. Button/CTA (#FBB02D - Gold/Yellow) */}
               <button className="mt-6 bg-[#FBB02D] hover:bg-[#f59e0b] text-[#03045E] text-sm font-extrabold py-3 px-8 rounded-full shadow-[0_0_15px_rgba(251,176,45,0.4)] transition">
                 Top up now
               </button>
@@ -159,8 +154,46 @@ export default function Home() {
           </div>
         </div>
 
-        {/* ==================== 4. Footer ==================== */}
+        {/* ==================== 4. Footer (Full details restored) ==================== */}
         <footer className="max-w-5xl mx-auto px-4 mt-24 pt-12 border-t border-[#00B4D8]/20 pb-28 md:pb-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+            <div className="col-span-1 md:col-span-1">
+               <h3 className="text-xl font-bold text-white mb-4">PAING GYI <span className="text-[#00B4D8]">SHOP</span></h3>
+               <p className="text-[#CAF0F8]/60 text-xs leading-relaxed mb-4">Fast, reliable, and automated gaming top-ups. Buy premium subscriptions and get instant delivery 24/7 with our Auto-bot.</p>
+            </div>
+            
+            <div>
+               <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Navigation</h4>
+               <ul className="space-y-3 text-[#CAF0F8]/80 text-sm">
+                 <li><Link href="/" className="hover:text-[#00B4D8] transition">Home</Link></li>
+                 <li><Link href="/account" className="hover:text-[#00B4D8] transition">My Account</Link></li>
+                 <li><Link href="/history" className="hover:text-[#00B4D8] transition">Track Order</Link></li>
+               </ul>
+            </div>
+            
+            <div>
+               <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Help</h4>
+               <ul className="space-y-3 text-[#CAF0F8]/80 text-sm">
+                 <li><Link href="#" className="hover:text-[#00B4D8] transition">Telegram Support</Link></li>
+                 <li><Link href="#" className="hover:text-[#00B4D8] transition">Facebook Page</Link></li>
+                 <li><Link href="#" className="hover:text-[#00B4D8] transition">Terms & Conditions</Link></li>
+               </ul>
+            </div>
+            
+            <div>
+               <h4 className="text-white text-xs font-bold mb-5 uppercase tracking-widest">Payment Methods</h4>
+               <div className="flex flex-wrap gap-2">
+                  <span className="bg-[#023E8A] border border-[#00B4D8]/30 text-xs text-[#CAF0F8] px-3 py-1.5 rounded-md">KBZ Pay</span>
+                  <span className="bg-[#023E8A] border border-[#00B4D8]/30 text-xs text-[#CAF0F8] px-3 py-1.5 rounded-md">Wave Pay</span>
+                  <span className="bg-[#023E8A] border border-[#00B4D8]/30 text-xs text-[#CAF0F8] px-3 py-1.5 rounded-md">Website Wallet</span>
+               </div>
+               <p className="text-[#CAF0F8]/50 text-[10px] mt-4 flex items-center gap-1">
+                 <svg className="w-3 h-3 text-[#00B4D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                 Encrypted secure transactions
+               </p>
+            </div>
+          </div>
+          
           <div className="text-center text-[#CAF0F8]/50 text-[10px]">
              © 2026 Paing Gyi Game Store. All rights reserved.
           </div>
