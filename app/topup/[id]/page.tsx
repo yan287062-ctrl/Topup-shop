@@ -19,14 +19,12 @@ export default function TopupPage() {
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
   
-  // Payment Modal & Order States
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [slipFile, setSlipFile] = useState<File | null>(null);
   const [userEmail, setUserEmail] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
-  // User ၏ Email ကို အလိုအလျောက် ရယူရန်
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -37,7 +35,6 @@ export default function TopupPage() {
     fetchUser();
   }, []);
 
-  // Admin Accounts for Payment 
   const adminAccounts: Record<string, {name: string, phone: string}> = {
     kpay: { name: 'Paing Gyi', phone: '09755008854' },
     wave: { name: 'Paing Gyi', phone: '09967241375' },
@@ -45,7 +42,6 @@ export default function TopupPage() {
     uabpay: { name: 'Paing Gyi', phone: '09967241375' }
   };
 
-  // 1. MLBB Packages
   const mlbbPackages = [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
@@ -72,7 +68,6 @@ export default function TopupPage() {
     { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 2. Magic Chess Packages
   const mcggPackages = [
     { id: 'mcgg_1', name: '10', bonus: '+ 1 Diamonds', price: 900 },
     { id: 'mcgg_2', name: '20', bonus: '+ 2 Diamonds', price: 1700 },
@@ -91,7 +86,6 @@ export default function TopupPage() {
     { id: 'mcgg_15', name: '5035', bonus: '+ 1007 Diamonds', price: 414100 }
   ];
 
-  // 3. PUBG UC Packages
   const pubgPackages = [
     { id: 'pubg_1', name: '60 UC', price: 4106 }, { id: 'pubg_2', name: '325 UC', price: 20529 },
     { id: 'pubg_3', name: '660 UC', price: 41059 }, { id: 'pubg_4', name: '985 UC', price: 61588 },
@@ -101,7 +95,6 @@ export default function TopupPage() {
     { id: 'pubg_11', name: '5900 UC', price: 367277 }, { id: 'pubg_12', name: '8100 UC', price: 504112 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 4. UC Pack Packages
   const ucPackPackages = [
     { id: 'ucp_1', name: 'First Purchase Pack', price: 4100 }, { id: 'ucp_2', name: 'Prime (1 Month)', price: 4100 },
     { id: 'ucp_3', name: 'Weekly Deal Pack 1', price: 4200 }, { id: 'ucp_4', name: 'Upgradable Firearm Materials Pack', price: 12300 },
@@ -114,7 +107,6 @@ export default function TopupPage() {
     { id: 'ucp_17', name: 'Prime Plus (12 Months)', price: 487800 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 5. Telegram Packages
   const telegramPackages = [
     { id: 'tg_1', name: '50 Stars', price: 3552 }, { id: 'tg_2', name: '75 Stars', price: 5306 },
     { id: 'tg_3', name: '100 Stars', price: 7058 }, { id: 'tg_4', name: '150 Stars', price: 10587 },
@@ -126,7 +118,6 @@ export default function TopupPage() {
     { id: 'tg_15', name: '6 months premium', price: 75241 }, { id: 'tg_16', name: '12 months premium', price: 136412 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 6. Heartopia Packages
   const heartopiaPackages = [
     { id: 'heart_1', name: '20 Heart Diamond', price: 2588 }, { id: 'heart_2', name: '60 Heart Diamond', price: 4895 },
     { id: 'heart_3', name: '300+20 Heart Diamond', price: 24846 }, { id: 'heart_4', name: '680+50 Heart Diamond', price: 55994 },
@@ -137,14 +128,12 @@ export default function TopupPage() {
     { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 7. Smile Coin Packages
   const smileCoinPackages = [
     { id: 'smile_1', name: 'Brl 300', price: 25800 },
     { id: 'smile_2', name: 'Brl 1000', price: 83800 },
     { id: 'smile_3', name: 'Brl 5000', price: 419000 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // Game Configurations
   const gameConfigs: Record<string, any> = {
     'mobile-legends': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
     'mobile-legends-(mlbb)': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
@@ -195,10 +184,10 @@ export default function TopupPage() {
 
   if (!game) {
     return (
-      <main className="min-h-screen bg-[#070814] flex flex-col items-center justify-center p-4">
-        <h1 className="text-white text-2xl font-bold mb-2">Game Not Found</h1>
-        <p className="text-gray-400 text-xs mb-6">Requested ID: {id}</p>
-        <Link href="/" className="bg-pink-600 text-white px-6 py-2.5 rounded-full font-medium text-sm">Go Back Home</Link>
+      <main className="min-h-screen bg-[#CAF0F8] flex flex-col items-center justify-center p-4">
+        <h1 className="text-[#023E8A] text-2xl font-bold mb-2">Game Not Found</h1>
+        <p className="text-[#023E8A]/70 text-xs mb-6">Requested ID: {id}</p>
+        <Link href="/" className="bg-[#023E8A] text-[#CAF0F8] px-6 py-2.5 rounded-full font-bold text-sm shadow-lg">Go Back Home</Link>
       </main>
     );
   }
@@ -230,7 +219,6 @@ export default function TopupPage() {
     try {
       let publicUrl = null;
 
-      // ====== Wallet ရွေးချယ်ထားပါက (Error ကို ရှင်းလင်းစွာ ဖြေရှင်းထားသော အပိုင်း) ======
       if (paymentMethod === 'wallet') {
         if (!userEmail) {
           alert("Wallet ဖြင့်ဝယ်ရန် အကောင့်ဝင် (Login) ထားရန် လိုအပ်ပါသည်။");
@@ -238,23 +226,19 @@ export default function TopupPage() {
           return;
         }
 
-        // Email ရှိ Space အပိုများကို ဖြတ်ထုတ်ခြင်း
         const cleanEmail = userEmail.trim();
 
-        // ilike အသုံးပြု၍ အကြီးအသေး မှားယွင်းမှုများကို အလိုအလျောက် ဖြေရှင်းပေးခြင်း
         const { data: walletList, error: walletError } = await supabase
           .from('users_wallet')
           .select('balance')
           .ilike('email', cleanEmail);
         
-        // Database နှင့် မချိတ်ဆက်မိပါက (Network Error) 
         if (walletError) {
           alert("Database Error (ခဏစောင့်ပြီး ပြန်ဝယ်ကြည့်ပါ): " + walletError.message);
           setIsUploading(false);
           return;
         }
 
-        // Wallet အကောင့် မတွေ့ပါက
         if (!walletList || walletList.length === 0) {
           alert("Wallet အကောင့် မတွေ့ပါ သို့မဟုတ် ငွေဖြည့်သွင်းထားခြင်း မရှိသေးပါ။");
           setIsUploading(false);
@@ -263,14 +247,12 @@ export default function TopupPage() {
 
         const walletData = walletList[0];
 
-        // ငွေလုံလောက်မှု ရှိ/မရှိ စစ်ဆေးခြင်း
         if (Number(walletData.balance) < Number(selectedPkg.price)) {
           alert("သင့် Wallet တွင် ငွေလုံလောက်မှု မရှိပါ။ ကျေးဇူးပြု၍ ငွေအရင်ဖြည့်ပါ။");
           setIsUploading(false);
           return;
         }
 
-        // Wallet ထဲမှ ပိုက်ဆံဖြတ်ခြင်း
         const newBalance = Number(walletData.balance) - Number(selectedPkg.price);
         const { error: updateError } = await supabase
           .from('users_wallet')
@@ -283,7 +265,6 @@ export default function TopupPage() {
           return;
         }
       } 
-      // ====== တခြား ဘဏ်/Pay များရွေးချယ်ထားပါက Screenshot တင်မည် ======
       else {
         if (!slipFile) {
           alert("ကျေးဇူးပြု၍ ငွေလွှဲပြေစာ (Screenshot) အရင်တင်ပေးပါ။");
@@ -298,7 +279,6 @@ export default function TopupPage() {
         publicUrl = data.publicUrl;
       }
 
-      // Order ကို Database (Admin Panel) သို့ ပို့ခြင်း
       const { error: insertError } = await supabase.from('orders').insert([{
         game_name: game.name,
         player_id: userId,
@@ -322,211 +302,214 @@ export default function TopupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070814] pb-28 font-sans">
-      <Navbar />
+    <main className="min-h-screen pb-28 relative bg-[#CAF0F8] font-sans">
+      
+      <div className="relative z-10">
+        <Navbar />
 
-      <div className="max-w-5xl mx-auto px-4 mt-2">
-        <div className="relative w-full rounded-3xl bg-gradient-to-r from-[#1a1b2e] to-[#0f1020] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center border border-white/5 shadow-2xl overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-pink-600/10 rounded-full blur-3xl -z-10"></div>
-          <img src={game.img} alt={game.name} className="w-24 h-24 rounded-2xl shadow-[0_0_20px_rgba(236,72,153,0.3)] object-cover z-10" />
-          <div className="z-10 text-center md:text-left">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">{game.name}</h1>
-            <p className="text-gray-400 text-sm mt-1">{game.sub}</p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
-              <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">Instant Process</span>
-              <span className="bg-white/5 border border-white/10 text-pink-400 px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">100% Safe</span>
+        <div className="max-w-5xl mx-auto px-4 mt-2">
+          
+          <div className="relative w-full rounded-3xl bg-[#023E8A] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center shadow-[0_10px_30px_rgba(2,62,138,0.2)] overflow-hidden">
+            <img src={game.img} alt={game.name} className="w-24 h-24 rounded-2xl shadow-[0_0_15px_rgba(0,180,216,0.3)] object-cover z-10" />
+            <div className="z-10 text-center md:text-left">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">{game.name}</h1>
+              <p className="text-[#CAF0F8]/80 text-sm mt-1">{game.sub}</p>
+              <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
+                <span className="bg-[#CAF0F8]/10 text-[#CAF0F8] px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">Instant Process</span>
+                <span className="bg-[#CAF0F8]/10 text-[#CAF0F8] px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">100% Safe</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-8">
-            
-            <section>
-              <div className="flex items-end gap-3 mb-4">
-                <span className="text-4xl italic font-light text-pink-500/80">01</span>
-                <div className="mb-1">
-                  <h2 className="text-lg font-bold text-white">Choose Nominal Amount</h2>
-                  <p className="text-gray-400 text-[11px]">Pick the {game.name} amount you want to top up</p>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-8">
+              
+              <section>
+                <div className="flex items-end gap-3 mb-4">
+                  <span className="text-4xl italic font-black text-[#023E8A]/20">01</span>
+                  <div className="mb-1">
+                    <h2 className="text-lg font-bold text-[#023E8A]">Choose Nominal Amount</h2>
+                    <p className="text-[#023E8A]/70 text-[11px]">Pick the {game.name} amount you want to top up</p>
+                  </div>
                 </div>
-              </div>
 
-              {displayPackages.length === 0 ? (
-                <div className="text-center text-gray-500 py-10">No items available yet.</div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {displayPackages.map((pkg: any) => (
+                {displayPackages.length === 0 ? (
+                  <div className="text-center text-[#023E8A]/50 py-10">No items available yet.</div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {displayPackages.map((pkg: any) => (
+                      <button
+                        key={pkg.id}
+                        onClick={() => setSelectedPkg(pkg)}
+                        className={`relative p-3.5 rounded-2xl text-left transition-all duration-200 overflow-hidden shadow-sm ${
+                          selectedPkg?.id === pkg.id
+                          ? 'bg-[#023E8A] border-2 border-[#00B4D8] shadow-[0_5px_15px_rgba(2,62,138,0.3)]'
+                          : 'bg-white border-2 border-transparent hover:border-[#00B4D8]/30'
+                        }`}
+                      >
+                        {selectedPkg?.id === pkg.id && (
+                          <div className="absolute top-0 right-0 bg-[#00B4D8] rounded-bl-xl p-1.5 shadow-md">
+                            <svg className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                          </div>
+                        )}
+                        <div className={`text-sm mb-1 ${selectedPkg?.id === pkg.id ? 'text-white font-bold' : 'text-[#023E8A] font-bold'}`}>{pkg.name}</div>
+                        <div className={`text-[10px] mb-3 ${selectedPkg?.id === pkg.id ? 'text-[#CAF0F8]/70' : 'text-[#023E8A]/60'}`}>{pkg.bonus || 'No bonus'}</div>
+                        <div className={`text-sm font-extrabold ${selectedPkg?.id === pkg.id ? 'text-[#00B4D8]' : 'text-[#00B4D8]'}`}>{pkg.price.toLocaleString()} Ks</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section>
+                <div className="flex items-end gap-3 mb-4">
+                  <span className="text-4xl italic font-black text-[#023E8A]/20">02</span>
+                  <div className="mb-1">
+                    <h2 className="text-lg font-bold text-[#023E8A]">Game Account Data</h2>
+                    <p className="text-[#023E8A]/70 text-[11px]">Make sure your account details are correct</p>
+                  </div>
+                </div>
+                
+                <div className="bg-[#023E8A] p-5 rounded-3xl shadow-lg space-y-4">
+                  {game.inputType === 'mlbb' && (
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <div className="w-full sm:w-1/2">
+                        <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">ID <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="Enter ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                      </div>
+                      <div className="w-full sm:w-1/2">
+                        <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">Server No. <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="Enter Server No." className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={zoneId} onChange={(e) => setZoneId(e.target.value)} />
+                      </div>
+                    </div>
+                  )}
+
+                  {game.inputType === 'pubg' && (
+                    <div>
+                      <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">Player ID <span className="text-[#FBB02D]">*</span></label>
+                      <input type="text" placeholder="Enter Player ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                    </div>
+                  )}
+
+                  {game.inputType === 'username' && (
+                    <div>
+                      <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">Telegram Username <span className="text-[#FBB02D]">*</span></label>
+                      <input type="text" placeholder="ဥပမာ: @username သို့မဟုတ် phone number" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                    </div>
+                  )}
+
+                  {game.inputType === 'heartopia' && (
+                    <div className="space-y-4">
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="w-full sm:w-1/2">
+                          <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">UID <span className="text-[#FBB02D]">*</span></label>
+                          <input type="text" placeholder="UID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                        </div>
+                        <div className="w-full sm:w-1/2">
+                          <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">FIELD <span className="text-[#FBB02D]">*</span></label>
+                          <select className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={serverField} onChange={(e) => setServerField(e.target.value)}>
+                            <option value="Global">Global</option>
+                            <option value="Asia">Asia</option>
+                            <option value="America">America</option>
+                            <option value="Europe">Europe</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">AID <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="AID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={aid} onChange={(e) => setAid(e.target.value)} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section>
+                <div className="flex items-end gap-3 mb-4">
+                  <span className="text-4xl italic font-black text-[#023E8A]/20">03</span>
+                  <div className="mb-1">
+                    <h2 className="text-lg font-bold text-[#023E8A]">Choose Payment Method</h2>
+                    <p className="text-[#023E8A]/70 text-[11px]">Various payment methods available</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                  {paymentMethods.map((pm) => (
                     <button
-                      key={pkg.id}
-                      onClick={() => setSelectedPkg(pkg)}
-                      className={`relative p-3.5 rounded-2xl text-left transition-all duration-200 overflow-hidden ${
-                        selectedPkg?.id === pkg.id
-                        ? 'bg-pink-950/30 border-2 border-pink-500'
-                        : 'bg-[#131422] border-2 border-transparent hover:border-white/10'
+                      key={pm.id}
+                      onClick={() => setPaymentMethod(pm.id)}
+                      className={`relative p-3 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-200 shadow-sm ${
+                        paymentMethod === pm.id
+                        ? 'bg-[#023E8A] border-2 border-[#00B4D8] shadow-[0_5px_15px_rgba(2,62,138,0.3)]'
+                        : 'bg-white border-2 border-transparent hover:border-[#00B4D8]/30'
                       }`}
                     >
-                      {selectedPkg?.id === pkg.id && (
-                        <div className="absolute top-0 right-0 bg-pink-500 rounded-bl-xl p-1.5 shadow-md">
-                          <svg className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                        </div>
-                      )}
-                      <div className="text-white font-bold text-sm mb-1">{pkg.name}</div>
-                      <div className="text-gray-500 text-[10px] mb-3">{pkg.bonus || 'No bonus'}</div>
-                      <div className="text-pink-500 font-extrabold text-sm">{pkg.price.toLocaleString()} Ks</div>
+                      <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center p-1 overflow-hidden shadow-inner mb-1">
+                        <img src={pm.img} alt={pm.name} className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.innerHTML = `<span class="text-[#023E8A] font-bold text-xs">${pm.name.charAt(0)}</span>`;
+                          }}
+                        />
+                      </div>
+                      <span className={`text-[10px] font-bold text-center ${paymentMethod === pm.id ? 'text-[#CAF0F8]' : 'text-[#023E8A]'}`}>{pm.name}</span>
                     </button>
                   ))}
                 </div>
-              )}
-            </section>
+              </section>
+            </div>
 
-            <section>
-              <div className="flex items-end gap-3 mb-4">
-                <span className="text-4xl italic font-light text-pink-500/80">02</span>
-                <div className="mb-1">
-                  <h2 className="text-lg font-bold text-white">Game Account Data</h2>
-                  <p className="text-gray-400 text-[11px]">Make sure your account details are correct</p>
-                </div>
-              </div>
-              
-              <div className="bg-[#131422] p-5 rounded-3xl border border-white/5 space-y-4">
-                {game.inputType === 'mlbb' && (
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="w-full sm:w-1/2">
-                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">ID <span className="text-red-500">*</span></label>
-                      <input type="text" placeholder="Enter ID" className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
-                    </div>
-                    <div className="w-full sm:w-1/2">
-                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Server No. <span className="text-red-500">*</span></label>
-                      <input type="text" placeholder="Enter Server No." className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={zoneId} onChange={(e) => setZoneId(e.target.value)} />
-                    </div>
-                  </div>
-                )}
-
-                {game.inputType === 'pubg' && (
+            <div className="lg:col-span-1">
+              <div className="sticky top-24 bg-[#023E8A] rounded-3xl p-5 shadow-2xl border border-white/10">
+                <h3 className="text-[#CAF0F8] text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/20 pb-3">Order Summary</h3>
+                
+                <div className="flex items-center gap-3 mb-5">
+                  <img src={game.img} className="w-12 h-12 rounded-xl object-cover shadow-md" />
                   <div>
-                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Player ID <span className="text-red-500">*</span></label>
-                    <input type="text" placeholder="Enter Player ID" className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                    <h4 className="text-white font-bold text-sm">{game.name}</h4>
+                    <p className="text-[#00B4D8] text-[10px] font-bold">{selectedPkg ? selectedPkg.name : 'No amount selected'}</p>
                   </div>
-                )}
+                </div>
 
-                {game.inputType === 'username' && (
+                <div className="space-y-4 mb-6">
                   <div>
-                    <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">Telegram Username <span className="text-red-500">*</span></label>
-                    <input type="text" placeholder="ဥပမာ: @username သို့မဟုတ် phone number" className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                    <p className="text-[#CAF0F8]/70 text-[10px] uppercase tracking-wider mb-1">Target Account</p>
+                    <p className="text-white text-xs font-medium italic">{getTargetAccountText()}</p>
                   </div>
-                )}
-
-                {game.inputType === 'heartopia' && (
-                  <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <div className="w-full sm:w-1/2">
-                        <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">UID <span className="text-red-500">*</span></label>
-                        <input type="text" placeholder="UID" className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
-                      </div>
-                      <div className="w-full sm:w-1/2">
-                        <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">FIELD <span className="text-red-500">*</span></label>
-                        <select className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={serverField} onChange={(e) => setServerField(e.target.value)}>
-                          <option value="Global">Global</option>
-                          <option value="Asia">Asia</option>
-                          <option value="America">America</option>
-                          <option value="Europe">Europe</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[10px] font-bold text-gray-400 mb-2 block uppercase tracking-wider">AID <span className="text-red-500">*</span></label>
-                      <input type="text" placeholder="AID" className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 transition-colors" value={aid} onChange={(e) => setAid(e.target.value)} />
-                    </div>
+                  <div>
+                    <p className="text-[#CAF0F8]/70 text-[10px] uppercase tracking-wider mb-1">Payment Method</p>
+                    <p className="text-white text-xs font-medium italic">
+                      {paymentMethod ? paymentMethods.find(p => p.id === paymentMethod)?.name : 'Not selected'}
+                    </p>
                   </div>
-                )}
-              </div>
-            </section>
-
-            <section>
-              <div className="flex items-end gap-3 mb-4">
-                <span className="text-4xl italic font-light text-pink-500/80">03</span>
-                <div className="mb-1">
-                  <h2 className="text-lg font-bold text-white">Choose Payment Method</h2>
-                  <p className="text-gray-400 text-[11px]">Various payment methods available</p>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                {paymentMethods.map((pm) => (
-                  <button
-                    key={pm.id}
-                    onClick={() => setPaymentMethod(pm.id)}
-                    className={`relative p-3 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-200 ${
-                      paymentMethod === pm.id
-                      ? 'bg-pink-950/30 border-2 border-pink-500'
-                      : 'bg-[#131422] border-2 border-transparent hover:border-white/10'
-                    }`}
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center p-1 overflow-hidden shadow-sm mb-1">
-                      <img src={pm.img} alt={pm.name} className="w-full h-full object-contain"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          e.currentTarget.parentElement!.innerHTML = `<span class="text-gray-800 font-bold text-xs">${pm.name.charAt(0)}</span>`;
-                        }}
-                      />
-                    </div>
-                    <span className="text-gray-300 text-[10px] font-medium text-center">{pm.name}</span>
-                  </button>
-                ))}
-              </div>
-            </section>
-          </div>
-
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-[#131422] rounded-3xl border border-white/5 p-5 shadow-2xl">
-              <h3 className="text-gray-400 text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/10 pb-3">Order Summary</h3>
-              
-              <div className="flex items-center gap-3 mb-5">
-                <img src={game.img} className="w-12 h-12 rounded-xl object-cover" />
-                <div>
-                  <h4 className="text-white font-bold text-sm">{game.name}</h4>
-                  <p className="text-pink-500 text-[10px]">{selectedPkg ? selectedPkg.name : 'No amount selected'}</p>
+                <div className="space-y-2 border-t border-white/20 pt-4 mb-4">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#CAF0F8]">Subtotal</span>
+                    <span className="text-white font-bold">{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-4 mb-6">
-                <div>
-                  <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Target Account</p>
-                  <p className="text-white text-xs font-medium italic">{getTargetAccountText()}</p>
+                <div className="flex justify-between items-center border-t border-white/20 pt-4 mb-6">
+                  <span className="text-white font-bold text-sm">Total Payment</span>
+                  <span className="text-[#FBB02D] font-extrabold text-xl">
+                    {selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks
+                  </span>
                 </div>
-                <div>
-                  <p className="text-gray-500 text-[10px] uppercase tracking-wider mb-1">Payment Method</p>
-                  <p className="text-white text-xs font-medium italic">
-                    {paymentMethod ? paymentMethods.find(p => p.id === paymentMethod)?.name : 'Not selected'}
-                  </p>
-                </div>
+                
+                <button
+                  onClick={openPaymentModal}
+                  disabled={!isFormValid}
+                  className={`w-full py-3.5 rounded-xl font-extrabold text-sm transition-all duration-300 shadow-lg ${
+                    isFormValid
+                    ? 'bg-[#FBB02D] text-[#023E8A] hover:bg-[#e8a329] shadow-[0_5px_15px_rgba(251,176,45,0.4)]'
+                    : 'bg-[#CAF0F8]/20 text-[#CAF0F8]/50 cursor-not-allowed'
+                  }`}
+                >
+                  {!isFormValid ? 'Complete the data first' : 'Buy Now'}
+                </button>
               </div>
-
-              <div className="space-y-2 border-t border-white/10 pt-4 mb-4">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Subtotal</span>
-                  <span className="text-white">{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</span>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center border-t border-white/10 pt-4 mb-6">
-                <span className="text-white font-bold text-sm">Total Payment</span>
-                <span className="text-pink-500 font-extrabold text-xl">
-                  {selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks
-                </span>
-              </div>
-              
-              <button
-                onClick={openPaymentModal}
-                disabled={!isFormValid}
-                className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all duration-300 shadow-lg ${
-                  isFormValid
-                  ? 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]'
-                  : 'bg-[#2a2b3d] text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {!isFormValid ? 'Complete the data first' : 'Buy Now'}
-              </button>
             </div>
           </div>
         </div>
@@ -535,53 +518,53 @@ export default function TopupPage() {
 
       {/* Payment Upload Modal */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
-          <div className="bg-[#131422] p-6 rounded-3xl border border-white/10 w-full max-w-md shadow-2xl relative">
-            <button onClick={() => setShowPaymentModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-white text-xl">✕</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#023E8A]/90 px-4 backdrop-blur-md">
+          <div className="bg-[#023E8A] p-6 rounded-3xl border border-[#00B4D8]/30 w-full max-w-md shadow-2xl relative">
+            <button onClick={() => setShowPaymentModal(false)} className="absolute top-4 right-4 text-[#CAF0F8]/50 hover:text-white text-xl">✕</button>
             
             <h3 className="text-xl font-bold text-white mb-2">ငွေပေးချေရန်</h3>
             
             {paymentMethod === 'wallet' ? (
-              <p className="text-gray-400 text-xs mb-5">သင့် Wallet ဖြင့် အလိုအလျောက် ပေးချေပါမည်။</p>
+              <p className="text-[#CAF0F8]/70 text-xs mb-5">သင့် Wallet ဖြင့် အလိုအလျောက် ပေးချေပါမည်။</p>
             ) : (
-              <p className="text-gray-400 text-xs mb-5">အောက်ပါအကောင့်သို့ ငွေလွှဲပြီး ပြေစာ (Screenshot) တင်ပေးပါ။</p>
+              <p className="text-[#CAF0F8]/70 text-xs mb-5">အောက်ပါအကောင့်သို့ ငွေလွှဲပြီး ပြေစာ (Screenshot) တင်ပေးပါ။</p>
             )}
 
             {paymentMethod !== 'wallet' && (
-              <div className="bg-[#0a0b14] p-5 rounded-2xl border border-white/5 mb-5 shadow-inner">
+              <div className="bg-[#CAF0F8]/10 p-5 rounded-2xl border border-[#00B4D8]/20 mb-5 shadow-inner">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-500 text-xs uppercase font-bold tracking-wider">Pay To:</span>
-                  <span className="text-pink-500 font-bold text-sm uppercase bg-pink-500/10 px-3 py-1 rounded-full">{paymentMethod}</span>
+                  <span className="text-[#CAF0F8]/70 text-xs uppercase font-bold tracking-wider">Pay To:</span>
+                  <span className="text-[#00B4D8] font-bold text-sm uppercase bg-[#00B4D8]/20 px-3 py-1 rounded-full">{paymentMethod}</span>
                 </div>
                 <div className="text-white text-2xl font-bold tracking-widest mt-2">{adminAccounts[paymentMethod]?.phone}</div>
-                <div className="text-gray-400 text-sm mt-1">အမည်: {adminAccounts[paymentMethod]?.name}</div>
+                <div className="text-[#CAF0F8] text-sm mt-1">အမည်: {adminAccounts[paymentMethod]?.name}</div>
                 
-                <div className="flex justify-between items-end mt-4 pt-4 border-t border-white/10">
-                  <span className="text-gray-500 text-xs">ကျသင့်ငွေ</span>
-                  <span className="text-pink-500 font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
+                <div className="flex justify-between items-end mt-4 pt-4 border-t border-[#00B4D8]/30">
+                  <span className="text-[#CAF0F8] text-xs">ကျသင့်ငွေ</span>
+                  <span className="text-[#FBB02D] font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
                 </div>
               </div>
             )}
 
             {paymentMethod === 'wallet' ? (
               <div className="mb-6">
-                <label className="block text-gray-300 text-xs font-bold mb-3 uppercase tracking-wider">Your Account Email</label>
-                <div className="w-full bg-[#131422] border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-bold opacity-80 cursor-not-allowed shadow-inner">
+                <label className="block text-[#CAF0F8] text-xs font-bold mb-3 uppercase tracking-wider">Your Account Email</label>
+                <div className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm font-bold opacity-80 cursor-not-allowed shadow-inner">
                   {userEmail || 'Please Login First'}
                 </div>
-                <div className="flex justify-between items-end mt-4 pt-4 border-t border-white/10">
-                  <span className="text-gray-500 text-xs">ဖြတ်တောက်မည့်ငွေ</span>
-                  <span className="text-pink-500 font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
+                <div className="flex justify-between items-end mt-4 pt-4 border-t border-[#00B4D8]/30">
+                  <span className="text-[#CAF0F8] text-xs">ဖြတ်တောက်မည့်ငွေ</span>
+                  <span className="text-[#FBB02D] font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
                 </div>
               </div>
             ) : (
               <div className="mb-6">
-                <label className="block text-gray-300 text-xs font-bold mb-3 uppercase tracking-wider">ငွေလွှဲပြေစာ (Screenshot) ရွေးရန် <span className="text-red-500">*</span></label>
+                <label className="block text-[#CAF0F8] text-xs font-bold mb-3 uppercase tracking-wider">ငွေလွှဲပြေစာ (Screenshot) ရွေးရန် <span className="text-[#FBB02D]">*</span></label>
                 <input 
                   type="file" 
                   accept="image/*" 
                   onChange={(e) => setSlipFile(e.target.files?.[0] || null)} 
-                  className="w-full text-sm text-gray-400 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-pink-600/20 file:text-pink-400 hover:file:bg-pink-600/30 cursor-pointer border border-dashed border-white/20 rounded-xl p-2" 
+                  className="w-full text-sm text-[#CAF0F8] file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#00B4D8] file:text-[#023E8A] hover:file:bg-[#0096b8] cursor-pointer border border-dashed border-[#00B4D8]/50 rounded-xl p-2 transition-all" 
                 />
               </div>
             )}
@@ -591,8 +574,8 @@ export default function TopupPage() {
               disabled={isUploading || (paymentMethod !== 'wallet' && !slipFile)} 
               className={`w-full py-4 rounded-xl font-bold text-sm transition-all shadow-lg ${
                 (!slipFile && paymentMethod !== 'wallet') || isUploading 
-                ? 'bg-[#2a2b3d] text-gray-500 cursor-not-allowed' 
-                : 'bg-pink-600 text-white hover:bg-pink-500 shadow-[0_0_15px_rgba(236,72,153,0.4)]'
+                ? 'bg-[#CAF0F8]/20 text-[#CAF0F8]/50 cursor-not-allowed' 
+                : 'bg-[#FBB02D] text-[#023E8A] hover:bg-[#e8a329] shadow-[0_5px_15px_rgba(251,176,45,0.4)]'
               }`}
             >
               {isUploading ? 'Processing...' : (paymentMethod === 'wallet' ? 'Confirm Wallet Payment' : 'Confirm Order & Upload')}
@@ -601,18 +584,18 @@ export default function TopupPage() {
         </div>
       )}
 
-      {/* မျက်နှာပြင်အပြည့်အစား ပြောင်းလဲလိုက်သော Success Popup သေးသေးလေး */}
+      {/* Success Popup */}
       {orderSuccess && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm transition-opacity duration-300">
-          <div className="bg-[#131422] p-8 rounded-3xl text-center max-w-sm w-full border border-white/10 shadow-[0_0_40px_rgba(236,72,153,0.15)] transform scale-100">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#023E8A]/90 px-4 backdrop-blur-md transition-opacity duration-300">
+          <div className="bg-white p-8 rounded-3xl text-center max-w-sm w-full border border-gray-200 shadow-[0_10px_40px_rgba(0,180,216,0.2)] transform scale-100">
             <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <h2 className="font-bold text-xl mb-2 text-white">Order Successful!</h2>
-            <p className="text-gray-400 text-xs mb-6">Admin will process your order shortly.</p>
+            <h2 className="font-bold text-xl mb-2 text-[#023E8A]">Order Successful!</h2>
+            <p className="text-gray-500 text-xs mb-6">Admin will process your order shortly.</p>
             <button 
               onClick={() => window.location.href = '/'} 
-              className="inline-block bg-pink-600 text-white font-bold py-3 px-8 rounded-xl w-full shadow-[0_0_15px_rgba(236,72,153,0.4)] hover:bg-pink-500 transition-colors text-sm"
+              className="inline-block bg-[#023E8A] text-white font-bold py-3 px-8 rounded-xl w-full shadow-[0_5px_15px_rgba(2,62,138,0.4)] hover:bg-[#03045E] transition-colors text-sm"
             >
               Return Home
             </button>
