@@ -19,11 +19,11 @@ export default function Home() {
 
   return (
     <main
-      // 1. Primary Background (#03045E) 
+      // Background ကို #03045E သုံးထားပေမယ့် အရမ်းမရင့်အောင် အောက်က အလွှာနဲ့ နုပေးထားတယ်
       className="min-h-screen pb-28 relative bg-[#03045E] font-sans"
     >
-      {/* 2. အနောက်ခံကို နည်းနည်း မှောင်ပေးထားတဲ့ အလွှာ */}
-      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px] z-0"></div>
+      {/* အမည်းရောင် (Black) ဖိထားတာကို ဖြုတ်လိုက်ပြီး Royal Blue (#023E8A) ကို အလင်းဖျော့ဖျော့လေးနဲ့ အပေါ်ကနေ ဖြာဆင်းလာအောင် လုပ်ပေးလိုက်တယ် (မျက်စိပိုအေးသွားမယ်) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#023E8A]/40 to-transparent backdrop-blur-[2px] z-0"></div>
       
       {/* 3. Highlights Glow Effect (#00B4D8) */}
       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-[#00B4D8]/15 rounded-full blur-[100px] pointer-events-none z-0"></div>
