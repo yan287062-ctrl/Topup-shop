@@ -25,6 +25,9 @@ export default function TopupPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
+  // Error 2 Fix: Database က Data ရလာတဲ့အထိ ဈေးနှုန်းမလှုပ်အောင် Loading State လေးခံထားမယ်
+  const [isLoadingPrices, setIsLoadingPrices] = useState(true);
+
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -158,7 +161,6 @@ export default function TopupPage() {
 
   useEffect(() => {
     if (!game) return;
-    setDisplayPackages(game.packages || []);
     
     const fetchRealPrices = async () => {
       try {
@@ -166,9 +168,16 @@ export default function TopupPage() {
         if (error) throw error;
         if (data && data.length > 0) {
           setDisplayPackages(data.sort((a, b) => Number(a.price) - Number(b.price)));
+        } else {
+          // Data မရှိရင် default ပြ
+          setDisplayPackages(game.packages || []);
         }
       } catch (error) {
         console.error("Error fetching prices:", error);
+        setDisplayPackages(game.packages || []);
+      } finally {
+        // Fetch ပြီးတာနဲ့ Loading ပြီးပြီလို့ သတ်မှတ်မယ် (ဈေးနှုန်း မလှုပ်တော့ဘူး)
+        setIsLoadingPrices(false);
       }
     };
     fetchRealPrices();
@@ -333,7 +342,12 @@ export default function TopupPage() {
                   </div>
                 </div>
 
-                {displayPackages.length === 0 ? (
+                {/* Error 2 Fix: isLoadingPrices ကို စစ်ပြီးမှ ပြမယ် */}
+                {isLoadingPrices ? (
+                  <div className="text-center text-[#023E8A]/50 py-10 font-medium animate-pulse">
+                    Loading packages...
+                  </div>
+                ) : displayPackages.length === 0 ? (
                   <div className="text-center text-[#023E8A]/50 py-10">No items available yet.</div>
                 ) : (
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -514,11 +528,15 @@ export default function TopupPage() {
           </div>
         </div>
       </div>
-      <BottomNav />
+      
+      {/* Error 1 Fix: BottomNav ကို z-index အမြင့်ဆုံးပေးလိုက်တယ် */}
+      <div className="relative z-50">
+        <BottomNav />
+      </div>
 
       {/* Payment Upload Modal */}
       {showPaymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#023E8A]/90 px-4 backdrop-blur-md">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#023E8A]/90 px-4 backdrop-blur-md">
           <div className="bg-[#023E8A] p-6 rounded-3xl border border-[#00B4D8]/30 w-full max-w-md shadow-2xl relative">
             <button onClick={() => setShowPaymentModal(false)} className="absolute top-4 right-4 text-[#CAF0F8]/50 hover:text-white text-xl">✕</button>
             
