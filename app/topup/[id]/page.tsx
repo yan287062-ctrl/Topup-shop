@@ -25,8 +25,10 @@ export default function TopupPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
-  // Error 2 Fix: Database က Data ရလာတဲ့အထိ ဈေးနှုန်းမလှုပ်အောင် Loading State လေးခံထားမယ်
   const [isLoadingPrices, setIsLoadingPrices] = useState(true);
+  
+  // 🌟 အသစ်ထည့်ထားသည် - တကယ်ဝယ်ထားတဲ့ အရေအတွက် အစစ်ကို သိမ်းရန်
+  const [orderCount, setOrderCount] = useState(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -162,6 +164,7 @@ export default function TopupPage() {
   useEffect(() => {
     if (!game) return;
     
+    // Database မှ စျေးနှုန်းများ ဆွဲယူခြင်း
     const fetchRealPrices = async () => {
       try {
         const { data, error } = await supabase.from('game_prices').select('*').eq('category', game.dbCat);
@@ -169,18 +172,34 @@ export default function TopupPage() {
         if (data && data.length > 0) {
           setDisplayPackages(data.sort((a, b) => Number(a.price) - Number(b.price)));
         } else {
-          // Data မရှိရင် default ပြ
           setDisplayPackages(game.packages || []);
         }
       } catch (error) {
         console.error("Error fetching prices:", error);
         setDisplayPackages(game.packages || []);
       } finally {
-        // Fetch ပြီးတာနဲ့ Loading ပြီးပြီလို့ သတ်မှတ်မယ် (ဈေးနှုန်း မလှုပ်တော့ဘူး)
         setIsLoadingPrices(false);
       }
     };
+
+    // 🌟 Database မှ အမှန်တကယ် ဝယ်ယူထားသူ အရေအတွက် (Real Order Count) ဆွဲယူခြင်း
+    const fetchRealOrderCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('orders')
+          .select('*', { count: 'exact', head: true })
+          .eq('game_name', game.name); // ဒီဂိမ်းကို ဝယ်ထားသမျှ အော်ဒါ အားလုံးကို ရေတွက်မည်
+        
+        if (!error && count !== null) {
+          setOrderCount(count);
+        }
+      } catch (err) {
+        console.error("Error fetching order count:", err);
+      }
+    };
+
     fetchRealPrices();
+    fetchRealOrderCount();
   }, [game]);
 
   const paymentMethods = [
@@ -318,17 +337,65 @@ export default function TopupPage() {
 
         <div className="max-w-5xl mx-auto px-4 mt-2">
           
-          <div className="relative w-full rounded-3xl bg-[#023E8A] p-6 mb-8 flex flex-col md:flex-row gap-5 items-center shadow-[0_10px_30px_rgba(2,62,138,0.2)] overflow-hidden">
-            <img src={game.img} alt={game.name} className="w-24 h-24 rounded-2xl shadow-[0_0_15px_rgba(0,180,216,0.3)] object-cover z-10" />
-            <div className="z-10 text-center md:text-left">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-wide">{game.name}</h1>
-              <p className="text-[#CAF0F8]/80 text-sm mt-1">{game.sub}</p>
-              <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
-                <span className="bg-[#CAF0F8]/10 text-[#CAF0F8] px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">Instant Process</span>
-                <span className="bg-[#CAF0F8]/10 text-[#CAF0F8] px-3 py-1 rounded-full text-[10px] sm:text-xs font-medium flex items-center gap-1">100% Safe</span>
+          {/* 🌟 New Realistic & Dynamic Game Banner 🌟 */}
+          <div className="relative w-full bg-[#023E8A] border border-[#00B4D8]/30 rounded-[2rem] p-6 md:p-8 overflow-hidden flex flex-col md:flex-row items-center md:items-start shadow-[0_10px_30px_rgba(2,62,138,0.2)] mb-8 mt-2">
+            
+            {/* Background Glow Effect */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#00B4D8]/20 rounded-full blur-[80px] pointer-events-none"></div>
+
+            {/* Right Side: Your Logo */}
+            <div className="absolute right-[-20px] md:right-8 top-1/2 -translate-y-1/2 w-48 h-48 md:w-64 md:h-64 opacity-20 md:opacity-100 pointer-events-none flex items-center justify-center transition-all">
+               <div className="w-full h-full rounded-full overflow-hidden shadow-[0_0_40px_rgba(0,180,216,0.3)] md:border-[6px] border-[#CAF0F8]/10 bg-[#070814]">
+                 <img src="/new-logo.jpg" alt="Paing Gyi Logo" className="w-full h-full object-cover" />
+               </div>
+            </div>
+
+            {/* Left Side: Game Info */}
+            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-6 w-full md:w-[70%]">
+              
+              {/* Game Icon */}
+              <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 rounded-[1.25rem] overflow-hidden border-4 border-white/10 shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+                <img src={game.img} alt={game.name} className="w-full h-full object-cover" />
               </div>
+
+              {/* Game Details */}
+              <div className="text-center md:text-left flex flex-col justify-center pt-2">
+                <h1 className="text-2xl md:text-[28px] font-black text-white tracking-tight leading-tight">{game.name}</h1>
+                <p className="text-sm text-[#CAF0F8]/80 font-medium mt-1">{game.sub}</p>
+                
+                {/* 🌟 Dynamic Stats Row (တကယ်ဝယ်ထားတဲ့ အရေအတွက်ပြမည့် နေရာ) 🌟 */}
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4 text-xs font-bold text-[#CAF0F8] mt-3">
+                  <span className="flex items-center gap-1"><span className="text-[#FBB02D] text-sm">★</span> Verified Service</span>
+                  <span className="hidden md:inline text-white/20">•</span>
+                  <span className="flex items-center gap-1">
+                    <span className="text-[#00B4D8] text-sm">👥</span> 
+                    {/* Database ထဲမှာ ဝယ်တဲ့သူ 0 ထက်များရင် အရေအတွက်ပြမယ်၊ မရှိသေးရင် Active လို့ပြမယ် */}
+                    {orderCount > 0 ? `${orderCount} players` : 'Active players'}
+                  </span>
+                  <span className="hidden md:inline text-white/20">•</span>
+                  <span className="flex items-center gap-1"><span className="text-green-400 text-sm">⚡</span> Fast process</span>
+                </div>
+
+                {/* 🌟 Tags Row (အတုတွေမပါတဲ့ သပ်ရပ်သော ဒီဇိုင်း) 🌟 */}
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-4">
+                  <span className="px-3 py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5">
+                    <svg className="w-3 h-3 text-[#00B4D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    CS 24/7
+                  </span>
+                  <span className="px-3 py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5">
+                    <svg className="w-3 h-3 text-[#FBB02D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    Instant Process
+                  </span>
+                  <span className="px-3 py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5">
+                    <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    100% Safe
+                  </span>
+                </div>
+              </div>
+
             </div>
           </div>
+          {/* 🌟 End of Banner 🌟 */}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-8">
@@ -342,7 +409,6 @@ export default function TopupPage() {
                   </div>
                 </div>
 
-                {/* Error 2 Fix: isLoadingPrices ကို စစ်ပြီးမှ ပြမယ် */}
                 {isLoadingPrices ? (
                   <div className="text-center text-[#023E8A]/50 py-10 font-medium animate-pulse">
                     Loading packages...
@@ -529,12 +595,10 @@ export default function TopupPage() {
         </div>
       </div>
       
-      {/* Error 1 Fix: BottomNav ကို z-index အမြင့်ဆုံးပေးလိုက်တယ် */}
       <div className="relative z-50">
         <BottomNav />
       </div>
 
-      {/* Payment Upload Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#023E8A]/90 px-4 backdrop-blur-md">
           <div className="bg-[#023E8A] p-6 rounded-3xl border border-[#00B4D8]/30 w-full max-w-md shadow-2xl relative">
@@ -602,7 +666,6 @@ export default function TopupPage() {
         </div>
       )}
 
-      {/* Success Popup */}
       {orderSuccess && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#023E8A]/90 px-4 backdrop-blur-md transition-opacity duration-300">
           <div className="bg-white p-8 rounded-3xl text-center max-w-sm w-full border border-gray-200 shadow-[0_10px_40px_rgba(0,180,216,0.2)] transform scale-100">
