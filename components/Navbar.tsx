@@ -64,7 +64,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2 relative">
              <div className="w-10 h-10 md:w-12 md:h-12 relative rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 flex items-center justify-center">
                 <img 
-                  src="/painggyi-logo.jpg" 
+                  src="/new-logo.jpg" 
                   alt="PG"
                   className="w-full h-full object-cover"
                   onError={(e) => {
