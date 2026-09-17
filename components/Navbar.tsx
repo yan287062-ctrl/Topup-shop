@@ -2,10 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { supabase } from '../lib/supabase';
 
 export default function Navbar() {
-  const [user, setUser] = useState<any>(null); // Supabase User Data
+  const [user, setUser] = useState<any>(null); 
   const [balance, setBalance] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
 
@@ -65,46 +66,57 @@ export default function Navbar() {
 
   return (
     <>
-      {/* 🌟 ပြင်ဆင်ထားသော နေရာ: fixed အစား sticky ပြောင်းပြီး အောက်ကို mb-8 ဖြင့် တွန်းထားပါသည် */}
-      <nav className="sticky top-4 mx-auto w-[92%] max-w-6xl flex items-center justify-between px-4 py-3 md:px-8 bg-[#070814]/80 backdrop-blur-md z-50 rounded-2xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] mb-8">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-full overflow-hidden border border-white/10 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
-            <img src="/logo.png" alt="Paing Gyi Shop" className="w-full h-full object-cover" 
-              onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=PG&background=ec4899&color=fff'; }}
-            />
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-white font-black text-sm tracking-widest uppercase">
-              Paing Gyi <span className="text-pink-500">shop</span>
-            </h1>
-          </div>
-        </Link>
-
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Link href="/history" className="bg-[#131422] border border-white/10 text-gray-300 px-3.5 py-2 rounded-full text-[10px] font-bold hover:bg-white/5 transition-colors hidden sm:block">
-            Track Order
+      {/* 🌟 Glass Design Navbar 🌟 */}
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50">
+        <div className="bg-[#070814]/40 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_0_rgba(31,38,135,0.3)] rounded-full px-4 py-2 md:px-6 md:py-3 flex items-center justify-between">
+          
+          {/* Logo Section */}
+          <Link href="/" className="flex items-center gap-2 relative">
+             <div className="w-10 h-10 md:w-12 md:h-12 relative rounded-full overflow-hidden border-2 border-white/30 shadow-sm bg-white">
+                <Image 
+                  src="/painggyi-logo.jpg" // <-- မင်းရဲ့ Logo အသစ် နာမည်
+                  alt="Paing Gyi Game Shop Logo"
+                  fill
+                  className="object-cover"
+                />
+             </div>
           </Link>
-          
-          <button 
-            onClick={() => setShowModal(true)}
-            className="bg-pink-600/20 border border-pink-500/30 text-pink-400 px-3.5 py-2 rounded-full text-[10px] font-bold hover:bg-pink-600/30 transition-colors shadow-[0_0_10px_rgba(236,72,153,0.2)]"
-          >
-            {user ? `${balance.toLocaleString()} Ks` : '0 Ks'}
-          </button>
-          
-          {user ? (
-            <button onClick={() => setShowModal(true)} className="w-8 h-8 rounded-full bg-pink-500 flex items-center justify-center text-white font-bold text-xs border-2 border-pink-500/50 shadow-[0_0_10px_rgba(236,72,153,0.4)]">
-              {getUserInitials(user.user_metadata?.full_name, user.email)}
-            </button>
-          ) : (
-            <Link href="/login" className="bg-pink-600 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-[10px] font-bold transition-all shadow-[0_0_15px_rgba(236,72,153,0.4)]">
-              Login
+
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center bg-white/5 backdrop-blur-sm rounded-full p-1 border border-white/10">
+            <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-white/90 hover:bg-white/10 transition-all">Home</Link>
+            <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-white/90 hover:bg-white/10 transition-all">All Games</Link>
+            <Link href="/history" className="px-5 py-2 rounded-full text-sm font-bold text-white/90 hover:bg-white/10 transition-all">Track Order</Link>
+          </div>
+
+          {/* Right Side Actions (Wallet & Profile) */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href="/history" className="bg-[#131422]/60 border border-white/10 text-gray-300 px-3.5 py-2 rounded-full text-[10px] font-bold hover:bg-white/10 transition-colors hidden sm:block backdrop-blur-sm">
+              Track Order
             </Link>
-          )}
+            
+            <button 
+              onClick={() => setShowModal(true)}
+              className="bg-pink-600/20 border border-pink-500/30 text-pink-400 px-3.5 py-2 rounded-full text-[10px] md:text-sm font-bold hover:bg-pink-600/30 transition-colors shadow-[0_0_10px_rgba(236,72,153,0.2)] backdrop-blur-sm"
+            >
+              {user ? `${balance.toLocaleString()} Ks` : '0 Ks'}
+            </button>
+            
+            {user ? (
+              <button onClick={() => setShowModal(true)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs md:text-sm border border-white/20 shadow-[0_0_15px_rgba(236,72,153,0.4)]">
+                {getUserInitials(user.user_metadata?.full_name, user.email)}
+              </button>
+            ) : (
+              <Link href="/login" className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-[10px] md:text-sm font-bold transition-all shadow-[0_0_15px_rgba(236,72,153,0.4)] border border-white/20">
+                Sign In
+              </Link>
+            )}
+          </div>
+
         </div>
       </nav>
 
-      {/* Profile / Wallet Modal */}
+      {/* Profile / Wallet Modal (ဒီအတိုင်းထားမယ်) */}
       {showModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm">
           <div className="bg-[#131422] p-6 rounded-3xl border border-white/10 w-full max-w-sm shadow-2xl relative">
