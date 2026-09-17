@@ -73,7 +73,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-6">
           <Link href="/">
             <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-pink-500/50 shadow-[0_0_20px_rgba(236,72,153,0.5)] transition-transform hover:scale-105">
-              <img src="/logo.png" alt="Paing Gyi Shop" className="w-full h-full object-cover bg-black" 
+              <img src="/new-logo.jpg" alt="Paing Gyi Shop" className="w-full h-full object-cover bg-black" 
                 onError={(e) => { e.currentTarget.src = 'https://ui-avatars.com/api/?name=PG&background=ec4899&color=fff'; }}
               />
             </div>
