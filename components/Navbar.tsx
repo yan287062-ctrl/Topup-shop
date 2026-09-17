@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { supabase } from '../lib/supabase';
 
 export default function Navbar() {
@@ -57,24 +56,26 @@ export default function Navbar() {
 
   return (
     <>
-      {/* 🌟 Light Glass Design Navbar 🌟 */}
-      <nav className="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] max-w-6xl z-50">
-        {/* Background color changed to white/40 to match light theme */}
-        <div className="bg-white/40 backdrop-blur-md border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-full px-4 py-2 md:px-6 md:py-3 flex items-center justify-between">
+      {/* 🌟 fixed အစား sticky ပြောင်းပြီး mb-8 ဖြင့် အောက်ကစာများကို တွန်းချထားပါသည် 🌟 */}
+      <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-8">
+        <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-lg rounded-full px-4 py-2 md:px-6 md:py-3 flex items-center justify-between">
           
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-2 relative">
              <div className="w-10 h-10 md:w-12 md:h-12 relative rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 flex items-center justify-center">
-                <Image 
+                <img 
                   src="/painggyi-logo.jpg" 
                   alt="PG"
-                  fill
-                  className="object-cover"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.parentElement!.innerHTML = '<span class="text-pink-600 font-black text-sm">PG</span>';
+                  }}
                 />
              </div>
           </Link>
 
-          {/* Desktop Navigation Links (Text changed to dark) */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60">
             <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-gray-800 hover:bg-white shadow-sm transition-all">Home</Link>
             <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-gray-600 hover:bg-white transition-all">All Games</Link>
