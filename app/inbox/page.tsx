@@ -9,37 +9,41 @@ import { supabase } from '../../lib/supabase';
 export default function InboxPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // 🌟 လောလောဆယ် Database မချိတ်ရသေးခင် အလွတ်ကြီးမဖြစ်အောင် အသင့်ပြထားမည့် စာများ (Dummy Data) 🌟
-  const notifications = [
-    {
-      id: 1,
-      type: 'system',
-      title: 'Welcome to Paing Gyi Game Shop! 🎉',
-      message: 'ကျွန်ုပ်တို့၏ ဝန်ဆောင်မှုကို အသုံးပြုပေးတဲ့အတွက် ကျေးဇူးတင်ပါတယ်။ ဂိမ်း Diamond နှင့် Package များကို ယုံကြည်စိတ်ချစွာ အမြန်ဆုံး ဝယ်ယူနိုင်ပါပြီ။',
-      date: 'Just now',
-      isRead: false,
-    },
-    {
-      id: 2,
-      type: 'promo',
-      title: 'Special Promotion & Giveaways!',
-      message: 'မကြာမီမှာ Paing Gyi Game Shop မှ အထူးပရိုမိုးရှင်းများနှင့် မဲဖောက်ပေးမည့် အစီအစဉ်များ ရှိတာမို့ စောင့်မျှော်ပေးကြပါဦးခင်ဗျာ။',
-      date: '1 day ago',
-      isRead: true,
-    }
-  ];
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserAndNotifs = async () => {
+      // 1. Check user login
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
         setUserEmail(session.user.email);
       }
-      setIsLoading(false);
+
+      // 2. Fetch announcements from Supabase
+      try {
+        const { data, error } = await supabase
+          .from('announcements')
+          .select('*')
+          .order('created_at', { ascending: false }); // အသစ်တင်တဲ့စာက အပေါ်ဆုံးမှာပေါ်မယ်
+          
+        if (!error && data) {
+          setNotifications(data);
+        }
+      } catch (error) {
+        console.error("Error fetching announcements:", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchUser();
+
+    fetchUserAndNotifs();
   }, []);
+
+  // ရက်စွဲလှလှလေးပေါ်အောင် ပြင်ပေးမည့် Function
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
 
   return (
     <main className="min-h-screen pb-28 relative bg-[#CAF0F8] font-sans">
@@ -56,7 +60,7 @@ export default function InboxPage() {
               <p className="text-xs md:text-sm text-[#023E8A]/70 font-medium mt-1">Your notifications and messages</p>
             </div>
             <div className="bg-[#023E8A] text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-sm">
-              {notifications.filter(n => !n.isRead).length} New
+              {notifications.length} Messages
             </div>
           </div>
 
@@ -77,16 +81,16 @@ export default function InboxPage() {
                 Go to Login
               </Link>
             </div>
+          ) : notifications.length === 0 ? (
+            // စာမရှိလျှင် ပြမည့်ပုံစံ
+            <div className="text-center py-10 text-[#023E8A]/50 text-sm font-medium">
+              No new messages.
+            </div>
           ) : (
-            // Login လုပ်ပြီးပါက ပြမည့် Message List
+            // Database မှ ဆွဲယူထားသော Message List
             <div className="space-y-3 md:space-y-4">
               {notifications.map((notif) => (
-                <div key={notif.id} className={`relative p-4 md:p-5 rounded-[1.25rem] md:rounded-3xl transition-all duration-300 shadow-sm border ${notif.isRead ? 'bg-white/80 border-white/60' : 'bg-white border-[#00B4D8]/30 shadow-[0_5px_15px_rgba(0,180,216,0.1)]'}`}>
-                  
-                  {/* Unread Red Dot */}
-                  {!notif.isRead && (
-                    <div className="absolute top-4 right-4 md:top-5 md:right-5 w-2.5 h-2.5 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,0.6)]"></div>
-                  )}
+                <div key={notif.id} className="relative p-4 md:p-5 rounded-[1.25rem] md:rounded-3xl transition-all duration-300 shadow-sm border bg-white border-[#00B4D8]/30 shadow-[0_5px_15px_rgba(0,180,216,0.1)]">
                   
                   <div className="flex gap-3 md:gap-4">
                     {/* Icon */}
@@ -101,10 +105,10 @@ export default function InboxPage() {
                     {/* Content */}
                     <div className="pr-4">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-3 mb-1">
-                        <h3 className={`text-sm md:text-base font-bold ${notif.isRead ? 'text-[#023E8A]/80' : 'text-[#023E8A]'}`}>{notif.title}</h3>
-                        <span className="text-[9px] md:text-[10px] text-[#023E8A]/50 font-medium">{notif.date}</span>
+                        <h3 className="text-sm md:text-base font-bold text-[#023E8A]">{notif.title}</h3>
+                        <span className="text-[9px] md:text-[10px] text-[#023E8A]/50 font-medium">{formatDate(notif.created_at)}</span>
                       </div>
-                      <p className="text-xs md:text-sm text-[#023E8A]/70 leading-relaxed mt-1 md:mt-1.5">{notif.message}</p>
+                      <p className="text-xs md:text-sm text-[#023E8A]/70 leading-relaxed mt-1 md:mt-1.5 whitespace-pre-wrap">{notif.message}</p>
                     </div>
                   </div>
                 </div>
@@ -115,7 +119,6 @@ export default function InboxPage() {
         </div>
       </div>
       
-      {/* Bottom Navigation */}
       <div className="relative z-50">
         <BottomNav />
       </div>
