@@ -347,6 +347,7 @@ export default function TopupPage() {
                <img 
                  src="/new-logo.jpg" 
                  alt="Paing Gyi Logo" 
+                 /* mix-blend-screen ကိုသုံးပြီး နောက်ခံအမည်းရောင်ကို အောက်ခံအပြာရောင်နဲ့ ရောဖျောက်ထားပါသည် */
                  className="w-full h-full object-contain mix-blend-screen filter contrast-125 drop-shadow-[0_10px_30px_rgba(0,180,216,0.6)]" 
                />
             </div>
