@@ -342,9 +342,13 @@ export default function TopupPage() {
             {/* Background Glow Effect */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#00B4D8]/20 rounded-full blur-[80px] pointer-events-none"></div>
 
-            {/* 🌟 Right Side: Your Logo (Removed Circle Crop) 🌟 */}
-            <div className="absolute right-[-20px] md:right-8 top-1/2 -translate-y-1/2 w-48 h-48 md:w-64 md:h-64 opacity-20 md:opacity-100 pointer-events-none flex items-center justify-center transition-all">
-               <img src="/new-logo.jpg" alt="Paing Gyi Logo" className="w-full h-full object-contain drop-shadow-[0_10px_30px_rgba(0,180,216,0.4)]" />
+            {/* 🌟 Right Side: Your Logo (Background Blended) 🌟 */}
+            <div className="absolute right-[-20px] md:right-8 top-1/2 -translate-y-1/2 w-48 h-48 md:w-[280px] md:h-[280px] opacity-20 md:opacity-100 pointer-events-none flex items-center justify-center transition-all">
+               <img 
+                 src="/new-logo.jpg" 
+                 alt="Paing Gyi Logo" 
+                 className="w-full h-full object-contain mix-blend-screen filter contrast-125 drop-shadow-[0_10px_30px_rgba(0,180,216,0.6)]" 
+               />
             </div>
 
             {/* Left Side: Game Info */}
