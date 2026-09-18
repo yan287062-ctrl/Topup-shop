@@ -57,48 +57,48 @@ export default function Navbar() {
   return (
     <>
       <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-8">
-        <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-lg rounded-full px-4 py-2 md:px-6 md:py-3 flex items-center justify-between">
+        <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-lg rounded-full px-3 py-2 md:px-6 md:py-3 flex items-center justify-between">
           
           {/* Logo Section */}
           <Link href="/" className="flex items-center gap-2 relative">
-             <div className="w-10 h-10 md:w-12 md:h-12 relative rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 flex items-center justify-center">
+             <div className="w-9 h-9 md:w-12 md:h-12 relative rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
                 <img 
                   src="/painggyi-logo-clear.png" 
                   alt="PG"
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
-                    e.currentTarget.parentElement!.innerHTML = '<span class="text-pink-600 font-black text-sm">PG</span>';
+                    e.currentTarget.parentElement!.innerHTML = '<span class="text-pink-600 font-black text-xs md:text-sm">PG</span>';
                   }}
                 />
              </div>
           </Link>
 
-          {/* Desktop Navigation Links (Track Order ပိုနေတာကို ဖြုတ်ထားသည်) */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60">
             <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-gray-800 hover:bg-white shadow-sm transition-all">Home</Link>
             <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-gray-600 hover:bg-white transition-all">All Games</Link>
           </div>
 
-          {/* Right Side Actions (Wallet & Profile) */}
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="/history" className="bg-white/60 border border-white/80 text-gray-700 px-3.5 py-2 rounded-full text-[10px] font-bold hover:bg-white transition-colors hidden sm:block shadow-sm">
+          {/* 🌟 Right Side Actions (ဖုန်းမှာ မပျောက်အောင် ချိန်ညှိထားသည်) 🌟 */}
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            <Link href="/history" className="bg-white/60 border border-white/80 text-gray-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-[9px] sm:text-[10px] font-bold hover:bg-white transition-colors shadow-sm whitespace-nowrap">
               Track Order
             </Link>
             
             <button 
               onClick={() => setShowModal(true)}
-              className="bg-pink-50 border border-pink-200 text-pink-600 px-3.5 py-2 rounded-full text-[10px] md:text-sm font-bold hover:bg-pink-100 transition-colors shadow-sm"
+              className="bg-pink-50 border border-pink-200 text-pink-600 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-[9px] sm:text-[10px] md:text-sm font-bold hover:bg-pink-100 transition-colors shadow-sm whitespace-nowrap"
             >
               {user ? `${balance.toLocaleString()} Ks` : '0 Ks'}
             </button>
             
             {user ? (
-              <button onClick={() => setShowModal(true)} className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-white font-bold text-xs md:text-sm border-2 border-white shadow-md">
+              <button onClick={() => setShowModal(true)} className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 flex items-center justify-center text-white font-bold text-[10px] md:text-sm border-2 border-white shadow-md flex-shrink-0">
                 {getUserInitials(user.user_metadata?.full_name, user.email)}
               </button>
             ) : (
-              <Link href="/login" className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-[10px] md:text-sm font-black transition-all shadow-md border border-pink-300">
+              <Link href="/login" className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-2.5 rounded-full text-[9px] sm:text-[10px] md:text-sm font-black transition-all shadow-md border border-pink-300 whitespace-nowrap">
                 Sign In
               </Link>
             )}
@@ -118,7 +118,7 @@ export default function Navbar() {
             {user ? (
               <div>
                 <div className="flex items-center gap-3 mb-6 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                  <div className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center text-white font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {getUserInitials(user.user_metadata?.full_name, user.email)}
                   </div>
                   <div className="overflow-hidden">

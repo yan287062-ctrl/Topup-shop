@@ -342,8 +342,8 @@ export default function TopupPage() {
             {/* Background Glow Effect */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#00B4D8]/20 rounded-full blur-[80px] pointer-events-none"></div>
 
-            {/* 🌟 Right Side: Transparent PNG Logo (CSS mix-blend ဖယ်ရှားထားသည်) 🌟 */}
-            <div className="absolute right-[-20px] md:right-8 top-1/2 -translate-y-1/2 w-48 h-48 md:w-[280px] md:h-[280px] opacity-20 md:opacity-100 pointer-events-none flex items-center justify-center transition-all">
+            {/* 🌟 Right Side: Transparent PNG Logo 🌟 */}
+            <div className="absolute right-[-10px] md:right-8 top-1/2 -translate-y-1/2 w-32 h-32 md:w-[280px] md:h-[280px] opacity-30 md:opacity-100 pointer-events-none flex items-center justify-center transition-all">
                <img 
                  src="/painggyi-logo-clear.png" 
                  alt="Paing Gyi Logo" 
@@ -352,41 +352,41 @@ export default function TopupPage() {
             </div>
 
             {/* Left Side: Game Info */}
-            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-5 md:gap-6 w-full md:w-[70%]">
+            <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 w-full md:w-[70%]">
               
               {/* Game Icon */}
-              <div className="w-24 h-24 md:w-28 md:h-28 flex-shrink-0 rounded-[1.25rem] overflow-hidden border-4 border-white/10 shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
+              <div className="w-20 h-20 md:w-28 md:h-28 flex-shrink-0 rounded-[1rem] md:rounded-[1.25rem] overflow-hidden border-2 md:border-4 border-white/10 shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
                 <img src={game.img} alt={game.name} className="w-full h-full object-cover" />
               </div>
 
               {/* Game Details */}
               <div className="text-center md:text-left flex flex-col justify-center pt-2">
-                <h1 className="text-2xl md:text-[28px] font-black text-white tracking-tight leading-tight">{game.name}</h1>
-                <p className="text-sm text-[#CAF0F8]/80 font-medium mt-1">{game.sub}</p>
+                <h1 className="text-xl md:text-[28px] font-black text-white tracking-tight leading-tight">{game.name}</h1>
+                <p className="text-xs md:text-sm text-[#CAF0F8]/80 font-medium mt-1">{game.sub}</p>
                 
                 {/* Dynamic Stats Row */}
-                <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 md:gap-4 text-xs font-bold text-[#CAF0F8] mt-3">
-                  <span className="flex items-center gap-1"><span className="text-[#FBB02D] text-sm">★</span> Verified Service</span>
-                  <span className="hidden md:inline text-white/20">•</span>
-                  <span className="flex items-center gap-1">
+                <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 md:gap-4 text-[10px] md:text-xs font-bold text-[#CAF0F8] mt-3">
+                  <span className="flex items-center gap-1 whitespace-nowrap"><span className="text-[#FBB02D] text-sm">★</span> Verified Service</span>
+                  <span className="text-white/20">•</span>
+                  <span className="flex items-center gap-1 whitespace-nowrap">
                     <span className="text-[#00B4D8] text-sm">👥</span> 
                     {orderCount > 0 ? `${orderCount} players` : 'Active players'}
                   </span>
-                  <span className="hidden md:inline text-white/20">•</span>
-                  <span className="flex items-center gap-1"><span className="text-green-400 text-sm">⚡</span> Fast process</span>
+                  <span className="text-white/20">•</span>
+                  <span className="flex items-center gap-1 whitespace-nowrap"><span className="text-green-400 text-sm">⚡</span> Fast process</span>
                 </div>
 
                 {/* Tags Row */}
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-4">
-                  <span className="px-3 py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5">
+                  <span className="px-2.5 py-1.5 md:px-3 md:py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[9px] md:text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5 whitespace-nowrap">
                     <svg className="w-3 h-3 text-[#00B4D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     CS 24/7
                   </span>
-                  <span className="px-3 py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5">
+                  <span className="px-2.5 py-1.5 md:px-3 md:py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[9px] md:text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5 whitespace-nowrap">
                     <svg className="w-3 h-3 text-[#FBB02D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     Instant Process
                   </span>
-                  <span className="px-3 py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5">
+                  <span className="px-2.5 py-1.5 md:px-3 md:py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[9px] md:text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5 whitespace-nowrap">
                     <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     100% Safe
                   </span>
@@ -396,44 +396,44 @@ export default function TopupPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <div className="lg:col-span-2 space-y-6 md:space-y-8">
               
               <section>
-                <div className="flex items-end gap-3 mb-4">
-                  <span className="text-4xl italic font-black text-[#023E8A]/20">01</span>
-                  <div className="mb-1">
-                    <h2 className="text-lg font-bold text-[#023E8A]">Choose Nominal Amount</h2>
-                    <p className="text-[#023E8A]/70 text-[11px]">Pick the {game.name} amount you want to top up</p>
+                <div className="flex items-end gap-2 md:gap-3 mb-4">
+                  <span className="text-3xl md:text-4xl italic font-black text-[#023E8A]/20">01</span>
+                  <div className="mb-0.5 md:mb-1">
+                    <h2 className="text-base md:text-lg font-bold text-[#023E8A]">Choose Nominal Amount</h2>
+                    <p className="text-[#023E8A]/70 text-[9px] md:text-[11px]">Pick the {game.name} amount you want to top up</p>
                   </div>
                 </div>
 
                 {isLoadingPrices ? (
-                  <div className="text-center text-[#023E8A]/50 py-10 font-medium animate-pulse">
+                  <div className="text-center text-[#023E8A]/50 py-10 font-medium animate-pulse text-sm">
                     Loading packages...
                   </div>
                 ) : displayPackages.length === 0 ? (
-                  <div className="text-center text-[#023E8A]/50 py-10">No items available yet.</div>
+                  <div className="text-center text-[#023E8A]/50 py-10 text-sm">No items available yet.</div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 md:gap-3">
                     {displayPackages.map((pkg: any) => (
                       <button
                         key={pkg.id}
                         onClick={() => setSelectedPkg(pkg)}
-                        className={`relative p-3.5 rounded-2xl text-left transition-all duration-200 overflow-hidden shadow-sm ${
+                        className={`relative p-2.5 md:p-3.5 rounded-[1rem] md:rounded-2xl text-left transition-all duration-200 overflow-hidden shadow-sm ${
                           selectedPkg?.id === pkg.id
                           ? 'bg-[#023E8A] border-2 border-[#00B4D8] shadow-[0_5px_15px_rgba(2,62,138,0.3)]'
                           : 'bg-white border-2 border-transparent hover:border-[#00B4D8]/30'
                         }`}
                       >
                         {selectedPkg?.id === pkg.id && (
-                          <div className="absolute top-0 right-0 bg-[#00B4D8] rounded-bl-xl p-1.5 shadow-md">
-                            <svg className="h-3 w-3 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                          <div className="absolute top-0 right-0 bg-[#00B4D8] rounded-bl-lg md:rounded-bl-xl p-1 md:p-1.5 shadow-md">
+                            <svg className="h-2.5 w-2.5 md:h-3 md:w-3 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                           </div>
                         )}
-                        <div className={`text-sm mb-1 ${selectedPkg?.id === pkg.id ? 'text-white font-bold' : 'text-[#023E8A] font-bold'}`}>{pkg.name}</div>
-                        <div className={`text-[10px] mb-3 ${selectedPkg?.id === pkg.id ? 'text-[#CAF0F8]/70' : 'text-[#023E8A]/60'}`}>{pkg.bonus || 'No bonus'}</div>
-                        <div className={`text-sm font-extrabold ${selectedPkg?.id === pkg.id ? 'text-[#00B4D8]' : 'text-[#00B4D8]'}`}>{pkg.price.toLocaleString()} Ks</div>
+                        <div className={`text-xs md:text-sm mb-1 line-clamp-2 ${selectedPkg?.id === pkg.id ? 'text-white font-bold' : 'text-[#023E8A] font-bold'}`}>{pkg.name}</div>
+                        <div className={`text-[9px] md:text-[10px] mb-2 md:mb-3 ${selectedPkg?.id === pkg.id ? 'text-[#CAF0F8]/70' : 'text-[#023E8A]/60'}`}>{pkg.bonus || 'No bonus'}</div>
+                        <div className={`text-xs md:text-sm font-extrabold ${selectedPkg?.id === pkg.id ? 'text-[#00B4D8]' : 'text-[#00B4D8]'}`}>{pkg.price.toLocaleString()} Ks</div>
                       </button>
                     ))}
                   </div>
@@ -441,52 +441,52 @@ export default function TopupPage() {
               </section>
 
               <section>
-                <div className="flex items-end gap-3 mb-4">
-                  <span className="text-4xl italic font-black text-[#023E8A]/20">02</span>
-                  <div className="mb-1">
-                    <h2 className="text-lg font-bold text-[#023E8A]">Game Account Data</h2>
-                    <p className="text-[#023E8A]/70 text-[11px]">Make sure your account details are correct</p>
+                <div className="flex items-end gap-2 md:gap-3 mb-4">
+                  <span className="text-3xl md:text-4xl italic font-black text-[#023E8A]/20">02</span>
+                  <div className="mb-0.5 md:mb-1">
+                    <h2 className="text-base md:text-lg font-bold text-[#023E8A]">Game Account Data</h2>
+                    <p className="text-[#023E8A]/70 text-[9px] md:text-[11px]">Make sure your account details are correct</p>
                   </div>
                 </div>
                 
-                <div className="bg-[#023E8A] p-5 rounded-3xl shadow-lg space-y-4">
+                <div className="bg-[#023E8A] p-4 md:p-5 rounded-[1.25rem] md:rounded-3xl shadow-lg space-y-4">
                   {game.inputType === 'mlbb' && (
-                    <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                       <div className="w-full sm:w-1/2">
-                        <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">ID <span className="text-[#FBB02D]">*</span></label>
-                        <input type="text" placeholder="Enter ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">ID <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="Enter ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                       </div>
                       <div className="w-full sm:w-1/2">
-                        <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">Server No. <span className="text-[#FBB02D]">*</span></label>
-                        <input type="text" placeholder="Enter Server No." className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={zoneId} onChange={(e) => setZoneId(e.target.value)} />
+                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Server No. <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="Enter Server No." className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={zoneId} onChange={(e) => setZoneId(e.target.value)} />
                       </div>
                     </div>
                   )}
 
                   {game.inputType === 'pubg' && (
                     <div>
-                      <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">Player ID <span className="text-[#FBB02D]">*</span></label>
-                      <input type="text" placeholder="Enter Player ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                      <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Player ID <span className="text-[#FBB02D]">*</span></label>
+                      <input type="text" placeholder="Enter Player ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                     </div>
                   )}
 
                   {game.inputType === 'username' && (
                     <div>
-                      <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">Telegram Username <span className="text-[#FBB02D]">*</span></label>
-                      <input type="text" placeholder="ဥပမာ: @username သို့မဟုတ် phone number" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                      <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Telegram Username <span className="text-[#FBB02D]">*</span></label>
+                      <input type="text" placeholder="ဥပမာ: @username သို့မဟုတ် phone number" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                     </div>
                   )}
 
                   {game.inputType === 'heartopia' && (
-                    <div className="space-y-4">
-                      <div className="flex flex-col sm:flex-row gap-4">
+                    <div className="space-y-3 md:space-y-4">
+                      <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                         <div className="w-full sm:w-1/2">
-                          <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">UID <span className="text-[#FBB02D]">*</span></label>
-                          <input type="text" placeholder="UID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">UID <span className="text-[#FBB02D]">*</span></label>
+                          <input type="text" placeholder="UID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                         </div>
                         <div className="w-full sm:w-1/2">
-                          <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">FIELD <span className="text-[#FBB02D]">*</span></label>
-                          <select className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={serverField} onChange={(e) => setServerField(e.target.value)}>
+                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">FIELD <span className="text-[#FBB02D]">*</span></label>
+                          <select className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={serverField} onChange={(e) => setServerField(e.target.value)}>
                             <option value="Global">Global</option>
                             <option value="Asia">Asia</option>
                             <option value="America">America</option>
@@ -495,8 +495,8 @@ export default function TopupPage() {
                         </div>
                       </div>
                       <div>
-                        <label className="text-[10px] font-bold text-[#CAF0F8] mb-2 block uppercase tracking-wider">AID <span className="text-[#FBB02D]">*</span></label>
-                        <input type="text" placeholder="AID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={aid} onChange={(e) => setAid(e.target.value)} />
+                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">AID <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="AID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={aid} onChange={(e) => setAid(e.target.value)} />
                       </div>
                     </div>
                   )}
@@ -504,26 +504,26 @@ export default function TopupPage() {
               </section>
 
               <section>
-                <div className="flex items-end gap-3 mb-4">
-                  <span className="text-4xl italic font-black text-[#023E8A]/20">03</span>
-                  <div className="mb-1">
-                    <h2 className="text-lg font-bold text-[#023E8A]">Choose Payment Method</h2>
-                    <p className="text-[#023E8A]/70 text-[11px]">Various payment methods available</p>
+                <div className="flex items-end gap-2 md:gap-3 mb-4">
+                  <span className="text-3xl md:text-4xl italic font-black text-[#023E8A]/20">03</span>
+                  <div className="mb-0.5 md:mb-1">
+                    <h2 className="text-base md:text-lg font-bold text-[#023E8A]">Choose Payment Method</h2>
+                    <p className="text-[#023E8A]/70 text-[9px] md:text-[11px]">Various payment methods available</p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 md:gap-3">
                   {paymentMethods.map((pm) => (
                     <button
                       key={pm.id}
                       onClick={() => setPaymentMethod(pm.id)}
-                      className={`relative p-3 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-200 shadow-sm ${
+                      className={`relative p-2.5 md:p-3 rounded-xl md:rounded-2xl flex flex-col items-center justify-center gap-1.5 md:gap-2 transition-all duration-200 shadow-sm ${
                         paymentMethod === pm.id
                         ? 'bg-[#023E8A] border-2 border-[#00B4D8] shadow-[0_5px_15px_rgba(2,62,138,0.3)]'
                         : 'bg-white border-2 border-transparent hover:border-[#00B4D8]/30'
                       }`}
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center p-1 overflow-hidden shadow-inner mb-1">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gray-100 flex items-center justify-center p-1 overflow-hidden shadow-inner mb-0.5 md:mb-1">
                         <img src={pm.img} alt={pm.name} className="w-full h-full object-contain"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none';
@@ -531,7 +531,7 @@ export default function TopupPage() {
                           }}
                         />
                       </div>
-                      <span className={`text-[10px] font-bold text-center ${paymentMethod === pm.id ? 'text-[#CAF0F8]' : 'text-[#023E8A]'}`}>{pm.name}</span>
+                      <span className={`text-[9px] md:text-[10px] font-bold text-center ${paymentMethod === pm.id ? 'text-[#CAF0F8]' : 'text-[#023E8A]'}`}>{pm.name}</span>
                     </button>
                   ))}
                 </div>
@@ -539,40 +539,40 @@ export default function TopupPage() {
             </div>
 
             <div className="lg:col-span-1">
-              <div className="sticky top-24 bg-[#023E8A] rounded-3xl p-5 shadow-2xl border border-white/10">
-                <h3 className="text-[#CAF0F8] text-[11px] font-bold uppercase tracking-widest mb-4 border-b border-white/20 pb-3">Order Summary</h3>
+              <div className="sticky top-20 md:top-24 bg-[#023E8A] rounded-[1.25rem] md:rounded-3xl p-4 md:p-5 shadow-2xl border border-white/10">
+                <h3 className="text-[#CAF0F8] text-[9px] md:text-[11px] font-bold uppercase tracking-widest mb-3 md:mb-4 border-b border-white/20 pb-2 md:pb-3">Order Summary</h3>
                 
-                <div className="flex items-center gap-3 mb-5">
-                  <img src={game.img} className="w-12 h-12 rounded-xl object-cover shadow-md" />
+                <div className="flex items-center gap-2.5 md:gap-3 mb-4 md:mb-5">
+                  <img src={game.img} className="w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl object-cover shadow-md" />
                   <div>
-                    <h4 className="text-white font-bold text-sm">{game.name}</h4>
-                    <p className="text-[#00B4D8] text-[10px] font-bold">{selectedPkg ? selectedPkg.name : 'No amount selected'}</p>
+                    <h4 className="text-white font-bold text-xs md:text-sm">{game.name}</h4>
+                    <p className="text-[#00B4D8] text-[9px] md:text-[10px] font-bold">{selectedPkg ? selectedPkg.name : 'No amount selected'}</p>
                   </div>
                 </div>
 
-                <div className="space-y-4 mb-6">
+                <div className="space-y-3 md:space-y-4 mb-4 md:mb-6">
                   <div>
-                    <p className="text-[#CAF0F8]/70 text-[10px] uppercase tracking-wider mb-1">Target Account</p>
-                    <p className="text-white text-xs font-medium italic">{getTargetAccountText()}</p>
+                    <p className="text-[#CAF0F8]/70 text-[9px] md:text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">Target Account</p>
+                    <p className="text-white text-[11px] md:text-xs font-medium italic break-words">{getTargetAccountText()}</p>
                   </div>
                   <div>
-                    <p className="text-[#CAF0F8]/70 text-[10px] uppercase tracking-wider mb-1">Payment Method</p>
-                    <p className="text-white text-xs font-medium italic">
+                    <p className="text-[#CAF0F8]/70 text-[9px] md:text-[10px] uppercase tracking-wider mb-0.5 md:mb-1">Payment Method</p>
+                    <p className="text-white text-[11px] md:text-xs font-medium italic">
                       {paymentMethod ? paymentMethods.find(p => p.id === paymentMethod)?.name : 'Not selected'}
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-2 border-t border-white/20 pt-4 mb-4">
-                  <div className="flex justify-between text-xs">
+                <div className="space-y-2 border-t border-white/20 pt-3 md:pt-4 mb-3 md:mb-4">
+                  <div className="flex justify-between text-[11px] md:text-xs">
                     <span className="text-[#CAF0F8]">Subtotal</span>
                     <span className="text-white font-bold">{selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks</span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center border-t border-white/20 pt-4 mb-6">
-                  <span className="text-white font-bold text-sm">Total Payment</span>
-                  <span className="text-[#FBB02D] font-extrabold text-xl">
+                <div className="flex justify-between items-center border-t border-white/20 pt-3 md:pt-4 mb-4 md:mb-6">
+                  <span className="text-white font-bold text-xs md:text-sm">Total Payment</span>
+                  <span className="text-[#FBB02D] font-extrabold text-base md:text-xl">
                     {selectedPkg ? selectedPkg.price.toLocaleString() : 0} Ks
                   </span>
                 </div>
@@ -580,7 +580,7 @@ export default function TopupPage() {
                 <button
                   onClick={openPaymentModal}
                   disabled={!isFormValid}
-                  className={`w-full py-3.5 rounded-xl font-extrabold text-sm transition-all duration-300 shadow-lg ${
+                  className={`w-full py-3 md:py-3.5 rounded-lg md:rounded-xl font-extrabold text-xs md:text-sm transition-all duration-300 shadow-lg ${
                     isFormValid
                     ? 'bg-[#FBB02D] text-[#023E8A] hover:bg-[#e8a329] shadow-[0_5px_15px_rgba(251,176,45,0.4)]'
                     : 'bg-[#CAF0F8]/20 text-[#CAF0F8]/50 cursor-not-allowed'
@@ -600,52 +600,52 @@ export default function TopupPage() {
 
       {showPaymentModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#023E8A]/90 px-4 backdrop-blur-md">
-          <div className="bg-[#023E8A] p-6 rounded-3xl border border-[#00B4D8]/30 w-full max-w-md shadow-2xl relative">
-            <button onClick={() => setShowPaymentModal(false)} className="absolute top-4 right-4 text-[#CAF0F8]/50 hover:text-white text-xl">✕</button>
+          <div className="bg-[#023E8A] p-5 md:p-6 rounded-[1.25rem] md:rounded-3xl border border-[#00B4D8]/30 w-full max-w-md shadow-2xl relative">
+            <button onClick={() => setShowPaymentModal(false)} className="absolute top-3 md:top-4 right-3 md:right-4 text-[#CAF0F8]/50 hover:text-white text-lg md:text-xl">✕</button>
             
-            <h3 className="text-xl font-bold text-white mb-2">ငွေပေးချေရန်</h3>
+            <h3 className="text-lg md:text-xl font-bold text-white mb-2">ငွေပေးချေရန်</h3>
             
             {paymentMethod === 'wallet' ? (
-              <p className="text-[#CAF0F8]/70 text-xs mb-5">သင့် Wallet ဖြင့် အလိုအလျောက် ပေးချေပါမည်။</p>
+              <p className="text-[#CAF0F8]/70 text-[10px] md:text-xs mb-4 md:mb-5">သင့် Wallet ဖြင့် အလိုအလျောက် ပေးချေပါမည်။</p>
             ) : (
-              <p className="text-[#CAF0F8]/70 text-xs mb-5">အောက်ပါအကောင့်သို့ ငွေလွှဲပြီး ပြေစာ (Screenshot) တင်ပေးပါ။</p>
+              <p className="text-[#CAF0F8]/70 text-[10px] md:text-xs mb-4 md:mb-5">အောက်ပါအကောင့်သို့ ငွေလွှဲပြီး ပြေစာ (Screenshot) တင်ပေးပါ။</p>
             )}
 
             {paymentMethod !== 'wallet' && (
-              <div className="bg-[#CAF0F8]/10 p-5 rounded-2xl border border-[#00B4D8]/20 mb-5 shadow-inner">
+              <div className="bg-[#CAF0F8]/10 p-4 md:p-5 rounded-xl md:rounded-2xl border border-[#00B4D8]/20 mb-4 md:mb-5 shadow-inner">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-[#CAF0F8]/70 text-xs uppercase font-bold tracking-wider">Pay To:</span>
-                  <span className="text-[#00B4D8] font-bold text-sm uppercase bg-[#00B4D8]/20 px-3 py-1 rounded-full">{paymentMethod}</span>
+                  <span className="text-[#CAF0F8]/70 text-[10px] md:text-xs uppercase font-bold tracking-wider">Pay To:</span>
+                  <span className="text-[#00B4D8] font-bold text-xs md:text-sm uppercase bg-[#00B4D8]/20 px-2 md:px-3 py-1 rounded-full">{paymentMethod}</span>
                 </div>
-                <div className="text-white text-2xl font-bold tracking-widest mt-2">{adminAccounts[paymentMethod]?.phone}</div>
-                <div className="text-[#CAF0F8] text-sm mt-1">အမည်: {adminAccounts[paymentMethod]?.name}</div>
+                <div className="text-white text-xl md:text-2xl font-bold tracking-widest mt-2">{adminAccounts[paymentMethod]?.phone}</div>
+                <div className="text-[#CAF0F8] text-xs md:text-sm mt-1">အမည်: {adminAccounts[paymentMethod]?.name}</div>
                 
-                <div className="flex justify-between items-end mt-4 pt-4 border-t border-[#00B4D8]/30">
-                  <span className="text-[#CAF0F8] text-xs">ကျသင့်ငွေ</span>
-                  <span className="text-[#FBB02D] font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
+                <div className="flex justify-between items-end mt-3 md:mt-4 pt-3 md:pt-4 border-t border-[#00B4D8]/30">
+                  <span className="text-[#CAF0F8] text-[10px] md:text-xs">ကျသင့်ငွေ</span>
+                  <span className="text-[#FBB02D] font-extrabold text-lg md:text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
                 </div>
               </div>
             )}
 
             {paymentMethod === 'wallet' ? (
-              <div className="mb-6">
-                <label className="block text-[#CAF0F8] text-xs font-bold mb-3 uppercase tracking-wider">Your Account Email</label>
-                <div className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-4 py-3 text-white text-sm font-bold opacity-80 cursor-not-allowed shadow-inner">
+              <div className="mb-4 md:mb-6">
+                <label className="block text-[#CAF0F8] text-[10px] md:text-xs font-bold mb-2 md:mb-3 uppercase tracking-wider">Your Account Email</label>
+                <div className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-lg md:rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm font-bold opacity-80 cursor-not-allowed shadow-inner overflow-hidden text-ellipsis">
                   {userEmail || 'Please Login First'}
                 </div>
-                <div className="flex justify-between items-end mt-4 pt-4 border-t border-[#00B4D8]/30">
-                  <span className="text-[#CAF0F8] text-xs">ဖြတ်တောက်မည့်ငွေ</span>
-                  <span className="text-[#FBB02D] font-extrabold text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
+                <div className="flex justify-between items-end mt-3 md:mt-4 pt-3 md:pt-4 border-t border-[#00B4D8]/30">
+                  <span className="text-[#CAF0F8] text-[10px] md:text-xs">ဖြတ်တောက်မည့်ငွေ</span>
+                  <span className="text-[#FBB02D] font-extrabold text-lg md:text-xl">{selectedPkg?.price.toLocaleString()} Ks</span>
                 </div>
               </div>
             ) : (
-              <div className="mb-6">
-                <label className="block text-[#CAF0F8] text-xs font-bold mb-3 uppercase tracking-wider">ငွေလွှဲပြေစာ (Screenshot) ရွေးရန် <span className="text-[#FBB02D]">*</span></label>
+              <div className="mb-4 md:mb-6">
+                <label className="block text-[#CAF0F8] text-[10px] md:text-xs font-bold mb-2 md:mb-3 uppercase tracking-wider">ငွေလွှဲပြေစာ (Screenshot) ရွေးရန် <span className="text-[#FBB02D]">*</span></label>
                 <input 
                   type="file" 
                   accept="image/*" 
                   onChange={(e) => setSlipFile(e.target.files?.[0] || null)} 
-                  className="w-full text-sm text-[#CAF0F8] file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#00B4D8] file:text-[#023E8A] hover:file:bg-[#0096b8] cursor-pointer border border-dashed border-[#00B4D8]/50 rounded-xl p-2 transition-all" 
+                  className="w-full text-[11px] md:text-sm text-[#CAF0F8] file:mr-2 md:file:mr-4 file:py-2 md:file:py-2.5 file:px-3 md:file:px-5 file:rounded-lg md:file:rounded-xl file:border-0 file:text-[10px] md:file:text-xs file:font-bold file:bg-[#00B4D8] file:text-[#023E8A] hover:file:bg-[#0096b8] cursor-pointer border border-dashed border-[#00B4D8]/50 rounded-lg md:rounded-xl p-1.5 md:p-2 transition-all" 
                 />
               </div>
             )}
@@ -653,7 +653,7 @@ export default function TopupPage() {
             <button 
               onClick={confirmOrder} 
               disabled={isUploading || (paymentMethod !== 'wallet' && !slipFile)} 
-              className={`w-full py-4 rounded-xl font-bold text-sm transition-all shadow-lg ${
+              className={`w-full py-3 md:py-4 rounded-lg md:rounded-xl font-bold text-xs md:text-sm transition-all shadow-lg ${
                 (!slipFile && paymentMethod !== 'wallet') || isUploading 
                 ? 'bg-[#CAF0F8]/20 text-[#CAF0F8]/50 cursor-not-allowed' 
                 : 'bg-[#FBB02D] text-[#023E8A] hover:bg-[#e8a329] shadow-[0_5px_15px_rgba(251,176,45,0.4)]'
@@ -667,15 +667,15 @@ export default function TopupPage() {
 
       {orderSuccess && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#023E8A]/90 px-4 backdrop-blur-md transition-opacity duration-300">
-          <div className="bg-white p-8 rounded-3xl text-center max-w-sm w-full border border-gray-200 shadow-[0_10px_40px_rgba(0,180,216,0.2)] transform scale-100">
-            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
+          <div className="bg-white p-6 md:p-8 rounded-[1.25rem] md:rounded-3xl text-center max-w-sm w-full border border-gray-200 shadow-[0_10px_40px_rgba(0,180,216,0.2)] transform scale-100">
+            <div className="w-12 h-12 md:w-16 md:h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4 shadow-[0_0_20px_rgba(34,197,94,0.4)]">
+              <svg className="w-6 h-6 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path></svg>
             </div>
-            <h2 className="font-bold text-xl mb-2 text-[#023E8A]">Order Successful!</h2>
-            <p className="text-gray-500 text-xs mb-6">Admin will process your order shortly.</p>
+            <h2 className="font-bold text-lg md:text-xl mb-1 md:mb-2 text-[#023E8A]">Order Successful!</h2>
+            <p className="text-gray-500 text-[10px] md:text-xs mb-5 md:mb-6">Admin will process your order shortly.</p>
             <button 
               onClick={() => window.location.href = '/'} 
-              className="inline-block bg-[#023E8A] text-white font-bold py-3 px-8 rounded-xl w-full shadow-[0_5px_15px_rgba(2,62,138,0.4)] hover:bg-[#03045E] transition-colors text-sm"
+              className="inline-block bg-[#023E8A] text-white font-bold py-2.5 md:py-3 px-6 md:px-8 rounded-lg md:rounded-xl w-full shadow-[0_5px_15px_rgba(2,62,138,0.4)] hover:bg-[#03045E] transition-colors text-xs md:text-sm"
             >
               Return Home
             </button>
