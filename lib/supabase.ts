@@ -1,6 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://painggyishop.vercel.app/api/supabase';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlamZoc3V3YWptemlrbXVkbWNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3NjA4NzUsImV4cCI6MjEwMzMzNjg3NX0.x3EVXbqCmrq0yiGlKI6GrWadKWU9TuXKs5F3w8uJNQA';
+const isBrowser = typeof window !== 'undefined';
+// 🌟 Vercel မှတစ်ဆင့် Proxy ခေါ်ရန် /api/supabase ဟု ပြောင်းလိုက်သည် 🌟
+const supabaseUrl = isBrowser ? '/api/supabase' : 'https://lejfhsuwajmzikmudmcs.supabase.co';
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: true,
+  }
+});
