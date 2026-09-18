@@ -56,7 +56,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* 🌟 fixed အစား sticky ပြောင်းပြီး mb-8 ဖြင့် အောက်ကစာများကို တွန်းချထားပါသည် 🌟 */}
       <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-8">
         <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-lg rounded-full px-4 py-2 md:px-6 md:py-3 flex items-center justify-between">
           
@@ -64,7 +63,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-2 relative">
              <div className="w-10 h-10 md:w-12 md:h-12 relative rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 flex items-center justify-center">
                 <img 
-                  src="/new-logo.jpg" 
+                  src="/painggyi-logo-clear.png" 
                   alt="PG"
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -75,11 +74,10 @@ export default function Navbar() {
              </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
+          {/* Desktop Navigation Links (Track Order ပိုနေတာကို ဖြုတ်ထားသည်) */}
           <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60">
             <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-gray-800 hover:bg-white shadow-sm transition-all">Home</Link>
             <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-gray-600 hover:bg-white transition-all">All Games</Link>
-            <Link href="/history" className="px-5 py-2 rounded-full text-sm font-bold text-gray-600 hover:bg-white transition-all">Track Order</Link>
           </div>
 
           {/* Right Side Actions (Wallet & Profile) */}
