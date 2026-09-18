@@ -7,7 +7,6 @@ import { supabase } from '../../lib/supabase';
 
 export default function WalletPage() {
   const [userEmail, setUserEmail] = useState<string>(''); 
-  // ပြင်ဆင်ချက် ၁: number အပြင် string ပါ လက်ခံအောင် ပြောင်းပြီး၊ မူလတန်ဖိုးကို 50000 ထားသည်
   const [amount, setAmount] = useState<number | string>(50000); 
   const [selectedMethod, setSelectedMethod] = useState('Wave Pay');
   const [step, setStep] = useState<'form' | 'detail'>('form');
@@ -19,6 +18,9 @@ export default function WalletPage() {
 
   const [invoiceCode, setInvoiceCode] = useState('');
 
+  // 🌟 အသစ်ထည့်ထားသည်: ၁၀ မိနစ် (စက္ကန့် ၆၀၀) Timer State
+  const [timeLeft, setTimeLeft] = useState(600);
+
   useEffect(() => {
     generateInvoiceCode();
     const fetchUser = async () => {
@@ -29,6 +31,23 @@ export default function WalletPage() {
     };
     fetchUser();
   }, []);
+
+  // 🌟 အသစ်ထည့်ထားသည်: Timer အလုပ်လုပ်ရန် useEffect
+  useEffect(() => {
+    if (step === 'detail' && timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [step, timeLeft]);
+
+  // 🌟 အသစ်ထည့်ထားသည်: စက္ကန့်များကို 00 : 10 : 00 ပုံစံပြောင်းပေးသည့် Function
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `00 : ${mins.toString().padStart(2, '0')} : ${secs.toString().padStart(2, '0')}`;
+  };
 
   const generateInvoiceCode = () => {
     const date = new Date();
@@ -73,7 +92,6 @@ export default function WalletPage() {
       return;
     }
     
-    // ပြင်ဆင်ချက် ၃: amount ကို Database ထဲ ထည့်ခါနီးမှာ number အဖြစ် သေချာပြောင်းသည်
     const numericAmount = Number(amount) || 0;
     if (numericAmount < 3000) {
       alert("အနည်းဆုံး ၃,၀၀၀ ကျပ် ဖြည့်သွင်းရပါမည်။");
@@ -162,7 +180,6 @@ export default function WalletPage() {
                       min="3000"
                       value={amount}
                       onChange={(e) => {
-                        // ပြင်ဆင်ချက် ၂: အလွတ်ဖြစ်ရင် အလွတ်ထားမယ်၊ မဟုတ်ရင် နံပါတ်ပြောင်းမယ်
                         const val = e.target.value;
                         setAmount(val === '' ? '' : Number(val));
                       }}
@@ -250,8 +267,10 @@ export default function WalletPage() {
                 </div>
 
                 <button 
-                  onClick={() => setStep('detail')}
-                  // amount ကို Number အဖြစ်ပြောင်းပြီး စစ်ဆေးသည်
+                  onClick={() => {
+                    setStep('detail');
+                    setTimeLeft(600); // 🌟 အသစ်: ငွေသွင်းမယ်နှိပ်တာနဲ့ ၁၀ မိနစ် အစက ပြန်စမယ်
+                  }}
                   disabled={Number(amount) < 3000 || !userEmail}
                   className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg ${
                     (Number(amount) >= 3000 && userEmail)
@@ -270,7 +289,8 @@ export default function WalletPage() {
             
             <div className="bg-[#131422] p-6 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
               <div className="bg-pink-600/20 border border-pink-500/30 text-pink-400 text-center py-2.5 rounded-2xl text-xs font-bold mb-6">
-                Complete within 00 : 14 : 59
+                {/* 🌟 အသစ်: အရှင် Timer နဲ့ အစားထိုးထားသည် 🌟 */}
+                {timeLeft > 0 ? `Complete within ${formatTime(timeLeft)}` : "⏱ Time's up! Please restart."}
               </div>
 
               <div className="mb-6 bg-[#0a0b14] p-4 rounded-2xl border border-white/5">
@@ -329,11 +349,11 @@ export default function WalletPage() {
 
                 <button 
                   onClick={submitTopup}
-                  disabled={isUploaded || isUploading || !slipFile}
+                  disabled={isUploaded || isUploading || !slipFile || timeLeft <= 0} // 🌟 အသစ်: အချိန်ကုန်သွားရင် နှိပ်လို့မရတော့ဘူး
                   className={`w-full mt-4 py-3 rounded-xl font-bold text-xs transition-all ${
                     isUploaded 
                     ? 'bg-green-600 text-white cursor-not-allowed' 
-                    : (!slipFile || isUploading)
+                    : (!slipFile || isUploading || timeLeft <= 0)
                       ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
                       : 'bg-pink-600 hover:bg-pink-500 text-white shadow-[0_0_10px_rgba(236,72,153,0.4)]'
                   }`}
@@ -349,8 +369,8 @@ export default function WalletPage() {
                     setIsUploaded(false); 
                     setSlipFile(null); 
                     generateInvoiceCode(); 
-                    // အသစ်ပြန်စရင် amount ကို ပြန်ရှင်းပေးမယ်
                     setAmount(""); 
+                    setTimeLeft(600); // 🌟 အသစ်: အစကပြန်စရင် Timer ပြန်စမယ်
                   }}
                   className="flex-1 bg-[#1a1b2e] hover:bg-[#25273c] text-white py-3 rounded-xl text-xs font-bold border border-white/10 text-center"
                 >
