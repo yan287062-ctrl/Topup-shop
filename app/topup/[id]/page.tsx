@@ -25,7 +25,8 @@ export default function TopupPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
 
-  const [isLoadingPrices, setIsLoadingPrices] = useState(true);
+  // 🌟 ပြင်ဆင်ချက်: true အစား false သို့ ပြောင်းထားသည် (Loading မကြာစေရန်) 🌟
+  const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   
   const [orderCount, setOrderCount] = useState(0);
 
