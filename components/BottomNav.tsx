@@ -2,96 +2,100 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
 
-  const user = {
-    isLoggedIn: true,
-    name: 'Mg Mg', 
-    avatarUrl: '' 
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-md bg-[#03045E]/95 backdrop-blur-xl rounded-[2rem] px-2 py-2.5 flex justify-between items-center shadow-[0_10px_40px_rgba(0,0,0,0.5)] z-[999] border border-white/10">
-      
-      <svg width="0" height="0" className="absolute">
-        <defs>
-          <linearGradient id="active-gradient" x1="0%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#00B4D8" />
-            <stop offset="100%" stopColor="#023E8A" />
-          </linearGradient>
-        </defs>
-      </svg>
-
-      <Link href="/" className="relative flex flex-col items-center justify-center w-[60px] group transition-transform duration-300 hover:scale-105 cursor-pointer">
-        <svg 
-          className={`w-[22px] h-[22px] mb-1 transition-all duration-300 ${pathname === '/' ? 'drop-shadow-[0_0_8px_rgba(0,180,216,0.6)]' : 'text-[#8a92a6] group-hover:text-gray-300'}`} 
-          fill={pathname === '/' ? "url(#active-gradient)" : "currentColor"} 
-          viewBox="0 0 24 24"
+    <div className="fixed bottom-4 left-0 right-0 z-[60] flex justify-center px-4">
+      {/* 🌟 Glass Design Container 🌟 */}
+      <div className="bg-[#023E8A]/85 backdrop-blur-xl border border-white/10 shadow-[0_10px_40px_rgba(2,62,138,0.4)] rounded-full px-1.5 py-1.5 flex items-center justify-between w-full max-w-[400px]">
+        
+        {/* 1. Home */}
+        <Link 
+          href="/" 
+          className={`relative flex flex-col items-center justify-center w-[20%] py-2 rounded-full transition-all duration-300 ${pathname === '/' ? 'bg-white/15 shadow-inner' : 'hover:bg-white/5'}`}
         >
-          <path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>
-        </svg>
-        <span className={`text-[9px] font-bold transition-colors duration-300 ${pathname === '/' ? 'text-[#00B4D8]' : 'text-[#8a92a6] group-hover:text-gray-300'}`}>Home</span>
-      </Link>
+          <svg className={`w-[22px] h-[22px] mb-1 transition-colors ${pathname === '/' ? 'text-white' : 'text-[#CAF0F8]/60'}`} fill={pathname === '/' ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+            {pathname === '/' ? (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            )}
+          </svg>
+          <span className={`text-[9px] font-bold tracking-wide transition-colors ${pathname === '/' ? 'text-white' : 'text-[#CAF0F8]/60'}`}>Home</span>
+        </Link>
 
-      <Link href="/history" className="relative flex flex-col items-center justify-center w-[60px] group transition-transform duration-300 hover:scale-105 cursor-pointer">
-        <svg 
-          className={`w-[22px] h-[22px] mb-1 transition-all duration-300 ${pathname === '/history' ? 'drop-shadow-[0_0_8px_rgba(0,180,216,0.6)]' : 'text-[#8a92a6] group-hover:text-gray-300'}`} 
-          fill="none" 
-          stroke={pathname === '/history' ? "url(#active-gradient)" : "currentColor"} 
-          strokeWidth="2.2" 
-          viewBox="0 0 24 24"
+        {/* 2. History */}
+        <Link 
+          href="/history" 
+          className={`relative flex flex-col items-center justify-center w-[20%] py-2 rounded-full transition-all duration-300 ${pathname === '/history' ? 'bg-white/15 shadow-inner' : 'hover:bg-white/5'}`}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        <span className={`text-[9px] font-bold transition-colors duration-300 ${pathname === '/history' ? 'text-[#00B4D8]' : 'text-[#8a92a6] group-hover:text-gray-300'}`}>History</span>
-      </Link>
+          <svg className={`w-[22px] h-[22px] mb-1 transition-colors ${pathname === '/history' ? 'text-white' : 'text-[#CAF0F8]/60'}`} fill={pathname === '/history' ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname === '/history' ? 0 : 1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span className={`text-[9px] font-bold tracking-wide transition-colors ${pathname === '/history' ? 'text-white' : 'text-[#CAF0F8]/60'}`}>History</span>
+        </Link>
 
-      <Link href="/wallet" className="relative flex flex-col items-center justify-center w-[60px] group transition-transform duration-300 hover:scale-105 cursor-pointer">
-        <svg 
-          className={`w-[24px] h-[24px] mb-1 transition-all duration-300 ${pathname === '/wallet' ? 'drop-shadow-[0_0_8px_rgba(0,180,216,0.6)]' : 'text-[#8a92a6] group-hover:text-gray-300'}`} 
-          viewBox="0 0 24 24"
+        {/* 3. Wallet (🌟 Animated Glowing Orb 🌟) */}
+        <Link 
+          href="/wallet" 
+          className="relative flex flex-col items-center justify-center w-[20%] py-1 group"
         >
-          <g fill={pathname === '/wallet' ? "url(#active-gradient)" : "currentColor"}>
-            <path opacity="0.5" d="M7 8l7.5-3.2a1.5 1.5 0 0 1 2 .6l1 2.1H7z" />
-            <path opacity="0.75" d="M5 9.5l8.5-2.4a1.5 1.5 0 0 1 1.9.9l.6 1.5H5z" />
-            <path d="M3 11a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H3zm14 5.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
-          </g>
-        </svg>
-        <span className={`text-[9px] font-bold transition-colors duration-300 ${pathname === '/wallet' ? 'text-[#00B4D8]' : 'text-[#8a92a6] group-hover:text-gray-300'}`}>Wallet</span>
-      </Link>
+          {/* Animated Background Glow */}
+          <div className="absolute top-1 w-[46px] h-[46px] rounded-full overflow-hidden">
+             <div className="absolute inset-[-50%] w-[200%] h-[200%] bg-[conic-gradient(from_0deg,transparent_0_340deg,white_360deg)] animate-spin-slow opacity-80 mix-blend-overlay"></div>
+             <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-pink-500 via-rose-400 to-yellow-400 opacity-90 blur-[2px]"></div>
+          </div>
+          
+          {/* Static Inner Circle with Icon */}
+          <div className={`relative z-10 w-[42px] h-[42px] rounded-full flex items-center justify-center mb-1 transition-all duration-300 bg-[#023E8A] border border-white/20 group-hover:scale-105 shadow-inner`}>
+            <svg className="w-[20px] h-[20px] text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+          </div>
+          <span className={`text-[9px] font-black tracking-wide relative z-10 ${pathname === '/wallet' ? 'text-white drop-shadow-md' : 'text-[#CAF0F8]/80'}`}>Wallet</span>
+        </Link>
 
-      <Link href="/inbox" className="relative flex flex-col items-center justify-center w-[60px] group transition-transform duration-300 hover:scale-105 cursor-pointer">
-        <svg 
-          className={`w-[22px] h-[22px] mb-1 transition-all duration-300 ${pathname === '/inbox' ? 'drop-shadow-[0_0_8px_rgba(0,180,216,0.6)]' : 'text-[#8a92a6] group-hover:text-gray-300'}`} 
-          fill="none" 
-          stroke={pathname === '/inbox' ? "url(#active-gradient)" : "currentColor"} 
-          strokeWidth="2.2" 
-          viewBox="0 0 24 24"
+        {/* 4. Inbox */}
+        <Link 
+          href="/inbox" 
+          className={`relative flex flex-col items-center justify-center w-[20%] py-2 rounded-full transition-all duration-300 ${pathname === '/inbox' ? 'bg-white/15 shadow-inner' : 'hover:bg-white/5'}`}
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-        <span className={`text-[9px] font-bold transition-colors duration-300 ${pathname === '/inbox' ? 'text-[#00B4D8]' : 'text-[#8a92a6] group-hover:text-gray-300'}`}>Inbox</span>
-      </Link>
+          <svg className={`w-[22px] h-[22px] mb-1 transition-colors ${pathname === '/inbox' ? 'text-white' : 'text-[#CAF0F8]/60'}`} fill={pathname === '/inbox' ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+             {pathname === '/inbox' ? (
+               <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
+             ) : (
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+             )}
+          </svg>
+          <span className={`text-[9px] font-bold tracking-wide transition-colors ${pathname === '/inbox' ? 'text-white' : 'text-[#CAF0F8]/60'}`}>Inbox</span>
+        </Link>
 
-      <Link href="/account" className="relative flex flex-col items-center justify-center w-[60px] group transition-transform duration-300 hover:scale-105 cursor-pointer">
-        <div 
-          className={`w-[22px] h-[22px] mb-1 rounded-full flex items-center justify-center overflow-hidden border-[2px] transition-all duration-300 ${
-            pathname === '/account' 
-              ? 'border-[#00B4D8] shadow-[0_0_8px_rgba(0,180,216,0.6)]' 
-              : 'border-transparent opacity-70 group-hover:opacity-100'
-          } ${!user.avatarUrl && 'bg-gradient-to-tr from-[#023E8A] to-[#00B4D8]'}`}
+        {/* 5. Account / Log In */}
+        <Link 
+          href="/login" 
+          className={`relative flex flex-col items-center justify-center w-[20%] py-2 rounded-full transition-all duration-300 ${pathname === '/login' || pathname === '/account' ? 'bg-white/15 shadow-inner' : 'hover:bg-white/5'}`}
         >
-          {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-          ) : (
-            <span className="text-white text-[10px] font-bold">{user.name.charAt(0)}</span>
-          )}
-        </div>
-        <span className={`text-[9px] font-bold transition-colors duration-300 ${pathname === '/account' ? 'text-[#00B4D8]' : 'text-[#8a92a6] group-hover:text-gray-300'}`}>Account</span>
-      </Link>
+          <svg className={`w-[22px] h-[22px] mb-1 transition-colors ${pathname === '/login' || pathname === '/account' ? 'text-white' : 'text-[#CAF0F8]/60'}`} fill={pathname === '/login' || pathname === '/account' ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+             {pathname === '/login' || pathname === '/account' ? (
+               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+             ) : (
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+             )}
+          </svg>
+          <span className={`text-[9px] font-bold tracking-wide transition-colors ${pathname === '/login' || pathname === '/account' ? 'text-white' : 'text-[#CAF0F8]/60'}`}>Account</span>
+        </Link>
 
+      </div>
     </div>
   );
 }

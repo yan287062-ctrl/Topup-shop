@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation'; // 🌟 URL ဖတ်ရန် အသစ်ထည့်ထားသည် 🌟
 import { supabase } from '../lib/supabase';
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null); 
   const [balance, setBalance] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
+  
+  // 🌟 လက်ရှိရောက်နေသော စာမျက်နှာကို သိရန် 🌟
+  const pathname = usePathname();
 
   useEffect(() => {
     const getSession = async () => {
@@ -74,19 +78,54 @@ export default function Navbar() {
              </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60 gap-1">
-            <Link href="/" className="px-4 py-2 rounded-full text-[13px] font-bold text-gray-800 hover:bg-white shadow-sm transition-all">Home</Link>
-            <Link href="/" className="px-4 py-2 rounded-full text-[13px] font-bold text-gray-600 hover:bg-white transition-all">All Games</Link>
-            {/* 🌟 အသစ်ထည့်ထားသော Region Checker လင့်ခ် 🌟 */}
-            <Link href="/check-region" className="px-4 py-2 rounded-full text-[13px] font-bold text-gray-600 hover:bg-white transition-all whitespace-nowrap">
+          {/* 🌟 Desktop Navigation Links (Active State နှင့် Glass Design) 🌟 */}
+          <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60 gap-1 relative">
+            
+            <Link 
+              href="/" 
+              className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${
+                pathname === '/' 
+                ? 'bg-white shadow-md text-gray-800' 
+                : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'
+              }`}
+            >
+              Home
+            </Link>
+            
+            <Link 
+              href="/all-games" 
+              className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${
+                pathname === '/all-games' 
+                ? 'bg-white shadow-md text-gray-800' 
+                : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'
+              }`}
+            >
+              All Games
+            </Link>
+            
+            <Link 
+              href="/check-region" 
+              className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-300 whitespace-nowrap ${
+                pathname === '/check-region' 
+                ? 'bg-white shadow-md text-[#023E8A]' 
+                : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'
+              }`}
+            >
                Region Check
             </Link>
+
           </div>
 
-          {/* Right Side Actions (ဖုန်းမှာ မပျောက်အောင် ချိန်ညှိထားသည်) */}
+          {/* Right Side Actions */}
           <div className="flex items-center gap-1.5 sm:gap-3">
-            <Link href="/history" className="bg-white/60 border border-white/80 text-gray-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-[9px] sm:text-[10px] font-bold hover:bg-white transition-colors shadow-sm whitespace-nowrap">
+            <Link 
+              href="/history" 
+              className={`border px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-[9px] sm:text-[10px] font-bold transition-colors shadow-sm whitespace-nowrap ${
+                pathname === '/history'
+                ? 'bg-white border-white text-[#023E8A]'
+                : 'bg-white/60 border-white/80 text-gray-700 hover:bg-white'
+              }`}
+            >
               Track Order
             </Link>
             
