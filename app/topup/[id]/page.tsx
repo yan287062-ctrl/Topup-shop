@@ -24,11 +24,12 @@ export default function TopupPage() {
   const [userEmail, setUserEmail] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
-
-  // 🌟 ပြင်ဆင်ချက်: true အစား false သို့ ပြောင်းထားသည် (Loading မကြာစေရန်) 🌟
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
-  
   const [orderCount, setOrderCount] = useState(0);
+
+  // 🌟 အသစ်ထည့်ထားသော ID စစ်ဆေးခြင်းဆိုင်ရာ State များ 🌟
+  const [isCheckingId, setIsCheckingId] = useState(false);
+  const [idCheckResult, setIdCheckResult] = useState<{ status: 'idle' | 'success' | 'error', name: string, region: string, flag: string }>({ status: 'idle', name: '', region: '', flag: '' });
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -161,10 +162,15 @@ export default function TopupPage() {
   const game = gameConfigs[id] || Object.values(gameConfigs).find(g => id.includes(g.dbCat.toLowerCase()));
   const [displayPackages, setDisplayPackages] = useState<any[]>(game ? game.packages : []);
 
+  // ID ရိုက်ထည့်တာနဲ့ Check Result ကို Reset ချဖို့
+  useEffect(() => {
+    if (game?.inputType === 'mlbb') {
+      setIdCheckResult({ status: 'idle', name: '', region: '', flag: '' });
+    }
+  }, [userId, zoneId, game?.inputType]);
+
   useEffect(() => {
     if (!game) return;
-    
-    // Database မှ စျေးနှုန်းများ ဆွဲယူခြင်း
     const fetchRealPrices = async () => {
       try {
         const { data, error } = await supabase.from('game_prices').select('*').eq('category', game.dbCat);
@@ -182,14 +188,9 @@ export default function TopupPage() {
       }
     };
 
-    // Database မှ အမှန်တကယ် ဝယ်ယူထားသူ အရေအတွက် ဆွဲယူခြင်း
     const fetchRealOrderCount = async () => {
       try {
-        const { count, error } = await supabase
-          .from('orders')
-          .select('*', { count: 'exact', head: true })
-          .eq('game_name', game.name); 
-        
+        const { count, error } = await supabase.from('orders').select('*', { count: 'exact', head: true }).eq('game_name', game.name); 
         if (!error && count !== null) {
           setOrderCount(count);
         }
@@ -222,7 +223,8 @@ export default function TopupPage() {
 
   const isFormValid = (() => {
     if (!selectedPkg || !paymentMethod) return false;
-    if (game.inputType === 'mlbb') return userId && zoneId;
+    // 🌟 MLBB ဆိုရင် ID Check Success ဖြစ်မှ Buy Now နှိပ်လို့ရမယ် 🌟
+    if (game.inputType === 'mlbb') return userId && zoneId && idCheckResult.status === 'success';
     if (game.inputType === 'pubg') return userId;
     if (game.inputType === 'username') return userId;
     if (game.inputType === 'heartopia') return userId && aid;
@@ -231,9 +233,47 @@ export default function TopupPage() {
 
   const getTargetAccountText = () => {
     if (!userId) return 'Not filled';
-    if (game.inputType === 'mlbb') return zoneId ? `${userId} (${zoneId})` : userId;
+    if (game.inputType === 'mlbb') return idCheckResult.name ? `${idCheckResult.name} (${userId} | ${zoneId})` : zoneId ? `${userId} (${zoneId})` : userId;
     if (game.inputType === 'heartopia') return aid ? `UID: ${userId}, AID: ${aid} (${serverField})` : `UID: ${userId}`;
     return userId;
+  };
+
+  // 🌟 ID Check Function (API သို့ ချိတ်ဆက်ခြင်း) 🌟
+  const handleCheckId = async () => {
+    if (!userId || !zoneId) {
+      alert("ကျေးဇူးပြု၍ ID နှင့် Server ID နှစ်ခုလုံးကို အပြည့်အစုံထည့်ပါ။");
+      return;
+    }
+    
+    setIsCheckingId(true);
+    setIdCheckResult({ status: 'idle', name: '', region: '', flag: '' });
+
+    try {
+      const response = await fetch(`https://api.isan.eu.org/nickname/ml?id=${userId}&zone=${zoneId}`);
+      if (!response.ok) throw new Error('API Error');
+      
+      const data = await response.json();
+      
+      // API က Name မတွေ့ရင် သို့မဟုတ် Error ပြရင် Invalid လို့သတ်မှတ်မယ်
+      if (!data.name || data.name === "User not found" || data.error) {
+        setIdCheckResult({ status: 'error', name: '', region: '', flag: '' });
+      } else {
+        const flagMap: Record<string, string> = { "MM": "🇲🇲", "ID": "🇮🇩", "PH": "🇵🇭", "MY": "🇲🇾", "SG": "🇸🇬", "TH": "🇹🇭", "VN": "🇻🇳", "GLOBAL": "🌐" };
+        const regionCode = data.region?.toUpperCase() || "GLOBAL";
+        const emoji = flagMap[regionCode] || "🌐";
+        
+        setIdCheckResult({ 
+          status: 'success', 
+          name: data.name, 
+          region: regionCode,
+          flag: emoji
+        });
+      }
+    } catch (error) {
+      setIdCheckResult({ status: 'error', name: '', region: '', flag: '' });
+    } finally {
+      setIsCheckingId(false);
+    }
   };
 
   const openPaymentModal = () => {
@@ -316,7 +356,8 @@ export default function TopupPage() {
         payment_method: paymentMethod,
         slip_url: publicUrl,
         status: 'pending',
-        user_email: userEmail || null // 🌟 ဒီတစ်ကြောင်းတည်း ထပ်ပေါင်းထည့်လိုက်တာပါ သားကြီး! 🌟
+        user_email: userEmail || null,
+        // (မှတ်ချက် - နောက်ပိုင်း Python Bot နဲ့ ချိတ်တဲ့အခါ လိုအပ်ရင်သုံးဖို့ player_name ကို ထည့်ပေးနိုင်ပါတယ်)
       }]);
 
       if (insertError) throw insertError;
@@ -338,13 +379,10 @@ export default function TopupPage() {
 
         <div className="max-w-5xl mx-auto px-4 mt-2">
           
-          {/* 🌟 New Realistic & Dynamic Game Banner 🌟 */}
           <div className="relative w-full bg-[#023E8A] border border-[#00B4D8]/30 rounded-[2rem] p-6 md:p-8 overflow-hidden flex flex-col md:flex-row items-center md:items-start shadow-[0_10px_30px_rgba(2,62,138,0.2)] mb-8 mt-2">
             
-            {/* Background Glow Effect */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-[#00B4D8]/20 rounded-full blur-[80px] pointer-events-none"></div>
 
-            {/* 🌟 Right Side: Transparent PNG Logo 🌟 */}
             <div className="absolute right-[-10px] md:right-8 top-1/2 -translate-y-1/2 w-32 h-32 md:w-[280px] md:h-[280px] opacity-30 md:opacity-100 pointer-events-none flex items-center justify-center transition-all">
                <img 
                  src="/painggyi-logo-clear.png" 
@@ -353,20 +391,16 @@ export default function TopupPage() {
                />
             </div>
 
-            {/* Left Side: Game Info */}
             <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-6 w-full md:w-[70%]">
               
-              {/* Game Icon */}
               <div className="w-20 h-20 md:w-28 md:h-28 flex-shrink-0 rounded-[1rem] md:rounded-[1.25rem] overflow-hidden border-2 md:border-4 border-white/10 shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
                 <img src={game.img} alt={game.name} className="w-full h-full object-cover" />
               </div>
 
-              {/* Game Details */}
               <div className="text-center md:text-left flex flex-col justify-center pt-2">
                 <h1 className="text-xl md:text-[28px] font-black text-white tracking-tight leading-tight">{game.name}</h1>
                 <p className="text-xs md:text-sm text-[#CAF0F8]/80 font-medium mt-1">{game.sub}</p>
                 
-                {/* Dynamic Stats Row */}
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 md:gap-4 text-[10px] md:text-xs font-bold text-[#CAF0F8] mt-3">
                   <span className="flex items-center gap-1 whitespace-nowrap"><span className="text-[#FBB02D] text-sm">★</span> Verified Service</span>
                   <span className="text-white/20">•</span>
@@ -378,7 +412,6 @@ export default function TopupPage() {
                   <span className="flex items-center gap-1 whitespace-nowrap"><span className="text-green-400 text-sm">⚡</span> Fast process</span>
                 </div>
 
-                {/* Tags Row */}
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-4">
                   <span className="px-2.5 py-1.5 md:px-3 md:py-1.5 bg-[#CAF0F8]/10 border border-[#00B4D8]/30 text-white text-[9px] md:text-[10px] font-bold rounded-full backdrop-blur-sm flex items-center gap-1.5 whitespace-nowrap">
                     <svg className="w-3 h-3 text-[#00B4D8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -453,15 +486,71 @@ export default function TopupPage() {
                 
                 <div className="bg-[#023E8A] p-4 md:p-5 rounded-[1.25rem] md:rounded-3xl shadow-lg space-y-4">
                   {game.inputType === 'mlbb' && (
-                    <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                      <div className="w-full sm:w-1/2">
-                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">ID <span className="text-[#FBB02D]">*</span></label>
-                        <input type="text" placeholder="Enter ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                    <div className="space-y-4">
+                      <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                        <div className="w-full sm:w-1/2">
+                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">User ID <span className="text-[#FBB02D]">*</span></label>
+                          <input type="text" placeholder="Enter User ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                        </div>
+                        <div className="w-full sm:w-1/2">
+                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Server (Zone) ID <span className="text-[#FBB02D]">*</span></label>
+                          <input type="text" placeholder="Enter Zone ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={zoneId} onChange={(e) => setZoneId(e.target.value)} />
+                        </div>
                       </div>
-                      <div className="w-full sm:w-1/2">
-                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Server No. <span className="text-[#FBB02D]">*</span></label>
-                        <input type="text" placeholder="Enter Server No." className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={zoneId} onChange={(e) => setZoneId(e.target.value)} />
-                      </div>
+                      
+                      {/* 🌟 New Check Button (Like the Screenshot) 🌟 */}
+                      <button 
+                        onClick={handleCheckId}
+                        disabled={isCheckingId || !userId || !zoneId}
+                        className={`w-full py-2.5 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all shadow-md flex items-center justify-center gap-2 ${isCheckingId || !userId || !zoneId ? 'bg-[#00B4D8]/50 text-white cursor-not-allowed' : 'bg-[#00B4D8] text-white hover:bg-[#0096b8]'}`}
+                      >
+                        {isCheckingId ? (
+                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        )}
+                        {isCheckingId ? 'Checking...' : 'Check Region'}
+                      </button>
+
+                      {/* 🌟 Result Box (Like the Screenshot) 🌟 */}
+                      {idCheckResult.status !== 'idle' && (
+                        <div className={`w-full p-4 rounded-xl border ${idCheckResult.status === 'success' ? 'bg-[#10b981]/10 border-[#10b981]/30' : 'bg-red-500/10 border-red-500/30'}`}>
+                          {idCheckResult.status === 'success' ? (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <span className="text-2xl">{idCheckResult.flag}</span>
+                                <div className="flex flex-col">
+                                  <span className="text-white font-bold text-sm">{idCheckResult.name}</span>
+                                  <span className="text-[#10b981] text-[10px] font-bold uppercase">{idCheckResult.region}</span>
+                                </div>
+                              </div>
+                              <span className="bg-[#10b981] text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> VALID
+                              </span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-2xl">❌</span>
+                                <span className="text-red-400 font-bold text-sm">Account not found</span>
+                              </div>
+                              <span className="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                                INVALID
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center mt-3 pt-3 border-t border-white/10">
+                             <div className="flex flex-col">
+                               <span className="text-white/50 text-[9px] uppercase">User ID</span>
+                               <span className="text-white/80 text-xs font-medium">{userId || '-'}</span>
+                             </div>
+                             <div className="flex flex-col text-right">
+                               <span className="text-white/50 text-[9px] uppercase">Server (Zone) ID</span>
+                               <span className="text-white/80 text-xs font-medium">{zoneId || '-'}</span>
+                             </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -588,7 +677,7 @@ export default function TopupPage() {
                     : 'bg-[#CAF0F8]/20 text-[#CAF0F8]/50 cursor-not-allowed'
                   }`}
                 >
-                  {!isFormValid ? 'Complete the data first' : 'Buy Now'}
+                  {!isFormValid ? (game.inputType === 'mlbb' ? (idCheckResult.status !== 'success' ? 'Check your ID first' : 'Select a package') : 'Complete the data first') : 'Buy Now'}
                 </button>
               </div>
             </div>
