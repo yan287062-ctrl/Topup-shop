@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
 import BottomNav from '../../../components/BottomNav';
@@ -27,9 +27,12 @@ export default function TopupPage() {
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
 
-  // 🌟 အသစ်ထည့်ထားသော ID စစ်ဆေးခြင်းဆိုင်ရာ State များ 🌟
+  // 🌟 Auto Check အတွက် State များ 🌟
   const [isCheckingId, setIsCheckingId] = useState(false);
   const [idCheckResult, setIdCheckResult] = useState<{ status: 'idle' | 'success' | 'error', name: string, region: string, flag: string }>({ status: 'idle', name: '', region: '', flag: '' });
+  
+  // Timer for debouncing auto-check
+  const checkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -162,13 +165,6 @@ export default function TopupPage() {
   const game = gameConfigs[id] || Object.values(gameConfigs).find(g => id.includes(g.dbCat.toLowerCase()));
   const [displayPackages, setDisplayPackages] = useState<any[]>(game ? game.packages : []);
 
-  // ID ရိုက်ထည့်တာနဲ့ Check Result ကို Reset ချဖို့
-  useEffect(() => {
-    if (game?.inputType === 'mlbb') {
-      setIdCheckResult({ status: 'idle', name: '', region: '', flag: '' });
-    }
-  }, [userId, zoneId, game?.inputType]);
-
   useEffect(() => {
     if (!game) return;
     const fetchRealPrices = async () => {
@@ -203,6 +199,57 @@ export default function TopupPage() {
     fetchRealOrderCount();
   }, [game]);
 
+  // 🌟 Auto Check Logic (User ID နဲ့ Zone ID နှစ်ခုလုံးပြည့်ရင် အလိုလိုစစ်မယ်) 🌟
+  useEffect(() => {
+    if (game?.inputType !== 'mlbb') return;
+
+    // Reset result whenever input changes
+    setIdCheckResult({ status: 'idle', name: '', region: '', flag: '' });
+
+    if (userId.trim() && zoneId.trim()) {
+      // Clear previous timeout
+      if (checkTimeoutRef.current) clearTimeout(checkTimeoutRef.current);
+
+      setIsCheckingId(true);
+
+      // Debounce: Wait 1 second after user stops typing before making API call
+      checkTimeoutRef.current = setTimeout(async () => {
+        try {
+          const response = await fetch(`https://api.isan.eu.org/nickname/ml?id=${userId}&zone=${zoneId}`);
+          if (!response.ok) throw new Error('API Error');
+          
+          const data = await response.json();
+          
+          if (!data.name || data.name === "User not found" || data.error) {
+            setIdCheckResult({ status: 'error', name: '', region: '', flag: '' });
+          } else {
+            const flagMap: Record<string, string> = { "MM": "🇲🇲", "ID": "🇮🇩", "PH": "🇵🇭", "MY": "🇲🇾", "SG": "🇸🇬", "TH": "🇹🇭", "VN": "🇻🇳", "GLOBAL": "🌐" };
+            const regionCode = data.region?.toUpperCase() || "GLOBAL";
+            const emoji = flagMap[regionCode] || "🌐";
+            
+            setIdCheckResult({ 
+              status: 'success', 
+              name: data.name, 
+              region: regionCode,
+              flag: emoji
+            });
+          }
+        } catch (error) {
+          setIdCheckResult({ status: 'error', name: '', region: '', flag: '' });
+        } finally {
+          setIsCheckingId(false);
+        }
+      }, 1000); // 1000ms (1 second) delay
+    } else {
+      setIsCheckingId(false);
+    }
+
+    return () => {
+      if (checkTimeoutRef.current) clearTimeout(checkTimeoutRef.current);
+    };
+  }, [userId, zoneId, game?.inputType]);
+
+
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', img: '/wave.png' },
@@ -223,7 +270,6 @@ export default function TopupPage() {
 
   const isFormValid = (() => {
     if (!selectedPkg || !paymentMethod) return false;
-    // 🌟 MLBB ဆိုရင် ID Check Success ဖြစ်မှ Buy Now နှိပ်လို့ရမယ် 🌟
     if (game.inputType === 'mlbb') return userId && zoneId && idCheckResult.status === 'success';
     if (game.inputType === 'pubg') return userId;
     if (game.inputType === 'username') return userId;
@@ -236,44 +282,6 @@ export default function TopupPage() {
     if (game.inputType === 'mlbb') return idCheckResult.name ? `${idCheckResult.name} (${userId} | ${zoneId})` : zoneId ? `${userId} (${zoneId})` : userId;
     if (game.inputType === 'heartopia') return aid ? `UID: ${userId}, AID: ${aid} (${serverField})` : `UID: ${userId}`;
     return userId;
-  };
-
-  // 🌟 ID Check Function (API သို့ ချိတ်ဆက်ခြင်း) 🌟
-  const handleCheckId = async () => {
-    if (!userId || !zoneId) {
-      alert("ကျေးဇူးပြု၍ ID နှင့် Server ID နှစ်ခုလုံးကို အပြည့်အစုံထည့်ပါ။");
-      return;
-    }
-    
-    setIsCheckingId(true);
-    setIdCheckResult({ status: 'idle', name: '', region: '', flag: '' });
-
-    try {
-      const response = await fetch(`https://api.isan.eu.org/nickname/ml?id=${userId}&zone=${zoneId}`);
-      if (!response.ok) throw new Error('API Error');
-      
-      const data = await response.json();
-      
-      // API က Name မတွေ့ရင် သို့မဟုတ် Error ပြရင် Invalid လို့သတ်မှတ်မယ်
-      if (!data.name || data.name === "User not found" || data.error) {
-        setIdCheckResult({ status: 'error', name: '', region: '', flag: '' });
-      } else {
-        const flagMap: Record<string, string> = { "MM": "🇲🇲", "ID": "🇮🇩", "PH": "🇵🇭", "MY": "🇲🇾", "SG": "🇸🇬", "TH": "🇹🇭", "VN": "🇻🇳", "GLOBAL": "🌐" };
-        const regionCode = data.region?.toUpperCase() || "GLOBAL";
-        const emoji = flagMap[regionCode] || "🌐";
-        
-        setIdCheckResult({ 
-          status: 'success', 
-          name: data.name, 
-          region: regionCode,
-          flag: emoji
-        });
-      }
-    } catch (error) {
-      setIdCheckResult({ status: 'error', name: '', region: '', flag: '' });
-    } finally {
-      setIsCheckingId(false);
-    }
   };
 
   const openPaymentModal = () => {
@@ -357,7 +365,6 @@ export default function TopupPage() {
         slip_url: publicUrl,
         status: 'pending',
         user_email: userEmail || null,
-        // (မှတ်ချက် - နောက်ပိုင်း Python Bot နဲ့ ချိတ်တဲ့အခါ လိုအပ်ရင်သုံးဖို့ player_name ကို ထည့်ပေးနိုင်ပါတယ်)
       }]);
 
       if (insertError) throw insertError;
@@ -488,32 +495,26 @@ export default function TopupPage() {
                   {game.inputType === 'mlbb' && (
                     <div className="space-y-4">
                       <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                        <div className="w-full sm:w-1/2">
+                        <div className="w-full sm:w-1/2 relative">
                           <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">User ID <span className="text-[#FBB02D]">*</span></label>
                           <input type="text" placeholder="Enter User ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                         </div>
-                        <div className="w-full sm:w-1/2">
+                        <div className="w-full sm:w-1/2 relative">
                           <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Server (Zone) ID <span className="text-[#FBB02D]">*</span></label>
                           <input type="text" placeholder="Enter Zone ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={zoneId} onChange={(e) => setZoneId(e.target.value)} />
                         </div>
                       </div>
-                      
-                      {/* 🌟 New Check Button (Like the Screenshot) 🌟 */}
-                      <button 
-                        onClick={handleCheckId}
-                        disabled={isCheckingId || !userId || !zoneId}
-                        className={`w-full py-2.5 md:py-3 rounded-xl font-bold text-xs md:text-sm transition-all shadow-md flex items-center justify-center gap-2 ${isCheckingId || !userId || !zoneId ? 'bg-[#00B4D8]/50 text-white cursor-not-allowed' : 'bg-[#00B4D8] text-white hover:bg-[#0096b8]'}`}
-                      >
-                        {isCheckingId ? (
-                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        ) : (
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        )}
-                        {isCheckingId ? 'Checking...' : 'Check Region'}
-                      </button>
 
-                      {/* 🌟 Result Box (Like the Screenshot) 🌟 */}
-                      {idCheckResult.status !== 'idle' && (
+                      {/* 🌟 Auto Checking Indicator 🌟 */}
+                      {isCheckingId && (
+                        <div className="flex items-center justify-center gap-2 text-[#00B4D8] text-xs font-bold py-2">
+                           <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                           Checking Account...
+                        </div>
+                      )}
+
+                      {/* 🌟 Result Box (Appears automatically) 🌟 */}
+                      {!isCheckingId && idCheckResult.status !== 'idle' && (
                         <div className={`w-full p-4 rounded-xl border ${idCheckResult.status === 'success' ? 'bg-[#10b981]/10 border-[#10b981]/30' : 'bg-red-500/10 border-red-500/30'}`}>
                           {idCheckResult.status === 'success' ? (
                             <div className="flex items-center justify-between">
@@ -677,7 +678,7 @@ export default function TopupPage() {
                     : 'bg-[#CAF0F8]/20 text-[#CAF0F8]/50 cursor-not-allowed'
                   }`}
                 >
-                  {!isFormValid ? (game.inputType === 'mlbb' ? (idCheckResult.status !== 'success' ? 'Check your ID first' : 'Select a package') : 'Complete the data first') : 'Buy Now'}
+                  {!isFormValid ? (game.inputType === 'mlbb' ? (idCheckResult.status !== 'success' ? 'Waiting for valid ID' : 'Select a package') : 'Complete the data first') : 'Buy Now'}
                 </button>
               </div>
             </div>

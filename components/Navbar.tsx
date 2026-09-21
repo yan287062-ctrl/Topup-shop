@@ -75,12 +75,16 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60">
-            <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-gray-800 hover:bg-white shadow-sm transition-all">Home</Link>
-            <Link href="/" className="px-5 py-2 rounded-full text-sm font-bold text-gray-600 hover:bg-white transition-all">All Games</Link>
+          <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60 gap-1">
+            <Link href="/" className="px-4 py-2 rounded-full text-[13px] font-bold text-gray-800 hover:bg-white shadow-sm transition-all">Home</Link>
+            <Link href="/" className="px-4 py-2 rounded-full text-[13px] font-bold text-gray-600 hover:bg-white transition-all">All Games</Link>
+            {/* 🌟 အသစ်ထည့်ထားသော Region Checker လင့်ခ် 🌟 */}
+            <Link href="/check-region" className="px-4 py-2 rounded-full text-[13px] font-bold text-gray-600 hover:bg-white transition-all whitespace-nowrap">
+               Region Check
+            </Link>
           </div>
 
-          {/* 🌟 Right Side Actions (ဖုန်းမှာ မပျောက်အောင် ချိန်ညှိထားသည်) 🌟 */}
+          {/* Right Side Actions (ဖုန်းမှာ မပျောက်အောင် ချိန်ညှိထားသည်) */}
           <div className="flex items-center gap-1.5 sm:gap-3">
             <Link href="/history" className="bg-white/60 border border-white/80 text-gray-700 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-[9px] sm:text-[10px] font-bold hover:bg-white transition-colors shadow-sm whitespace-nowrap">
               Track Order
