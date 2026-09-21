@@ -315,7 +315,8 @@ export default function TopupPage() {
         price: selectedPkg.price,
         payment_method: paymentMethod,
         slip_url: publicUrl,
-        status: 'pending'
+        status: 'pending',
+        user_email: userEmail || null // 🌟 ဒီတစ်ကြောင်းတည်း ထပ်ပေါင်းထည့်လိုက်တာပါ သားကြီး! 🌟
       }]);
 
       if (insertError) throw insertError;
