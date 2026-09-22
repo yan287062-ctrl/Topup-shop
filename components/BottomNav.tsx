@@ -29,7 +29,6 @@ export default function BottomNav() {
 
   const accountLink = isLoggedIn ? '/account/settings' : '/login';
 
-  // 🌟 Code ရှင်းလင်းစေရန် Nav Items များကို Array ဖြင့် စီထားသည် 🌟
   const navItems = [
     {
       name: 'Home',
@@ -54,7 +53,6 @@ export default function BottomNav() {
       link: '/wallet',
       icon: (
         <svg className="w-[22px] h-[22px] mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          {/* 🌟 မင်းပေးထားသော ပုံအတိုင်း Wallet ကို ဆွဲထားခြင်း 🌟 */}
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname === '/wallet' ? 2.5 : 1.5} d="M17 8V6a2 2 0 00-2-2H9a2 2 0 00-2 2v2" />
           <rect x="3" y="8" width="18" height="12" rx="2" strokeWidth={pathname === '/wallet' ? 2.5 : 1.5} />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={pathname === '/wallet' ? 2.5 : 1.5} d="M17 12h4v4h-4a2 2 0 010-4z" />
@@ -85,7 +83,8 @@ export default function BottomNav() {
 
   return (
     <div className="fixed bottom-4 left-0 right-0 z-[60] flex justify-center px-4">
-      <div className="bg-[#131422] border border-white/5 shadow-[0_10px_40px_rgba(0,0,0,0.5)] rounded-full px-2 py-2 flex items-center justify-between w-full max-w-[400px]">
+      {/* 🌟 အမဲရောင်အစား မှန်သားအကြည် (Glassmorphism) သုံးထားသည် 🌟 */}
+      <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-full px-2 py-2 flex items-center justify-between w-full max-w-[400px]">
         {navItems.map((item, index) => {
           const isActive = item.activeCheck !== undefined ? item.activeCheck : pathname === item.link;
           return (
@@ -93,7 +92,7 @@ export default function BottomNav() {
               key={index}
               href={item.link}
               className={`relative flex flex-col items-center justify-center w-[20%] py-2 rounded-full transition-all duration-300 ${
-                isActive ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'
+                isActive ? 'bg-white/20 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]' : 'text-white/70 hover:bg-white/10 hover:text-white'
               }`}
             >
               {item.icon}
