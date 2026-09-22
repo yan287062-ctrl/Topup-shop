@@ -1,22 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '../../../components/Navbar';
 import BottomNav from '../../../components/BottomNav';
+import { supabase } from '../../../lib/supabase'; // 🌟 Supabase ကို Import လုပ်ထားသည် 🌟
 
 export default function AccountSettingsPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile');
-  const [username, setUsername] = useState('Mibb');
-  const [fullName, setFullName] = useState('Mibb Game');
-  const [email, setEmail] = useState('gamer2040@gmail.com');
+  const [username, setUsername] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [saved, setSaved] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const user = {
-    name: 'Mibb Game',
-    email: 'gamer2040@gmail.com',
-  };
+  // 🌟 Supabase မှ User Data ကို ဆွဲယူခြင်း 🌟
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const userEmail = session.user.email || '';
+        // Supabase မှ Metadata (နာမည်) များကို ယူခြင်း
+        const userName = session.user.user_metadata?.full_name || session.user.user_metadata?.name || 'Member';
+        
+        setEmail(userEmail);
+        setFullName(userName);
+        // Username မရှိလျှင် Email ရဲ့ ရှေ့ပိုင်းကို ယူသုံးမည်
+        setUsername(session.user.user_metadata?.username || userEmail.split('@')[0] || 'User');
+      }
+      setIsLoading(false);
+    };
+
+    fetchUser();
+
+    // 🌟 Auth State အပြောင်းအလဲကို စောင့်ကြည့်ခြင်း 🌟
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          setEmail(session.user.email || '');
+          setFullName(session.user.user_metadata?.full_name || 'Member');
+        } else {
+          setEmail('');
+          setFullName('');
+          setUsername('');
+        }
+    });
+
+    return () => { authListener.subscription.unsubscribe(); };
+  }, []);
 
   const menuItems = [
     { name: 'ပထမ', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', link: '/' },
@@ -35,6 +67,21 @@ export default function AccountSettingsPage() {
     setTimeout(() => setSaved(false), 3000);
   };
 
+  // 🌟 အမည်၏ ပထမ စာလုံး (၂) လုံးကို ယူရန် 🌟
+  const getUserInitials = () => {
+    if (fullName) return fullName.substring(0, 2).toUpperCase();
+    if (email) return email.substring(0, 2).toUpperCase();
+    return 'PG';
+  };
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-[#070814] flex items-center justify-center font-sans">
+        <div className="text-white">Loading...</div>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#070814] pb-28 font-sans">
       <Navbar />
@@ -46,11 +93,11 @@ export default function AccountSettingsPage() {
           <div className="bg-[#131422] rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
             <div className="p-5 flex items-center gap-3 border-b border-white/5">
               <div className="w-12 h-12 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-pink-600 to-pink-400 text-white font-bold text-lg shadow-lg">
-                <span>MG</span>
+                <span>{getUserInitials()}</span>
               </div>
               <div className="overflow-hidden">
-                <h2 className="text-white font-bold text-sm truncate">{user.name}</h2>
-                <p className="text-gray-500 text-[10px] truncate">{user.email}</p>
+                <h2 className="text-white font-bold text-sm truncate">{fullName || 'Member'}</h2>
+                <p className="text-gray-500 text-[10px] truncate">{email || 'Not logged in'}</p>
               </div>
             </div>
 
@@ -112,7 +159,7 @@ export default function AccountSettingsPage() {
 
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-600 to-pink-400 flex items-center justify-center text-white font-bold text-2xl shadow-lg">
-                    MG
+                    {getUserInitials()}
                   </div>
                 </div>
 
@@ -147,6 +194,7 @@ export default function AccountSettingsPage() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full bg-[#0a0b14] border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-pink-500 pr-20" 
+                        readOnly // Email ကို ပြင်ခွင့်မပေးချင်ရင် readOnly ထည့်ထားနိုင်ပါတယ်။
                       />
                       <span className="absolute right-3 top-3 bg-green-500/20 text-green-400 text-[10px] font-bold px-2 py-1 rounded-md border border-green-500/30">
                         ✓ Verified
