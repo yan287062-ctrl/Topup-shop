@@ -289,11 +289,15 @@ export default function TopupPage() {
     setShowPaymentModal(true);
   };
 
+  // 🌟 [ပြောင်းလဲထားသော အပိုင်း] Telegram သို့ Order လှမ်းပို့မည့် Logic အသစ် 🌟
   const confirmOrder = async () => {
     setIsUploading(true);
     
     try {
       let publicUrl = null;
+
+      const BOT_TOKEN = "8916421457:AAGIW1kDmkLqX9c4MssARYS55Co-8aemWTU"; 
+      const CHAT_ID = "1934339791"; 
 
       if (paymentMethod === 'wallet') {
         if (!userEmail) {
@@ -355,7 +359,7 @@ export default function TopupPage() {
         publicUrl = data.publicUrl;
       }
 
-      const { error: insertError } = await supabase.from('orders').insert([{
+      const { data: insertData, error: insertError } = await supabase.from('orders').insert([{
         game_name: game.name,
         player_id: userId,
         zone_id: zoneId || null,
@@ -365,9 +369,44 @@ export default function TopupPage() {
         slip_url: publicUrl,
         status: 'pending',
         user_email: userEmail || null,
-      }]);
+      }]).select(); 
 
       if (insertError) throw insertError;
+      
+      const newOrderId = insertData && insertData[0] ? insertData[0].id : 'N/A';
+      
+      const targetAcc = getTargetAccountText();
+      const tgCaption = `🚨 <b>အော်ဒါအသစ် ဝင်လာပါပြီ (Order #${newOrderId})</b>\n\n`
+                      + `🎮 <b>ဂိမ်း :</b> ${game.name}\n`
+                      + `👤 <b>အကောင့် :</b> <code>${targetAcc}</code>\n`
+                      + `📦 <b>ပစ္စည်း :</b> ${selectedPkg.name}\n`
+                      + `💰 <b>ဈေးနှုန်း :</b> ${selectedPkg.price.toLocaleString()} Ks\n`
+                      + `💳 <b>ပေးချေမှု :</b> ${paymentMethod === 'wallet' ? 'Wallet' : paymentMethod.toUpperCase()}\n`
+                      + `📧 <b>Email :</b> ${userEmail || 'Guest'}\n\n`
+                      + `⏳ <i>Admin မှ 'Done' နှိပ်ပါက Bot မှ Auto ဖြည့်ပေးပါမည်။</i>`;
+
+      try {
+        if (paymentMethod === 'wallet' || !slipFile) {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: CHAT_ID, text: tgCaption, parse_mode: 'HTML' })
+            });
+        } else {
+            const formData = new FormData();
+            formData.append('chat_id', CHAT_ID);
+            formData.append('photo', slipFile);
+            formData.append('caption', tgCaption);
+            formData.append('parse_mode', 'HTML');
+
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                method: 'POST',
+                body: formData
+            });
+        }
+      } catch (tgError) {
+          console.error("Telegram Notification Error:", tgError);
+      }
       
       setShowPaymentModal(false);
       setOrderSuccess(true);
@@ -698,7 +737,7 @@ export default function TopupPage() {
             <h3 className="text-lg md:text-xl font-bold text-white mb-2">ငွေပေးချေရန်</h3>
             
             {paymentMethod === 'wallet' ? (
-              <p className="text-[#CAF0F8]/70 text-[10px] md:text-xs mb-4 md:mb-5">သင့် Wallet ဖြင့် အလိုအလျောက် ပေးချေပါမည်။</p>
+              <p className="text-[#CAF0F8]/70 text-[10px] md:text-xs mb-4 md:mb-5">သင့် Wallet ဖြင့် အလိုအလျောက် ပေးချေပါမည်。</p>
             ) : (
               <p className="text-[#CAF0F8]/70 text-[10px] md:text-xs mb-4 md:mb-5">အောက်ပါအကောင့်သို့ ငွေလွှဲပြီး ပြေစာ (Screenshot) တင်ပေးပါ။</p>
             )}
