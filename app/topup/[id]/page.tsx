@@ -296,7 +296,7 @@ export default function TopupPage() {
     try {
       let publicUrl = null;
 
-      const BOT_TOKEN = "8916421457:AAGIW1kDmkLqX9c4MssARYS55Co-8aemWTU"; 
+      const BOT_TOKEN = "8916421457:AAE8spRRfqR5fc3MDeWPdpfQoPHsEXmwfp0"; 
       const CHAT_ID = "1934339791"; 
 
       if (paymentMethod === 'wallet') {
