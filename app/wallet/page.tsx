@@ -119,22 +119,23 @@ export default function WalletPage() {
       setIsUploaded(true);
       alert("ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ ဤဘောက်ချာကုဒ် (" + invoiceCode + ") ဖြင့် သင့်မှတ်တမ်းကို ပြန်ရှာနိုင်ပါသည်။");
 
-      // 🌟 Telegram Bot သို့ Notification ပို့မည့် အပိုင်း 🌟
+      // 🌟 Telegram Bot သို့ တိုက်ရိုက်ပို့မည့် အပိုင်း 🌟
       const botToken = '8916421457:AAGIW1kDmkLqX9c4MssARYS55Co-8aemWTU'; 
       const chatId = '1934339791'; 
 
-      const telegramMessage = `
-💰 <b>Wallet Top-up အသစ်ဝင်ပါသည်!</b>
+      // အထူးအက္ခရာတွေကြောင့် Error မတက်အောင် HTML လုံးဝ မသုံးဘဲ ရိုးရိုးစာသား (Plain Text) ဖြင့် ပြောင်းရေးထားသည်
+      const telegramMessage = 
+`💰 Wallet Top-up အသစ်ဝင်ပါသည်!
 
-📧 <b>အီးမေးလ်:</b> <code>${userEmail}</code>
-💵 <b>ပမာဏ:</b> ${numericAmount.toLocaleString()} Ks
-💳 <b>ငွေပေးချေမှု:</b> ${selectedMethod}
-🧾 <b>ပြေစာနံပါတ် (Invoice):</b> <code>${invoiceCode}</code>
+📧 အီးမေးလ်: ${userEmail}
+💵 ပမာဏ: ${numericAmount.toLocaleString()} Ks
+💳 ငွေပေးချေမှု: ${selectedMethod}
+🧾 ပြေစာနံပါတ်: ${invoiceCode}
 
-<a href="${publicUrl}">🖼️ ငွေလွှဲပြေစာ (Screenshot) ကြည့်ရန် နှိပ်ပါ</a>
+🖼️ ငွေလွှဲပြေစာ (Screenshot):
+${publicUrl}
 
-⚡ <i>Admin Panel > Wallet Topups တွင် ဝင်ရောက်စစ်ဆေးပြီး Approve လုပ်ပေးနိုင်ပါသည်။</i>
-      `;
+⚡ Admin Panel တွင် ဝင်ရောက်စစ်ဆေးပါ။`;
 
       fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: 'POST',
@@ -144,9 +145,11 @@ export default function WalletPage() {
         body: JSON.stringify({
           chat_id: chatId,
           text: telegramMessage,
-          parse_mode: 'HTML',
         }),
+      }).then(res => {
+        if(!res.ok) console.log("Telegram Failed to send");
       }).catch(err => console.log("Telegram Error:", err)); 
+      // 🌟 Telegram ပို့သည့် အပိုင်း ပြီးပါပြီ 🌟
 
     } catch (error: any) {
       alert("Error: " + error.message);
