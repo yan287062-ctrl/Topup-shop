@@ -120,7 +120,7 @@ export default function WalletPage() {
       alert("ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ ဤဘောက်ချာကုဒ် (" + invoiceCode + ") ဖြင့် သင့်မှတ်တမ်းကို ပြန်ရှာနိုင်ပါသည်။");
 
       // 🌟 Telegram Bot သို့ တိုက်ရိုက်ပို့မည့် အပိုင်း 🌟
-      const botToken = '8916421457:AAGIW1kDmkLqX9c4MssARYS55Co-8aemWTU'; 
+      const botToken = '8916421457:AAHfALcMnORdMSoGc0gpEXEKzNqqLmPWvN0'; 
       const chatId = '1934339791'; 
 
       // အထူးအက္ခရာတွေကြောင့် Error မတက်အောင် HTML လုံးဝ မသုံးဘဲ ရိုးရိုးစာသား (Plain Text) ဖြင့် ပြောင်းရေးထားသည်
