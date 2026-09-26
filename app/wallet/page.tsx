@@ -17,8 +17,6 @@ export default function WalletPage() {
   const [invoiceCopied, setInvoiceCopied] = useState(false);
 
   const [invoiceCode, setInvoiceCode] = useState('');
-
-  // 🌟 အသစ်ထည့်ထားသည်: ၁၀ မိနစ် (စက္ကန့် ၆၀၀) Timer State
   const [timeLeft, setTimeLeft] = useState(600);
 
   useEffect(() => {
@@ -32,7 +30,6 @@ export default function WalletPage() {
     fetchUser();
   }, []);
 
-  // 🌟 အသစ်ထည့်ထားသည်: Timer အလုပ်လုပ်ရန် useEffect
   useEffect(() => {
     if (step === 'detail' && timeLeft > 0) {
       const timer = setInterval(() => {
@@ -42,7 +39,6 @@ export default function WalletPage() {
     }
   }, [step, timeLeft]);
 
-  // 🌟 အသစ်ထည့်ထားသည်: စက္ကန့်များကို 00 : 10 : 00 ပုံစံပြောင်းပေးသည့် Function
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -122,6 +118,36 @@ export default function WalletPage() {
       
       setIsUploaded(true);
       alert("ငွေဖြည့်တောင်းဆိုမှု အောင်မြင်ပါသည်။ ဤဘောက်ချာကုဒ် (" + invoiceCode + ") ဖြင့် သင့်မှတ်တမ်းကို ပြန်ရှာနိုင်ပါသည်။");
+
+      // 🌟 Telegram Bot သို့ Notification ပို့မည့် အပိုင်း 🌟
+      const botToken = '8916421457:AAGIW1kDmkLqX9c4MssARYS55Co-8aemWTU'; 
+      const chatId = '1934339791'; 
+
+      const telegramMessage = `
+💰 <b>Wallet Top-up အသစ်ဝင်ပါသည်!</b>
+
+📧 <b>အီးမေးလ်:</b> <code>${userEmail}</code>
+💵 <b>ပမာဏ:</b> ${numericAmount.toLocaleString()} Ks
+💳 <b>ငွေပေးချေမှု:</b> ${selectedMethod}
+🧾 <b>ပြေစာနံပါတ် (Invoice):</b> <code>${invoiceCode}</code>
+
+<a href="${publicUrl}">🖼️ ငွေလွှဲပြေစာ (Screenshot) ကြည့်ရန် နှိပ်ပါ</a>
+
+⚡ <i>Admin Panel > Wallet Topups တွင် ဝင်ရောက်စစ်ဆေးပြီး Approve လုပ်ပေးနိုင်ပါသည်။</i>
+      `;
+
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: telegramMessage,
+          parse_mode: 'HTML',
+        }),
+      }).catch(err => console.log("Telegram Error:", err)); 
+
     } catch (error: any) {
       alert("Error: " + error.message);
     } finally {
@@ -168,7 +194,6 @@ export default function WalletPage() {
                   </div>
                 </div>
 
-                {/* Amount Section */}
                 <div className="mb-6">
                   <label className="text-xs font-bold text-gray-300 block mb-2">Top Up Amount</label>
                   <p className="text-[10px] text-pink-500 mb-2">Minimum K3,000.</p>
@@ -204,7 +229,6 @@ export default function WalletPage() {
                   </div>
                 </div>
 
-                {/* Payment Method */}
                 <div>
                   <label className="text-xs font-bold text-gray-300 block mb-2">Payment Method</label>
                   <p className="text-[10px] text-gray-400 mb-3">Choose one method below.</p>
@@ -269,7 +293,7 @@ export default function WalletPage() {
                 <button 
                   onClick={() => {
                     setStep('detail');
-                    setTimeLeft(600); // 🌟 အသစ်: ငွေသွင်းမယ်နှိပ်တာနဲ့ ၁၀ မိနစ် အစက ပြန်စမယ်
+                    setTimeLeft(600);
                   }}
                   disabled={Number(amount) < 3000 || !userEmail}
                   className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg ${
@@ -289,7 +313,6 @@ export default function WalletPage() {
             
             <div className="bg-[#131422] p-6 rounded-3xl border border-white/5 shadow-2xl relative overflow-hidden">
               <div className="bg-pink-600/20 border border-pink-500/30 text-pink-400 text-center py-2.5 rounded-2xl text-xs font-bold mb-6">
-                {/* 🌟 အသစ်: အရှင် Timer နဲ့ အစားထိုးထားသည် 🌟 */}
                 {timeLeft > 0 ? `Complete within ${formatTime(timeLeft)}` : "⏱ Time's up! Please restart."}
               </div>
 
@@ -349,7 +372,7 @@ export default function WalletPage() {
 
                 <button 
                   onClick={submitTopup}
-                  disabled={isUploaded || isUploading || !slipFile || timeLeft <= 0} // 🌟 အသစ်: အချိန်ကုန်သွားရင် နှိပ်လို့မရတော့ဘူး
+                  disabled={isUploaded || isUploading || !slipFile || timeLeft <= 0} 
                   className={`w-full mt-4 py-3 rounded-xl font-bold text-xs transition-all ${
                     isUploaded 
                     ? 'bg-green-600 text-white cursor-not-allowed' 
@@ -370,7 +393,7 @@ export default function WalletPage() {
                     setSlipFile(null); 
                     generateInvoiceCode(); 
                     setAmount(""); 
-                    setTimeLeft(600); // 🌟 အသစ်: အစကပြန်စရင် Timer ပြန်စမယ်
+                    setTimeLeft(600); 
                   }}
                   className="flex-1 bg-[#1a1b2e] hover:bg-[#25273c] text-white py-3 rounded-xl text-xs font-bold border border-white/10 text-center"
                 >
