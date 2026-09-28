@@ -250,12 +250,21 @@ export default function TopupPage() {
   }, [userId, zoneId, game?.inputType]);
 
 
+  // 🌟 ဤနေရာတွင် Wallet အတွက် SVG Icon ပြောင်းလဲထားပါသည် 🌟
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', img: '/wave.png' },
     { id: 'ayapay', name: 'AYA Pay', img: '/ayapay.png' },
     { id: 'uabpay', name: 'UAB Pay', img: '/uabpay.png' },
-    { id: 'wallet', name: 'Wallet', img: '/wallet.png' }
+    { 
+      id: 'wallet', 
+      name: 'Wallet', 
+      svg: (
+        <svg className="w-full h-full text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+        </svg>
+      )
+    }
   ];
 
   if (!game) {
@@ -289,7 +298,6 @@ export default function TopupPage() {
     setShowPaymentModal(true);
   };
 
-  // 🌟 [ပြောင်းလဲထားသော အပိုင်း] Telegram သို့ Order လှမ်းပို့မည့် Logic အသစ် 🌟
   const confirmOrder = async () => {
     setIsUploading(true);
     
@@ -634,6 +642,7 @@ export default function TopupPage() {
                 </div>
               </section>
 
+              {/* 🌟 ဤနေရာတွင် Wallet ကို SVG အဖြစ် Rendering လုပ်မည့် အပြောင်းအလဲ 🌟 */}
               <section>
                 <div className="flex items-end gap-2 md:gap-3 mb-4">
                   <span className="text-3xl md:text-4xl italic font-black text-[#023E8A]/20">03</span>
@@ -655,12 +664,16 @@ export default function TopupPage() {
                       }`}
                     >
                       <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gray-100 flex items-center justify-center p-1 overflow-hidden shadow-inner mb-0.5 md:mb-1">
-                        <img src={pm.img} alt={pm.name} className="w-full h-full object-contain"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.parentElement!.innerHTML = `<span class="text-[#023E8A] font-bold text-xs">${pm.name.charAt(0)}</span>`;
-                          }}
-                        />
+                        {pm.svg ? (
+                          pm.svg
+                        ) : (
+                          <img src={pm.img} alt={pm.name} className="w-full h-full object-contain"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.parentElement!.innerHTML = `<span class="text-[#023E8A] font-bold text-xs">${pm.name.charAt(0)}</span>`;
+                            }}
+                          />
+                        )}
                       </div>
                       <span className={`text-[9px] md:text-[10px] font-bold text-center ${paymentMethod === pm.id ? 'text-[#CAF0F8]' : 'text-[#023E8A]'}`}>{pm.name}</span>
                     </button>
