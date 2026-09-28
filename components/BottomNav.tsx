@@ -83,8 +83,8 @@ export default function BottomNav() {
 
   return (
     <div className="fixed bottom-4 left-0 right-0 z-[60] flex justify-center px-4">
-      {/* 🌟 အမဲရောင်အစား မှန်သားအကြည် (Glassmorphism) သုံးထားသည် 🌟 */}
-      <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-full px-2 py-2 flex items-center justify-between w-full max-w-[400px]">
+      {/* 🌟 Solid Color အပြည့် (အကြည်ရောင် ဖျောက်ထားသည်) 🌟 */}
+      <div className="bg-[#1e293b] shadow-2xl rounded-full px-2 py-2 flex items-center justify-between w-full max-w-[400px] border border-gray-700">
         {navItems.map((item, index) => {
           const isActive = item.activeCheck !== undefined ? item.activeCheck : pathname === item.link;
           return (
@@ -92,7 +92,7 @@ export default function BottomNav() {
               key={index}
               href={item.link}
               className={`relative flex flex-col items-center justify-center w-[20%] py-2 rounded-full transition-all duration-300 ${
-                isActive ? 'bg-white/20 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]' : 'text-white/70 hover:bg-white/10 hover:text-white'
+                isActive ? 'bg-[#3b82f6] text-white shadow-md' : 'text-gray-400 hover:text-white hover:bg-[#334155]'
               }`}
             >
               {item.icon}
