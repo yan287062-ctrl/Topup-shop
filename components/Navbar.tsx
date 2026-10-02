@@ -5,8 +5,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabase';
 
-const Marquee = 'marquee' as any;
-
 export default function Navbar() {
   const [user, setUser] = useState<any>(null); 
   const [balance, setBalance] = useState<number>(0);
@@ -61,7 +59,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-4">
+      <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-8">
         <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-lg rounded-full px-3 py-2 md:px-6 md:py-3 flex items-center justify-between">
           
           <Link href="/" className="flex items-center gap-2 relative">
@@ -146,21 +144,18 @@ export default function Navbar() {
       </nav>
 
       {pathname === '/' && (
-        <div className="mx-auto w-[95%] max-w-5xl z-40 mb-2 relative">
+        <div className="mx-auto w-[95%] max-w-5xl z-40 mb-2 mt-4 relative">
           
-          {/* ==================== 🌟 NEW: Banner Section (ဒုတိယပုံကလို Banner နေရာ) 🌟 ==================== */}
-          {/* ကိုယ်ပိုင် Banner ဆွဲပြီးရင် public folder ထဲထည့်ပြီး src="/your-banner.jpg" လို့ ပြင်လိုက်ပါ */}
+          {/* ==================== Banner Section ==================== */}
           <div className="w-full mb-6 md:mb-8 rounded-3xl overflow-hidden shadow-lg border-2 border-[#4A5C82]/10 relative group">
              <img 
                src="https://via.placeholder.com/1200x400/2D3A54/D99B48?text=Your+Banner+Here" 
                alt="Main Banner" 
                className="w-full h-[150px] sm:h-[200px] md:h-[320px] object-cover transition-transform duration-700 group-hover:scale-105"
              />
-             {/* Slider လိုမျိုး ဘေးက မျှားလေးတွေ အလှထည့်ထားသည် */}
              <button className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/50 backdrop-blur-sm rounded-full flex items-center justify-center text-[#4A5C82] hover:bg-white shadow-md transition hidden md:flex font-bold">❮</button>
              <button className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/50 backdrop-blur-sm rounded-full flex items-center justify-center text-[#4A5C82] hover:bg-white shadow-md transition hidden md:flex font-bold">❯</button>
              
-             {/* Slider အောက်ခြေက အစက်လေးတွေ */}
              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
                 <div className="w-2 h-2 rounded-full bg-white"></div>
                 <div className="w-2 h-2 rounded-full bg-white/50"></div>
@@ -175,11 +170,15 @@ export default function Navbar() {
               <span className="text-[#4A5C82] text-xs font-extrabold tracking-wide">Admin online</span>
             </div>
 
+            {/* 🌟 အနီရောင် လုံးဝ မပြတော့မည့် React ၏ dangerouslySetInnerHTML နည်းလမ်းကို သုံးထားပါသည် 🌟 */}
             <div className="flex-1 bg-[#E4D5B7]/50 border border-[#4A5C82]/20 rounded-full overflow-hidden flex items-center px-4 py-2 w-full shadow-sm">
               <span className="text-[#D99B48] mr-3 text-sm">📢</span>
-              <Marquee scrollamount="4" className="text-xs text-[#4A5C82] font-bold mt-0.5 tracking-wide">
-                ငွေကြိုဖြည့်စရာမလိုဘဲ ငွေစာရင်းလွှဲပြေစာပြ၍ တိုက်ရိုက်ဝယ်ယူနိုင်ပါသည်။ &nbsp; • &nbsp; Wallet ထဲ ငွေဖြည့်ထားပါက 24 နာရီလုံး အချိန်မရွေး Auto Topup စနစ်ဖြင့် စက္ကန့်ပိုင်းအတွင်း ရရှိပါမည်။
-              </Marquee>
+              <div 
+                className="flex-1 overflow-hidden flex items-center"
+                dangerouslySetInnerHTML={{
+                  __html: '<marquee scrollamount="4" class="text-xs text-[#4A5C82] font-bold mt-0.5 tracking-wide">ငွေကြိုဖြည့်စရာမလိုဘဲ ငွေစာရင်းလွှဲပြေစာပြ၍ တိုက်ရိုက်ဝယ်ယူနိုင်ပါသည်။ &nbsp; • &nbsp; Wallet ထဲ ငွေဖြည့်ထားပါက 24 နာရီလုံး အချိန်မရွေး Auto Topup စနစ်ဖြင့် စက္ကန့်ပိုင်းအတွင်း ရရှိပါမည်။</marquee>'
+                }}
+              />
             </div>
           </div>
 
