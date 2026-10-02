@@ -28,7 +28,13 @@ export default function Home() {
       <div className="relative z-10">
         <Navbar />
 
-        <div className="max-w-4xl mx-auto px-4 mb-3 mt-4">
+        {/* --- နောက်ပိုင်း Banner (သို့) Slider ထည့်ချင်ရင် ဒီကြားထဲမှာ ထည့်ပါ --- */}
+        {/* <div className="max-w-4xl mx-auto px-4 mt-6">
+              <img src="/banner.png" alt="Promo Banner" className="w-full rounded-2xl shadow-md" />
+            </div> */}
+
+        {/* နေရာလွတ်ရအောင် mt-4 ကို mt-24 သို့ ပြောင်းထားပါသည် (ပိုချချင်ပါက mt-28, mt-32 စသဖြင့် တိုးနိုင်သည်) */}
+        <div className="max-w-4xl mx-auto px-4 mb-3 mt-24">
           <h2 className="text-[#4A5C82] text-xs sm:text-sm font-bold tracking-wide uppercase">
             ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ:
           </h2>
