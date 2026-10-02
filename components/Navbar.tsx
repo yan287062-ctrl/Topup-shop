@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation'; // 🌟 URL ဖတ်ရန် အသစ်ထည့်ထားသည် 🌟
+import { usePathname } from 'next/navigation';
 import { supabase } from '../lib/supabase';
+
+// 🌟 TypeScript က အနီရောင်မျဉ်းမပြအောင် Marquee ကို ကြိုတင်ကြေညာထားခြင်းဖြစ်ပါသည် 🌟
+const Marquee = 'marquee' as any;
 
 export default function Navbar() {
   const [user, setUser] = useState<any>(null); 
   const [balance, setBalance] = useState<number>(0);
   const [showModal, setShowModal] = useState(false);
   
-  // 🌟 လက်ရှိရောက်နေသော စာမျက်နှာကို သိရန် 🌟
   const pathname = usePathname();
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-8">
+      <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-4">
         <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-lg rounded-full px-3 py-2 md:px-6 md:py-3 flex items-center justify-between">
           
           {/* Logo Section */}
@@ -78,7 +80,7 @@ export default function Navbar() {
              </div>
           </Link>
 
-          {/* 🌟 Desktop Navigation Links (Active State နှင့် Glass Design) 🌟 */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60 gap-1 relative">
             
             <Link 
@@ -146,9 +148,65 @@ export default function Navbar() {
               </Link>
             )}
           </div>
-
         </div>
       </nav>
+
+      {/* 🌟 ဤအပိုင်းသည် Home Page တွင်သာ ပေါ်စေရန် pathname ကို စစ်ထားပါသည် 🌟 */}
+      {pathname === '/' && (
+        <div className="mx-auto w-[95%] max-w-4xl z-40 mb-8 relative">
+          
+          {/* ==================== 1. Announcement Bar ==================== */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center mb-4">
+            
+            {/* Admin Status */}
+            <div className="flex items-center gap-2 bg-[#4A5C82]/10 border border-[#4A5C82]/20 px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
+              <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.6)]"></div>
+              <span className="text-[#4A5C82] text-xs font-extrabold tracking-wide">Admin online</span>
+            </div>
+
+            {/* Marquee Text */}
+            <div className="flex-1 bg-[#E4D5B7]/50 border border-[#4A5C82]/20 rounded-full overflow-hidden flex items-center px-4 py-2 w-full shadow-sm">
+              <span className="text-[#D99B48] mr-3 text-sm">📢</span>
+              
+              {/* 🌟 အနီရောင်မပြတော့သော Marquee ကို အသုံးပြုထားပါသည် 🌟 */}
+              <Marquee scrollamount="4" className="text-xs text-[#4A5C82] font-bold mt-0.5 tracking-wide">
+                ငွေကြိုဖြည့်စရာမလိုဘဲ ငွေစာရင်းလွှဲပြေစာပြ၍ တိုက်ရိုက်ဝယ်ယူနိုင်ပါသည်။ &nbsp; • &nbsp; Wallet ထဲ ငွေဖြည့်ထားပါက 24 နာရီလုံး အချိန်မရွေး Auto Topup စနစ်ဖြင့် စက္ကန့်ပိုင်းအတွင်း ရရှိပါမည်။
+              </Marquee>
+            </div>
+          </div>
+
+          {/* ==================== 2. Category Filter Bar ==================== */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-[#4A5C82]/5 p-2 rounded-2xl border border-[#4A5C82]/10">
+             
+             {/* Active Item */}
+             <button className="flex items-center gap-2 bg-[#D99B48] text-[#E4D5B7] px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-[3px_3px_0px_rgba(74,92,130,0.2)] transition hover:-translate-y-0.5">
+                <span>⭐</span> Favorit
+             </button>
+             
+             {/* Inactive Items */}
+             <button className="flex items-center gap-2 text-[#4A5C82] hover:bg-[#4A5C82]/10 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
+                <span>🔥</span> Popular Games
+             </button>
+             
+             <button className="flex items-center gap-2 text-[#4A5C82] hover:bg-[#4A5C82]/10 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
+                <span>🎮</span> Topup Games
+             </button>
+             
+             <button className="flex items-center gap-2 text-[#4A5C82] hover:bg-[#4A5C82]/10 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
+                <span>🎫</span> Gift Card & Voucher
+             </button>
+             
+             <button className="flex items-center gap-2 text-[#4A5C82] hover:bg-[#4A5C82]/10 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
+                <span>💎</span> App items
+             </button>
+
+             {/* See More Link */}
+             <button className="ml-auto flex items-center gap-1.5 text-[#4A5C82] text-xs font-extrabold whitespace-nowrap px-3 hover:text-[#D99B48] transition uppercase">
+                See More <span>→</span>
+             </button>
+          </div>
+        </div>
+      )}
 
       {/* Profile / Wallet Modal */}
       {showModal && (
