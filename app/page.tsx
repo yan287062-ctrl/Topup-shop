@@ -19,7 +19,6 @@ export default function Home() {
 
   return (
     <main
-      // ပုံထဲကအတိုင်း သဲရောင်နုနုလေးကို Background အဖြစ်သုံးထားပါတယ်
       className="min-h-screen pb-28 relative bg-[#E4D5B7] font-sans"
     >
       {/* Soft Glow Effect */}
@@ -28,13 +27,8 @@ export default function Home() {
       <div className="relative z-10">
         <Navbar />
 
-        {/* --- နောက်ပိုင်း Banner (သို့) Slider ထည့်ချင်ရင် ဒီကြားထဲမှာ ထည့်ပါ --- */}
-        {/* <div className="max-w-4xl mx-auto px-4 mt-6">
-              <img src="/banner.png" alt="Promo Banner" className="w-full rounded-2xl shadow-md" />
-            </div> */}
-
-        {/* နေရာလွတ်ရအောင် mt-4 ကို mt-24 သို့ ပြောင်းထားပါသည် (ပိုချချင်ပါက mt-28, mt-32 စသဖြင့် တိုးနိုင်သည်) */}
-        <div className="max-w-4xl mx-auto px-4 mb-3 mt-24">
+        {/* 🌟 နေရာလွတ် အရမ်းမကျယ်စေရန် mt-24 အစား mt-6 ဟု ပြန်ပြင်ထားပါသည် 🌟 */}
+        <div className="max-w-4xl mx-auto px-4 mb-3 mt-6">
           <h2 className="text-[#4A5C82] text-xs sm:text-sm font-bold tracking-wide uppercase">
             ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ:
           </h2>
@@ -46,7 +40,6 @@ export default function Home() {
             <Link
               key={game.id}
               href={`/topup/${game.id}`}
-              // ကတ်တွေကို Denim Blue အရောင်သုံးပြီး ပုံထဲကလို Solid Shadow ပုံစံလေး ထည့်ထားတယ်
               className="bg-[#4A5C82] border border-[#4A5C82] shadow-[4px_4px_0px_rgba(74,92,130,0.3)] rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[6px_6px_0px_rgba(74,92,130,0.4)] flex flex-col group"
             >
               <div className="w-full h-16 sm:h-20 relative bg-[#2D3A54]">
@@ -58,7 +51,6 @@ export default function Home() {
               </div>
               
               <div className="p-1.5 sm:p-2 flex flex-col justify-between flex-1 bg-[#4A5C82] border-t border-[#E4D5B7]/20">
-                {/* စာသားတွေကို သဲရောင်၊ အောက်က Sub ကို မုန်ညင်းဝါရောင် သုံးထားတယ် */}
                 <h3 className="text-[#E4D5B7] font-bold text-[9px] sm:text-[11px] truncate uppercase">{game.name}</h3>
                 <p className="text-[#D99B48] font-bold text-[7px] sm:text-[9px] truncate mt-0.5 uppercase">{game.sub}</p>
               </div>
