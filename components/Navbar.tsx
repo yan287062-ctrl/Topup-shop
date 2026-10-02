@@ -145,10 +145,30 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* 🌟 အနီရောင် Error တက်စေသော Comment ကို ဖယ်ရှားလိုက်ပါပြီ 🌟 */}
       {pathname === '/' && (
         <div className="mx-auto w-[95%] max-w-5xl z-40 mb-2 relative">
           
+          {/* ==================== 🌟 NEW: Banner Section (ဒုတိယပုံကလို Banner နေရာ) 🌟 ==================== */}
+          {/* ကိုယ်ပိုင် Banner ဆွဲပြီးရင် public folder ထဲထည့်ပြီး src="/your-banner.jpg" လို့ ပြင်လိုက်ပါ */}
+          <div className="w-full mb-6 md:mb-8 rounded-3xl overflow-hidden shadow-lg border-2 border-[#4A5C82]/10 relative group">
+             <img 
+               src="https://via.placeholder.com/1200x400/2D3A54/D99B48?text=Your+Banner+Here" 
+               alt="Main Banner" 
+               className="w-full h-[150px] sm:h-[200px] md:h-[320px] object-cover transition-transform duration-700 group-hover:scale-105"
+             />
+             {/* Slider လိုမျိုး ဘေးက မျှားလေးတွေ အလှထည့်ထားသည် */}
+             <button className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/50 backdrop-blur-sm rounded-full flex items-center justify-center text-[#4A5C82] hover:bg-white shadow-md transition hidden md:flex font-bold">❮</button>
+             <button className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 bg-white/50 backdrop-blur-sm rounded-full flex items-center justify-center text-[#4A5C82] hover:bg-white shadow-md transition hidden md:flex font-bold">❯</button>
+             
+             {/* Slider အောက်ခြေက အစက်လေးတွေ */}
+             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="w-2 h-2 rounded-full bg-white"></div>
+                <div className="w-2 h-2 rounded-full bg-white/50"></div>
+                <div className="w-2 h-2 rounded-full bg-white/50"></div>
+             </div>
+          </div>
+
+          {/* ==================== 1. Announcement Bar ==================== */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center mb-4">
             <div className="flex items-center gap-2 bg-[#4A5C82]/10 border border-[#4A5C82]/20 px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
               <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.6)]"></div>
@@ -163,6 +183,7 @@ export default function Navbar() {
             </div>
           </div>
 
+          {/* ==================== 2. Category Filter Bar ==================== */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-[#4A5C82]/5 p-2 rounded-2xl border border-[#4A5C82]/10">
              <button className="flex items-center gap-2 bg-[#D99B48] text-[#E4D5B7] px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-[3px_3px_0px_rgba(74,92,130,0.2)] transition hover:-translate-y-0.5">
                 <span>⭐</span> Favorit
