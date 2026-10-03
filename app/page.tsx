@@ -18,18 +18,20 @@ export default function Home() {
   ];
 
   return (
-    <main
-      className="min-h-screen pb-28 relative bg-[#E4D5B7] font-sans"
-    >
+    <main className="min-h-screen pb-28 relative bg-[url('/bg.gif')] bg-cover bg-center bg-fixed font-sans">
+      
+      {/* 🌟 နောက်ခံအရောင်အစား bg.gif ကို ခေါ်သုံးထားပါသည် 🌟 */}
+      {/* 🌟 Background ပုံအရမ်းရှုပ်နေပြီး စာဖတ်ရခက်ရင် အောက်က Comment ကိုဖြုတ်ပြီး အရောင်အုပ် (Overlay) ပေးလို့ရပါတယ် 🌟 */}
+      {/* <div className="absolute inset-0 bg-[#E4D5B7]/70 backdrop-blur-sm z-0 pointer-events-none"></div> */}
+
       {/* Soft Glow Effect */}
       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-[#4A5C82]/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
       <div className="relative z-10">
         <Navbar />
 
-        {/* 🌟 နေရာလွတ် အရမ်းမကျယ်စေရန် mt-24 အစား mt-6 ဟု ပြန်ပြင်ထားပါသည် 🌟 */}
         <div className="max-w-4xl mx-auto px-4 mb-3 mt-6">
-          <h2 className="text-[#4A5C82] text-xs sm:text-sm font-bold tracking-wide uppercase">
+          <h2 className="text-[#4A5C82] bg-white/70 inline-block px-3 py-1.5 rounded-lg backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide uppercase">
             ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ:
           </h2>
         </div>
@@ -60,8 +62,9 @@ export default function Home() {
 
         {/* ==================== 1. How it Works ==================== */}
         <div className="max-w-5xl mx-auto px-4 mt-20">
-          <h2 className="text-3xl font-black text-[#4A5C82] mb-2 uppercase tracking-tight">Fully Automated. <span className="text-[#D99B48] italic">Instant Delivery.</span></h2>
-          <p className="text-[#4A5C82]/80 text-sm mb-8 font-medium">Powered by our advanced auto-bot system. No waiting time, top up directly and get your diamonds in seconds.</p>
+          <h2 className="text-3xl font-black text-[#4A5C82] mb-2 uppercase tracking-tight bg-white/70 inline-block px-4 py-1.5 rounded-xl backdrop-blur-md">Fully Automated. <span className="text-[#D99B48] italic">Instant Delivery.</span></h2>
+          <br/>
+          <p className="text-[#4A5C82] bg-white/70 inline-block px-4 py-1.5 rounded-lg backdrop-blur-md text-sm mb-8 font-medium">Powered by our advanced auto-bot system. No waiting time, top up directly and get your diamonds in seconds.</p>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-[#4A5C82] p-8 rounded-3xl border border-[#4A5C82] shadow-[6px_6px_0px_rgba(74,92,130,0.2)] relative overflow-hidden transition hover:-translate-y-1">
@@ -87,8 +90,10 @@ export default function Home() {
         {/* ==================== 2. Statistics ==================== */}
         <div className="max-w-5xl mx-auto px-4 mt-20 flex flex-col md:flex-row gap-10 items-center">
           <div className="w-full md:w-2/5">
-            <h2 className="text-4xl font-black text-[#4A5C82] mb-4 leading-tight uppercase tracking-tight">Trust the <br/><span className="text-[#D99B48] italic">System.</span></h2>
-            <p className="text-[#4A5C82]/80 text-sm font-medium leading-relaxed">We provide a secure, fast, and automated gaming top-up experience. Thousands of gamers trust Paing Gyi Shop for their daily needs.</p>
+            <h2 className="text-4xl font-black text-[#4A5C82] mb-4 leading-tight uppercase tracking-tight bg-white/70 inline-block px-4 py-2 rounded-xl backdrop-blur-md">Trust the <br/><span className="text-[#D99B48] italic">System.</span></h2>
+            <br/>
+            <p className="text-[#4A5C82] bg-white/70 inline-block px-4 py-2 rounded-lg backdrop-blur-md text-sm font-medium leading-relaxed mt-2">We provide a secure, fast, and automated gaming top-up experience. Thousands of gamers trust Paing Gyi Shop for their daily needs.</p>
+            <br/>
             <Link href="#games">
               <button className="mt-6 bg-[#D99B48] hover:bg-[#c2873b] text-[#E4D5B7] text-sm font-extrabold py-3 px-8 rounded-full shadow-[4px_4px_0px_rgba(74,92,130,0.3)] transition-all hover:-translate-y-1 uppercase tracking-wider">
                 Top up now
@@ -118,7 +123,7 @@ export default function Home() {
 
         {/* ==================== 3. FAQ Section ==================== */}
         <div className="max-w-3xl mx-auto px-4 mt-24">
-          <h2 className="text-3xl font-black text-[#4A5C82] text-center mb-10 uppercase tracking-tight">Things users <span className="text-[#D99B48] italic">ask often.</span></h2>
+          <h2 className="text-3xl font-black text-[#4A5C82] text-center mb-10 uppercase tracking-tight bg-white/70 inline-block px-5 py-2 rounded-xl backdrop-blur-md mx-auto flex justify-center w-max">Things users <span className="text-[#D99B48] italic ml-2">ask often.</span></h2>
           <div className="space-y-4">
              <details className="bg-[#4A5C82] rounded-2xl border border-[#4A5C82] group overflow-hidden cursor-pointer shadow-[4px_4px_0px_rgba(74,92,130,0.2)]">
                 <summary className="p-6 text-sm font-bold text-[#E4D5B7] flex justify-between items-center list-none outline-none">
@@ -153,16 +158,16 @@ export default function Home() {
         </div>
 
         {/* ==================== 4. Footer ==================== */}
-        <footer className="max-w-5xl mx-auto px-4 mt-24 pt-12 border-t border-[#4A5C82]/20 pb-28 md:pb-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+        <footer className="max-w-5xl mx-auto px-4 mt-24 pt-12 border-t border-white/20 pb-28 md:pb-12 bg-white/60 rounded-t-3xl backdrop-blur-md">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12 px-6">
             <div className="col-span-1 md:col-span-1">
                <h3 className="text-xl font-black text-[#4A5C82] mb-4 uppercase">PAING GYI <span className="text-[#D99B48]">SHOP</span></h3>
-               <p className="text-[#4A5C82]/80 font-medium text-xs leading-relaxed mb-4">Fast, reliable, and automated gaming top-ups. Buy premium subscriptions and get instant delivery 24/7 with our Auto-bot.</p>
+               <p className="text-[#4A5C82] font-bold text-xs leading-relaxed mb-4">Fast, reliable, and automated gaming top-ups. Buy premium subscriptions and get instant delivery 24/7 with our Auto-bot.</p>
             </div>
             
             <div>
                <h4 className="text-[#4A5C82] text-xs font-black mb-5 uppercase tracking-widest">Navigation</h4>
-               <ul className="space-y-3 text-[#4A5C82]/80 font-medium text-sm">
+               <ul className="space-y-3 text-[#4A5C82] font-bold text-sm">
                  <li><Link href="/" className="hover:text-[#D99B48] transition">Home</Link></li>
                  <li><Link href="/account" className="hover:text-[#D99B48] transition">My Account</Link></li>
                  <li><Link href="/history" className="hover:text-[#D99B48] transition">Track Order</Link></li>
@@ -171,7 +176,7 @@ export default function Home() {
             
             <div>
                <h4 className="text-[#4A5C82] text-xs font-black mb-5 uppercase tracking-widest">Help</h4>
-               <ul className="space-y-3 text-[#4A5C82]/80 font-medium text-sm">
+               <ul className="space-y-3 text-[#4A5C82] font-bold text-sm">
                  <li><Link href="#" className="hover:text-[#D99B48] transition">Telegram Support</Link></li>
                  <li><Link href="#" className="hover:text-[#D99B48] transition">Facebook Page</Link></li>
                  <li><Link href="#" className="hover:text-[#D99B48] transition">Terms & Conditions</Link></li>
@@ -185,14 +190,14 @@ export default function Home() {
                   <span className="bg-[#4A5C82] text-xs text-[#E4D5B7] px-3 py-1.5 rounded-md shadow-sm font-bold tracking-wide">Wave Pay</span>
                   <span className="bg-[#4A5C82] text-xs text-[#E4D5B7] px-3 py-1.5 rounded-md shadow-sm font-bold tracking-wide">Website Wallet</span>
                </div>
-               <p className="text-[#4A5C82]/70 font-medium text-[10px] mt-4 flex items-center gap-1">
+               <p className="text-[#4A5C82] font-bold text-[10px] mt-4 flex items-center gap-1">
                  <svg className="w-3 h-3 text-[#D99B48]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                  Encrypted secure transactions
                </p>
             </div>
           </div>
           
-          <div className="text-center text-[#4A5C82]/60 font-medium text-[10px]">
+          <div className="text-center text-[#4A5C82] font-bold text-[10px] pb-6">
              © 2026 Paing Gyi Game Store. All rights reserved.
           </div>
         </footer>
