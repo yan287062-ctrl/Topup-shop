@@ -21,11 +21,11 @@ export default function Home() {
     { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Topup Games' },
     { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Topup Games' },
     
-    // 🌟 ဤနေရာတွင် public folder ရှိ ဖိုင်နာမည် အတိအကျအတိုင်း (အကြီး/အသေး/Space) ပြင်ဆင်ပေးထားပါသည် 🌟
-    { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/Aniimo.png', category: 'Topup Games' },
-    { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.png', category: 'VPN' },
-    { id: 'express-vpn', name: 'Express VPN', sub: 'VPN Subscription', img: '/Express Vpn.png', category: 'VPN' },
-    { id: 'spotify', name: 'Spotify', sub: 'Premium', img: '/Spotify.png', category: 'Gift Card & Voucher' },
+    // 🌟 .png အစား .jpg ဟု ပြောင်းပေးထားပါသည် 🌟
+    { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/Aniimo.jpg', category: 'Topup Games' },
+    { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.jpg', category: 'VPN' },
+    { id: 'express-vpn', name: 'Express VPN', sub: 'VPN Subscription', img: '/Express Vpn.jpg', category: 'VPN' },
+    { id: 'spotify', name: 'Spotify', sub: 'Premium', img: '/Spotify.jpg', category: 'Gift Card & Voucher' },
   ];
 
   const filteredGames = games.filter(game => {
