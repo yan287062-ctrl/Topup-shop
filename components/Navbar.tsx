@@ -60,10 +60,16 @@ export default function Navbar() {
   return (
     <>
       <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-8">
-        {/* 🌟 အကြည်ရောင်အစား bg-white/95 (ပိုပိတ်သောအရောင်) ပြောင်းထားပါသည် 🌟 */}
-        <div className="bg-white/95 backdrop-blur-xl border border-white shadow-lg rounded-full px-3 py-2 md:px-6 md:py-3 flex items-center justify-between">
+        
+        {/* 🌟 Navbar Background ကို nav-bg.jpg အဖြစ် ချိတ်ဆက်ထားပါသည် 🌟 */}
+        <div className="relative border border-white/20 shadow-xl rounded-full px-3 py-2 md:px-6 md:py-3 flex items-center justify-between overflow-hidden">
           
-          <Link href="/" className="flex items-center gap-2 relative">
+          {/* Navbar နောက်ခံပုံ */}
+          <div className="absolute inset-0 bg-[url('/nav-bg.jpg')] bg-cover bg-center"></div>
+          {/* ပုံပေါ်ကနေ အရောင်ခပ်မှိုင်းမှိုင်းလေး အုပ်ထားခြင်း (စာတွေ ဖတ်ရလွယ်အောင်) */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+
+          <Link href="/" className="flex items-center gap-2 relative z-10">
              <div className="w-9 h-9 md:w-12 md:h-12 relative rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
                 <img 
                   src="/painggyi-logo-clear.png" 
@@ -77,13 +83,13 @@ export default function Navbar() {
              </div>
           </Link>
 
-          <div className="hidden md:flex items-center bg-gray-100/80 backdrop-blur-sm rounded-full p-1 border border-gray-200 gap-1 relative">
+          <div className="hidden md:flex items-center bg-white/20 backdrop-blur-md rounded-full p-1 border border-white/30 gap-1 relative z-10">
             <Link 
               href="/" 
               className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${
                 pathname === '/' 
-                ? 'bg-white shadow-md text-gray-800' 
-                : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'
+                ? 'bg-white shadow-sm text-gray-900' 
+                : 'text-white hover:bg-white/30 hover:text-white'
               }`}
             >
               Home
@@ -93,8 +99,8 @@ export default function Navbar() {
               href="/all-games" 
               className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${
                 pathname === '/all-games' 
-                ? 'bg-white shadow-md text-gray-800' 
-                : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'
+                ? 'bg-white shadow-sm text-gray-900' 
+                : 'text-white hover:bg-white/30 hover:text-white'
               }`}
             >
               All Games
@@ -104,21 +110,21 @@ export default function Navbar() {
               href="/check-region" 
               className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-300 whitespace-nowrap ${
                 pathname === '/check-region' 
-                ? 'bg-white shadow-md text-[#023E8A]' 
-                : 'text-gray-600 hover:bg-white/60 hover:text-gray-800'
+                ? 'bg-white shadow-sm text-[#023E8A]' 
+                : 'text-white hover:bg-white/30 hover:text-white'
               }`}
             >
                Region Check
             </Link>
           </div>
 
-          <div className="flex items-center gap-1.5 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 relative z-10">
             <Link 
               href="/history" 
               className={`border px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-[9px] sm:text-[10px] font-bold transition-colors shadow-sm whitespace-nowrap ${
                 pathname === '/history'
-                ? 'bg-white border-white text-[#023E8A]'
-                : 'bg-white/60 border-white/80 text-gray-700 hover:bg-white'
+                ? 'bg-white border-transparent text-[#023E8A]'
+                : 'bg-white/20 border-white/40 text-white backdrop-blur-sm hover:bg-white/40'
               }`}
             >
               Track Order
@@ -126,7 +132,7 @@ export default function Navbar() {
             
             <button 
               onClick={() => setShowModal(true)}
-              className="bg-pink-50 border border-pink-200 text-pink-600 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-[9px] sm:text-[10px] md:text-sm font-bold hover:bg-pink-100 transition-colors shadow-sm whitespace-nowrap"
+              className="bg-pink-500/90 border border-pink-400 text-white px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-[9px] sm:text-[10px] md:text-sm font-bold hover:bg-pink-600 transition-colors shadow-sm whitespace-nowrap backdrop-blur-sm"
             >
               {user ? `${balance.toLocaleString()} Ks` : '0 Ks'}
             </button>
@@ -136,7 +142,7 @@ export default function Navbar() {
                 {getUserInitials(user.user_metadata?.full_name, user.email)}
               </button>
             ) : (
-              <Link href="/login" className="bg-gradient-to-r from-pink-400 to-rose-400 hover:from-pink-500 hover:to-rose-500 text-white px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-2.5 rounded-full text-[9px] sm:text-[10px] md:text-sm font-black transition-all shadow-md border border-pink-300 whitespace-nowrap">
+              <Link href="/login" className="bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-2.5 rounded-full text-[9px] sm:text-[10px] md:text-sm font-black transition-all shadow-md border border-pink-400 whitespace-nowrap">
                 Sign In
               </Link>
             )}
@@ -164,44 +170,44 @@ export default function Navbar() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center mb-4">
-            <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md border border-[#4A5C82]/10 px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
+            <div className="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
               <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.6)]"></div>
-              <span className="text-[#4A5C82] text-xs font-extrabold tracking-wide">Admin online</span>
+              <span className="text-gray-700 text-xs font-extrabold tracking-wide">Admin online</span>
             </div>
 
-            <div className="flex-1 bg-white/95 backdrop-blur-md border border-[#4A5C82]/10 rounded-full overflow-hidden flex items-center px-4 py-2 w-full shadow-sm">
-              <span className="text-[#D99B48] mr-3 text-sm">📢</span>
+            <div className="flex-1 bg-white border border-gray-200 rounded-full overflow-hidden flex items-center px-4 py-2 w-full shadow-sm">
+              <span className="text-pink-500 mr-3 text-sm">📢</span>
               <div 
                 className="flex-1 overflow-hidden flex items-center"
                 dangerouslySetInnerHTML={{
-                  __html: '<marquee scrollamount="4" class="text-xs text-[#4A5C82] font-bold mt-0.5 tracking-wide">ငွေကြိုဖြည့်စရာမလိုဘဲ ငွေစာရင်းလွှဲပြေစာပြ၍ တိုက်ရိုက်ဝယ်ယူနိုင်ပါသည်။ &nbsp; • &nbsp; Wallet ထဲ ငွေဖြည့်ထားပါက 24 နာရီလုံး အချိန်မရွေး Auto Topup စနစ်ဖြင့် စက္ကန့်ပိုင်းအတွင်း ရရှိပါမည်။</marquee>'
+                  __html: '<marquee scrollamount="4" class="text-xs text-gray-700 font-bold mt-0.5 tracking-wide">ငွေကြိုဖြည့်စရာမလိုဘဲ ငွေစာရင်းလွှဲပြေစာပြ၍ တိုက်ရိုက်ဝယ်ယူနိုင်ပါသည်။ &nbsp; • &nbsp; Wallet ထဲ ငွေဖြည့်ထားပါက 24 နာရီလုံး အချိန်မရွေး Auto Topup စနစ်ဖြင့် စက္ကန့်ပိုင်းအတွင်း ရရှိပါမည်။</marquee>'
                 }}
               />
             </div>
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-white/95 backdrop-blur-md p-2 rounded-2xl border border-[#4A5C82]/10 shadow-sm">
-             <button className="flex items-center gap-2 bg-[#D99B48] text-[#E4D5B7] px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-[3px_3px_0px_rgba(74,92,130,0.2)] transition hover:-translate-y-0.5">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-white p-2 rounded-2xl border border-gray-200 shadow-sm">
+             <button className="flex items-center gap-2 bg-pink-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-md transition hover:-translate-y-0.5">
                 <span>⭐</span> Favorit
              </button>
              
-             <button className="flex items-center gap-2 text-[#4A5C82] hover:bg-[#4A5C82]/10 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
+             <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
                 <span>🔥</span> Popular Games
              </button>
              
-             <button className="flex items-center gap-2 text-[#4A5C82] hover:bg-[#4A5C82]/10 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
+             <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
                 <span>🎮</span> Topup Games
              </button>
              
-             <button className="flex items-center gap-2 text-[#4A5C82] hover:bg-[#4A5C82]/10 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
+             <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
                 <span>🎫</span> Gift Card & Voucher
              </button>
              
-             <button className="flex items-center gap-2 text-[#4A5C82] hover:bg-[#4A5C82]/10 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
+             <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
                 <span>💎</span> App items
              </button>
 
-             <button className="ml-auto flex items-center gap-1.5 text-[#4A5C82] text-xs font-extrabold whitespace-nowrap px-3 hover:text-[#D99B48] transition uppercase">
+             <button className="ml-auto flex items-center gap-1.5 text-pink-600 text-xs font-extrabold whitespace-nowrap px-3 hover:text-pink-700 transition uppercase">
                 See More <span>→</span>
              </button>
           </div>
