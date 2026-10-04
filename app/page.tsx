@@ -18,8 +18,11 @@ export default function Home() {
     { id: 'pubg-uc', name: 'PUBG UC', sub: 'Global', img: '/pubg.png', category: 'Topup Games' },
     { id: 'uc-pack', name: 'UC pack', sub: 'Global', img: '/Pubgucpack.png', category: 'Topup Games' },
     { id: 'heartopia', name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', category: 'Topup Games' },
-    { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Topup Games' },
-    { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Topup Games' },
+    
+    // 🌟 Telegram Premium နှင့် Smile coin တို့၏ Category ကို Gift Card & Voucher သို့ ပြောင်းပေးထားပါသည် 🌟
+    { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Gift Card & Voucher' },
+    { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Gift Card & Voucher' },
+    
     { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/Aniimo.jpg', category: 'Topup Games' },
     { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.jpg', category: 'VPN' },
     { id: 'express-vpn', name: 'Express VPN', sub: 'VPN Subscription', img: '/Express Vpn.jpg', category: 'VPN' },
@@ -83,7 +86,7 @@ export default function Home() {
           </h2>
         </div>
 
-        {/* ==================== Games List (Chi Chi Design) ==================== */}
+        {/* ==================== Games List ==================== */}
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
           {filteredGames.map((game) => (
             <Link
@@ -91,7 +94,6 @@ export default function Home() {
               href={`/topup/${game.id}`}
               className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col group"
             >
-              {/* ပုံအရွယ်အစားကို ပိုမြင့်ပေးထားသည် (h-32 မှ h-44 အထိ) */}
               <div className="w-full h-32 sm:h-36 md:h-44 relative bg-gray-50">
                 <img 
                   src={game.img} 
@@ -100,7 +102,6 @@ export default function Home() {
                 />
               </div>
               
-              {/* စာသားအပိုင်းကို အဖြူရောင်ပြောင်းပြီး မျှားလေးထည့်ထားသည် */}
               <div className="p-3 sm:p-4 flex flex-col justify-between flex-1 bg-white">
                 <div>
                   <h3 className="text-gray-800 font-bold text-xs sm:text-sm truncate">{game.name}</h3>
