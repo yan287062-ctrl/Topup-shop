@@ -20,8 +20,6 @@ export default function Home() {
     { id: 'heartopia', name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', category: 'Topup Games' },
     { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Topup Games' },
     { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Topup Games' },
-    
-    // 🌟 .png အစား .jpg ဟု ပြောင်းပေးထားပါသည် 🌟
     { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/Aniimo.jpg', category: 'Topup Games' },
     { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.jpg', category: 'VPN' },
     { id: 'express-vpn', name: 'Express VPN', sub: 'VPN Subscription', img: '/Express Vpn.jpg', category: 'VPN' },
@@ -85,25 +83,36 @@ export default function Home() {
           </h2>
         </div>
 
-        {/* ==================== Games List ==================== */}
+        {/* ==================== Games List (Chi Chi Design) ==================== */}
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
           {filteredGames.map((game) => (
             <Link
               key={game.id}
               href={`/topup/${game.id}`}
-              className="bg-[#4A5C82] border border-[#4A5C82] shadow-[4px_4px_0px_rgba(74,92,130,0.3)] rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[6px_6px_0px_rgba(74,92,130,0.4)] flex flex-col group"
+              className="bg-white border border-gray-100 shadow-sm rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col group"
             >
-              <div className="w-full h-24 sm:h-28 md:h-32 relative bg-[#2D3A54]">
+              {/* ပုံအရွယ်အစားကို ပိုမြင့်ပေးထားသည် (h-32 မှ h-44 အထိ) */}
+              <div className="w-full h-32 sm:h-36 md:h-44 relative bg-gray-50">
                 <img 
                   src={game.img} 
                   alt={game.name} 
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 opacity-90 group-hover:opacity-100" 
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                 />
               </div>
               
-              <div className="p-2 sm:p-3 flex flex-col justify-between flex-1 bg-[#4A5C82] border-t border-[#E4D5B7]/20">
-                <h3 className="text-[#E4D5B7] font-bold text-[11px] sm:text-[13px] truncate uppercase">{game.name}</h3>
-                <p className="text-[#D99B48] font-bold text-[9px] sm:text-[10px] truncate mt-0.5 uppercase">{game.sub}</p>
+              {/* စာသားအပိုင်းကို အဖြူရောင်ပြောင်းပြီး မျှားလေးထည့်ထားသည် */}
+              <div className="p-3 sm:p-4 flex flex-col justify-between flex-1 bg-white">
+                <div>
+                  <h3 className="text-gray-800 font-bold text-xs sm:text-sm truncate">{game.name}</h3>
+                  <p className="text-gray-400 font-medium text-[9px] sm:text-[10px] truncate mt-0.5">{game.sub}</p>
+                </div>
+                
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+                   <span className="text-gray-400 text-[9px] sm:text-[10px] font-medium">View details</span>
+                   <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-pink-50 group-hover:text-pink-500 transition-colors">
+                     <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+                   </div>
+                </div>
               </div>
             </Link>
           ))}
