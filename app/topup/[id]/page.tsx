@@ -143,23 +143,65 @@ export default function TopupPage() {
     { id: 'smile_3', name: 'Brl 5000', price: 419000 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
+  const aniimoPackages = [
+    { id: 'an1', name: '60 Stars', price: 3900 },
+    { id: 'an2', name: '300 Stars', price: 23000 },
+    { id: 'an3', name: '980 Stars', price: 67100 },
+    { id: 'an4', name: '1980 Stars', price: 134100 },
+    { id: 'an5', name: '3280 Stars', price: 227400 },
+    { id: 'an6', name: '6480 Stars', price: 439000 },
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const spotifyPackages = [
+    { id: 'sp1', name: '1m - Individual', bonus: 'Individual Plan', price: 8500 },
+    { id: 'sp2', name: '3m - Individual', bonus: 'Individual Plan', price: 33000 },
+    { id: 'sp3', name: '6m - Individual', bonus: 'Individual Plan', price: 52000 },
+    { id: 'sp4', name: '12m - Individual', bonus: 'Individual Plan', price: 78000 },
+    { id: 'sp5', name: '2m - Family', bonus: 'Family plan', price: 12000 },
+    { id: 'sp6', name: '3m - Family', bonus: 'Family plan', price: 16000 },
+    { id: 'sp7', name: '6m - Family', bonus: 'Family plan', price: 29000 },
+    { id: 'sp8', name: '1yr - Family', bonus: 'Family plan', price: 50000 },
+  ];
+
+  const netflixPackages = [
+    { id: 'nf1', name: '1 Month - Share Profile', bonus: 'Share Profile', price: 8000 },
+    { id: 'nf2', name: '1 Month - Own Profile', bonus: 'Own Profile', price: 14000 },
+    { id: 'nf3', name: '2 Month - Share', bonus: 'Share Profile', price: 15500 },
+    { id: 'nf4', name: '2 Month - Own Profile', bonus: 'Own Profile', price: 27500 },
+    { id: 'nf5', name: '3 Month - Share', bonus: 'Share Profile', price: 23000 },
+    { id: 'nf6', name: '3 Month - Own', bonus: 'Own Profile', price: 40000 },
+    { id: 'nf7', name: '6 Month - Share', bonus: 'Share Profile', price: 45000 },
+    { id: 'nf8', name: '6 Month - Own', bonus: 'Own Profile', price: 80000 },
+  ];
+
+  const jumpJumpPackages = [
+    { id: 'jv1', name: '1 Month - 1 Device (Share)', bonus: 'Share', price: 10000 },
+    { id: 'jv2', name: '1 Month - 1 Device (Own)', bonus: 'Own', price: 14500 },
+    { id: 'jv3', name: '1 Month - 2 Device (Own)', bonus: 'Own', price: 19000 },
+    { id: 'jv4', name: '6 Month - 2 Device (Own)', bonus: 'Own', price: 95000 },
+    { id: 'jv5', name: '12 Month - 2 Device (Own)', bonus: 'Own', price: 123000 },
+  ];
+
+  const expressVpnPackages = [
+    { id: 'ev1', name: '1 Month - 1 Device', bonus: '1 Device', price: 2000 },
+    { id: 'ev2', name: '1 Month - 12 Device', bonus: '12 Device', price: 12000 },
+  ];
+
   const gameConfigs: Record<string, any> = {
     'mobile-legends': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
-    'mobile-legends-(mlbb)': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
     'mlbb': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
     'magic-chess': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
     'mcgg': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
-    'pubg-mobile': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
-    'pubg': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
     'pubg-uc': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
-    'uc-packs': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
     'uc-pack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
-    'ucpack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
-    'telegram-premium': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
     'telegram': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
     'heartopia': { name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', packages: heartopiaPackages, inputType: 'heartopia', dbCat: 'heartopia' },
     'smile-coin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', packages: smileCoinPackages, inputType: 'username', dbCat: 'smileCoin' },
-    'smilecoin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', packages: smileCoinPackages, inputType: 'username', dbCat: 'smileCoin' }
+    'aniimo': { name: 'Aniimo', sub: 'Global', img: '/Aniimo.jpg', packages: aniimoPackages, inputType: 'pubg', dbCat: 'aniimo' }, 
+    'spotify': { name: 'Spotify Premium', sub: 'Music Subscription', img: '/Spotify.jpg', packages: spotifyPackages, inputType: 'email', dbCat: 'spotify' },
+    'netflix-premium': { name: 'Netflix Premium', sub: 'Streaming', img: '/Netflix.jpg', packages: netflixPackages, inputType: 'email', dbCat: 'netflix' },
+    'jump-jump-vpn': { name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.jpg', packages: jumpJumpPackages, inputType: 'email', dbCat: 'jumpjump' },
+    'express-vpn': { name: 'Express VPN', sub: 'VPN Subscription', img: '/Express Vpn.jpg', packages: expressVpnPackages, inputType: 'email', dbCat: 'expressvpn' },
   };
 
   const game = gameConfigs[id] || Object.values(gameConfigs).find(g => id.includes(g.dbCat.toLowerCase()));
@@ -199,20 +241,15 @@ export default function TopupPage() {
     fetchRealOrderCount();
   }, [game]);
 
-  // 🌟 Auto Check Logic (User ID နဲ့ Zone ID နှစ်ခုလုံးပြည့်ရင် အလိုလိုစစ်မယ်) 🌟
   useEffect(() => {
     if (game?.inputType !== 'mlbb') return;
 
-    // Reset result whenever input changes
     setIdCheckResult({ status: 'idle', name: '', region: '', flag: '' });
 
     if (userId.trim() && zoneId.trim()) {
-      // Clear previous timeout
       if (checkTimeoutRef.current) clearTimeout(checkTimeoutRef.current);
-
       setIsCheckingId(true);
 
-      // Debounce: Wait 1 second after user stops typing before making API call
       checkTimeoutRef.current = setTimeout(async () => {
         try {
           const response = await fetch(`https://api.isan.eu.org/nickname/ml?id=${userId}&zone=${zoneId}`);
@@ -239,7 +276,7 @@ export default function TopupPage() {
         } finally {
           setIsCheckingId(false);
         }
-      }, 1000); // 1000ms (1 second) delay
+      }, 1000); 
     } else {
       setIsCheckingId(false);
     }
@@ -249,8 +286,6 @@ export default function TopupPage() {
     };
   }, [userId, zoneId, game?.inputType]);
 
-
-  // 🌟 Wallet ပုံအမှန် ပြန်ထည့်ထားသည် 🌟
   const paymentMethods = [
     { id: 'kpay', name: 'KBZ Pay', img: '/kpay.png' },
     { id: 'wave', name: 'Wave Pay', img: '/wave.png' },
@@ -275,6 +310,7 @@ export default function TopupPage() {
     if (game.inputType === 'pubg') return userId;
     if (game.inputType === 'username') return userId;
     if (game.inputType === 'heartopia') return userId && aid;
+    if (game.inputType === 'email') return userId; 
     return false;
   })();
 
@@ -501,7 +537,7 @@ export default function TopupPage() {
                       <button
                         key={pkg.id}
                         onClick={() => setSelectedPkg(pkg)}
-                        className={`relative p-2.5 md:p-3.5 rounded-[1rem] md:rounded-2xl text-left transition-all duration-200 overflow-hidden shadow-sm ${
+                        className={`relative p-2.5 md:p-3.5 rounded-[1rem] md:rounded-2xl text-left transition-all duration-200 overflow-hidden shadow-sm h-full flex flex-col justify-between ${
                           selectedPkg?.id === pkg.id
                           ? 'bg-[#023E8A] border-2 border-[#00B4D8] shadow-[0_5px_15px_rgba(2,62,138,0.3)]'
                           : 'bg-white border-2 border-transparent hover:border-[#00B4D8]/30'
@@ -512,9 +548,11 @@ export default function TopupPage() {
                             <svg className="h-2.5 w-2.5 md:h-3 md:w-3 text-white" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                           </div>
                         )}
-                        <div className={`text-xs md:text-sm mb-1 line-clamp-2 ${selectedPkg?.id === pkg.id ? 'text-white font-bold' : 'text-[#023E8A] font-bold'}`}>{pkg.name}</div>
-                        <div className={`text-[9px] md:text-[10px] mb-2 md:mb-3 ${selectedPkg?.id === pkg.id ? 'text-[#CAF0F8]/70' : 'text-[#023E8A]/60'}`}>{pkg.bonus || 'No bonus'}</div>
-                        <div className={`text-xs md:text-sm font-extrabold ${selectedPkg?.id === pkg.id ? 'text-[#00B4D8]' : 'text-[#00B4D8]'}`}>{pkg.price.toLocaleString()} Ks</div>
+                        <div>
+                          <div className={`text-xs md:text-sm mb-1 line-clamp-2 ${selectedPkg?.id === pkg.id ? 'text-white font-bold' : 'text-[#023E8A] font-bold'}`}>{pkg.name}</div>
+                          <div className={`text-[9px] md:text-[10px] mb-2 md:mb-3 ${selectedPkg?.id === pkg.id ? 'text-[#CAF0F8]/70' : 'text-[#023E8A]/60'}`}>{pkg.bonus || 'No bonus'}</div>
+                        </div>
+                        <div className={`text-xs md:text-sm font-extrabold mt-auto pt-2 border-t border-[#023E8A]/10 ${selectedPkg?.id === pkg.id ? 'text-[#00B4D8] border-[#00B4D8]/30' : 'text-[#00B4D8]'}`}>{pkg.price.toLocaleString()} Ks</div>
                       </button>
                     ))}
                   </div>
@@ -544,7 +582,6 @@ export default function TopupPage() {
                         </div>
                       </div>
 
-                      {/* 🌟 Auto Checking Indicator 🌟 */}
                       {isCheckingId && (
                         <div className="flex items-center justify-center gap-2 text-[#00B4D8] text-xs font-bold py-2">
                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -552,7 +589,6 @@ export default function TopupPage() {
                         </div>
                       )}
 
-                      {/* 🌟 Result Box (Appears automatically) 🌟 */}
                       {!isCheckingId && idCheckResult.status !== 'idle' && (
                         <div className={`w-full p-4 rounded-xl border ${idCheckResult.status === 'success' ? 'bg-[#10b981]/10 border-[#10b981]/30' : 'bg-red-500/10 border-red-500/30'}`}>
                           {idCheckResult.status === 'success' ? (
@@ -608,6 +644,13 @@ export default function TopupPage() {
                     </div>
                   )}
 
+                  {game.inputType === 'email' && (
+                    <div>
+                      <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Email or Account Info <span className="text-[#FBB02D]">*</span></label>
+                      <input type="text" placeholder="Enter your Email / Account details" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                    </div>
+                  )}
+
                   {game.inputType === 'heartopia' && (
                     <div className="space-y-3 md:space-y-4">
                       <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
@@ -634,7 +677,6 @@ export default function TopupPage() {
                 </div>
               </section>
 
-              {/* 🌟 ဤနေရာတွင် Error ကင်းစင်အောင် ပြင်ဆင်ထားပါသည် 🌟 */}
               <section>
                 <div className="flex items-end gap-2 md:gap-3 mb-4">
                   <span className="text-3xl md:text-4xl italic font-black text-[#023E8A]/20">03</span>
