@@ -1,4 +1,4 @@
-'use client'; // 🌟 Filter စနစ်သုံးရန်အတွက် Client Component အဖြစ်ပြောင်းထားပါသည် 🌟
+'use client'; 
 
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
@@ -10,10 +10,8 @@ export default function Home() {
   const successOrders = "1,200+";
   const avgDeliveryTime = "5s";
 
-  // 🌟 Filter လုပ်မည့် Active Category သတ်မှတ်ခြင်း 🌟
   const [activeCategory, setActiveCategory] = useState('Favorit');
 
-  // 🌟 Item အသစ်များနှင့် ၎င်းတို့၏ Category များကို ထပ်မံဖြည့်စွက်ထားပါသည် 🌟
   const games = [
     { id: 'mobile-legends', name: 'Mobile Legend', sub: 'Myanmar (Global)', img: '/mlbb.png', category: 'Topup Games' },
     { id: 'magic-chess', name: 'Magic Chess', sub: 'Myanmar (Global)', img: '/MCGG.png', category: 'Topup Games' },
@@ -23,16 +21,15 @@ export default function Home() {
     { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Topup Games' },
     { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Topup Games' },
     
-    // NEW ITEMS (ပုံနာမည်များ public folder နှင့် တူညီမှုရှိမရှိ ပြန်စစ်ပါ)
-    { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/aniimo.png', category: 'Topup Games' },
-    { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/jumpjump.png', category: 'VPN' },
-    { id: 'express-vpn', name: 'Express VPN', sub: 'VPN Subscription', img: '/expressvpn.png', category: 'VPN' },
-    { id: 'spotify', name: 'Spotify', sub: 'Premium', img: '/spotify.png', category: 'Gift Card & Voucher' },
+    // 🌟 ဤနေရာတွင် public folder ရှိ ဖိုင်နာမည် အတိအကျအတိုင်း (အကြီး/အသေး/Space) ပြင်ဆင်ပေးထားပါသည် 🌟
+    { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/Aniimo.png', category: 'Topup Games' },
+    { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.png', category: 'VPN' },
+    { id: 'express-vpn', name: 'Express VPN', sub: 'VPN Subscription', img: '/Express Vpn.png', category: 'VPN' },
+    { id: 'spotify', name: 'Spotify', sub: 'Premium', img: '/Spotify.png', category: 'Gift Card & Voucher' },
   ];
 
-  // Category အလိုက် ရွေးထုတ်ခြင်း
   const filteredGames = games.filter(game => {
-    if (activeCategory === 'Favorit') return true; // Favorit ဆိုရင် အကုန်ပေါ်မယ်
+    if (activeCategory === 'Favorit') return true; 
     return game.category === activeCategory;
   });
 
@@ -45,7 +42,7 @@ export default function Home() {
       <div className="relative z-10">
         <Navbar />
 
-        {/* ==================== Category Filter Bar (ရွှေ့ပြောင်းထည့်သွင်းထားသည်) ==================== */}
+        {/* ==================== Category Filter Bar ==================== */}
         <div className="max-w-4xl mx-auto px-4 mb-6">
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-white p-2 rounded-2xl border border-gray-200 shadow-sm">
              <button 
@@ -69,7 +66,6 @@ export default function Home() {
                 <span>🎫</span> Gift Card & Voucher
              </button>
              
-             {/* App Items အစား VPN သို့ ပြောင်းထားပါသည် */}
              <button 
                onClick={() => setActiveCategory('VPN')}
                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition hover:-translate-y-0.5 ${activeCategory === 'VPN' ? 'bg-pink-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
@@ -89,8 +85,7 @@ export default function Home() {
           </h2>
         </div>
 
-        {/* ==================== Games List (ကတ်များကို ပိုကြီးသွားအောင် ပြင်ထားသည်) ==================== */}
-        {/* 🌟 grid-cols-2 သို့ပြောင်းထား၍ ဖုန်းတွင် ၂ ကတ်သာပေါ်ပြီး ပိုကြီးသွားပါမည် 🌟 */}
+        {/* ==================== Games List ==================== */}
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
           {filteredGames.map((game) => (
             <Link
@@ -98,7 +93,6 @@ export default function Home() {
               href={`/topup/${game.id}`}
               className="bg-[#4A5C82] border border-[#4A5C82] shadow-[4px_4px_0px_rgba(74,92,130,0.3)] rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[6px_6px_0px_rgba(74,92,130,0.4)] flex flex-col group"
             >
-              {/* 🌟 အမြင့် h-24 သို့ တိုးထားပါသည် 🌟 */}
               <div className="w-full h-24 sm:h-28 md:h-32 relative bg-[#2D3A54]">
                 <img 
                   src={game.img} 
