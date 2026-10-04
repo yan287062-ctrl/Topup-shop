@@ -51,7 +51,10 @@ export default function TopupPage() {
     uabpay: { name: 'Paing Gyi', phone: '09967241375' }
   };
 
-  const mlbbPackages = [
+  // ==========================================
+  // 🌟 MLBB Packages ကို Region ၃ မျိုး ခွဲထုတ်ခြင်း 🌟
+  // ==========================================
+  const mlbbGlobalPackages = [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
     { id: 'mlbb_5', name: 'Weekly Pass', price: 6600 }, { id: 'mlbb_6', name: 'Weekly Pass x 2', price: 13200 },
@@ -75,6 +78,46 @@ export default function TopupPage() {
     { id: 'mlbb_41', name: '5532 Diamonds', price: 324734 }, { id: 'mlbb_42', name: '6055 Diamonds', price: 354812 },
     { id: 'mlbb_43', name: '6752 Diamonds', price: 398677 }, { id: 'mlbb_44', name: '7030 Diamonds', price: 415366 },
     { id: 'mlbb_45', name: '7727 Diamonds', price: 453651 }, { id: 'mlbb_46', name: '9288 Diamonds', price: 539360 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const mlbbBrazilPackages = [
+    { id: '50_5_diamonds_first_top_up_bonus', name: '55 Diamonds', price: 3500 },
+    { id: '78_8_diamonds', name: '86 Diamonds', price: 5500 },
+    { id: 'weekly_pass', name: 'Weekly Pass', price: 6600 },
+    { id: '156_16_diamonds', name: '172 Diamonds', price: 10800 },
+    { id: '150_15_diamonds_first_top_up_bonus', name: '165 Diamonds (First Top-Up)', price: 10400 },
+    { id: '234_23_diamonds', name: '257 Diamonds', price: 16100 },
+    { id: '310_34_diamonds', name: '344 Diamonds', price: 21500 },
+    { id: '250_25_diamonds_first_top_up_bonus', name: '275 Diamonds (First Top-Up)', price: 17000 },
+    { id: '482_diamonds', name: '482 Diamonds', price: 30000 },
+    { id: '465_51_diamonds', name: '516 Diamonds', price: 26300 },
+    { id: '500_65_diamonds_first_top_up_bonus', name: '565 Diamonds (First Top-Up)', price: 34100 },
+    { id: 'twilight_pass', name: 'Twilight Pass', price: 35700 },
+    { id: '625_81_diamonds', name: '706 Diamonds', price: 43000 },
+    { id: '1860_335_diamonds', name: '2195 Diamonds', price: 128900 },
+    { id: '3099_589_diamonds', name: '3688 Diamonds', price: 215000 },
+    { id: '4649_883_diamonds', name: '5532 Diamonds', price: 324700 },
+    { id: '7740_1548_diamonds', name: '9288 Diamonds', price: 539300 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const mlbbPHPackages = [
+    { id: '10_1_diamonds', name: '11 Diamonds', price: 900 },
+    { id: '20_2_diamonds', name: '22 Diamonds', price: 1800 },
+    { id: '51_5_diamonds', name: '56 Diamonds', price: 4300 },
+    { id: '50_5_diamonds_first_top_up_bonus', name: '55 Diamonds (First Top-Up)', price: 4200 },
+    { id: 'weekly_diamond_pass', name: 'Weekly Diamond Pass', price: 8800 },
+    { id: '102_10_diamonds', name: '112 Diamonds', price: 8500 },
+    { id: '153_15_diamonds', name: '168 Diamonds', price: 13500 },
+    { id: '203_20_diamonds', name: '223 Diamonds', price: 17000 },
+    { id: '150_15_diamonds_first_top_up_bonus', name: '165 Diamonds (First Top-Up)', price: 12500 },
+    { id: '303_33_diamonds', name: '336 Diamonds', price: 25500 },
+    { id: '250_25_diamonds_first_top_up_bonus', name: '275 Diamonds (First Top-Up)', price: 21500 },
+    { id: 'twilight_pass', name: 'Twilight Pass', price: 43500 },
+    { id: '504_66_diamonds', name: '570 Diamonds', price: 42000 },
+    { id: '500_65_diamonds_first_top_up_bonus', name: '565 Diamonds (First Top-Up)', price: 43000 },
+    { id: '1007_156_diamonds', name: '1163 Diamonds', price: 84000 },
+    { id: '2015_383_diamonds', name: '2398 Diamonds', price: 169000 },
+    { id: '5035_1007_diamonds', name: '6042 Diamonds', price: 420000 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
   const mcggPackages = [
@@ -187,9 +230,13 @@ export default function TopupPage() {
     { id: 'ev2', name: '1 Month - 12 Device', bonus: '12 Device', price: 12000 },
   ];
 
+  // ==========================================
+  // 🌟 DB Categorie ကို FazerCards Category IDs အတိုင်း သတ်မှတ်ခြင်း 🌟
+  // ==========================================
   const gameConfigs: Record<string, any> = {
-    'mobile-legends': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
-    'mlbb': { name: 'Mobile Legends', sub: 'All Server', img: '/mlbb.png', packages: mlbbPackages, inputType: 'mlbb', dbCat: 'mlbb' },
+    'mobile-legends': { name: 'Mobile Legends', sub: 'Global Server', img: '/mlbb.png', packages: mlbbGlobalPackages, inputType: 'mlbb', dbCat: 'mobile_legends_global' },
+    'mobile-legends-br': { name: 'Mobile Legends (BR)', sub: 'Brazil Server', img: '/mlbb.png', packages: mlbbBrazilPackages, inputType: 'mlbb', dbCat: 'mobile_legends_brazil' },
+    'mobile-legends-ph': { name: 'Mobile Legends (PH)', sub: 'Philippines Server', img: '/mlbb.png', packages: mlbbPHPackages, inputType: 'mlbb', dbCat: 'mobile_legends_philippines' },
     'magic-chess': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
     'mcgg': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
     'pubg-uc': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
@@ -393,6 +440,18 @@ export default function TopupPage() {
         if (uploadError) throw uploadError;
         const { data } = supabase.storage.from('receipts').getPublicUrl(fileName);
         publicUrl = data.publicUrl;
+      }
+
+      // ==========================================
+      // 🌟 FazerCards API သို့ Order ပို့ရန် Fields သတ်မှတ်ခြင်း 🌟
+      // ==========================================
+      let orderFields: any = {};
+      if (game.inputType === 'mlbb') {
+         orderFields = { "player_id": userId, "server_id": zoneId }; 
+      } else if (game.inputType === 'pubg') {
+         orderFields = { "player_id": userId };
+      } else {
+         orderFields = { "account": userId };
       }
 
       const { data: insertData, error: insertError } = await supabase.from('orders').insert([{
