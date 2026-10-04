@@ -61,12 +61,9 @@ export default function Navbar() {
     <>
       <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-8">
         
-        {/* 🌟 Navbar Background ကို nav-bg.jpg အဖြစ် ချိတ်ဆက်ထားပါသည် 🌟 */}
         <div className="relative border border-white/20 shadow-xl rounded-full px-3 py-2 md:px-6 md:py-3 flex items-center justify-between overflow-hidden">
           
-          {/* Navbar နောက်ခံပုံ */}
           <div className="absolute inset-0 bg-[url('/nav-bg.jpg')] bg-cover bg-center"></div>
-          {/* ပုံပေါ်ကနေ အရောင်ခပ်မှိုင်းမှိုင်းလေး အုပ်ထားခြင်း (စာတွေ ဖတ်ရလွယ်အောင်) */}
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
 
           <Link href="/" className="flex items-center gap-2 relative z-10">
@@ -184,32 +181,6 @@ export default function Navbar() {
                 }}
               />
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-white p-2 rounded-2xl border border-gray-200 shadow-sm">
-             <button className="flex items-center gap-2 bg-pink-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-md transition hover:-translate-y-0.5">
-                <span>⭐</span> Favorit
-             </button>
-             
-             <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
-                <span>🔥</span> Popular Games
-             </button>
-             
-             <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
-                <span>🎮</span> Topup Games
-             </button>
-             
-             <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
-                <span>🎫</span> Gift Card & Voucher
-             </button>
-             
-             <button className="flex items-center gap-2 text-gray-600 hover:bg-gray-50 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition">
-                <span>💎</span> App items
-             </button>
-
-             <button className="ml-auto flex items-center gap-1.5 text-pink-600 text-xs font-extrabold whitespace-nowrap px-3 hover:text-pink-700 transition uppercase">
-                See More <span>→</span>
-             </button>
           </div>
         </div>
       )}

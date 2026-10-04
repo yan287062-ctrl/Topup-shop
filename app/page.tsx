@@ -1,3 +1,6 @@
+'use client'; // 🌟 Filter စနစ်သုံးရန်အတွက် Client Component အဖြစ်ပြောင်းထားပါသည် 🌟
+
+import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Link from 'next/link';
 
@@ -7,43 +10,96 @@ export default function Home() {
   const successOrders = "1,200+";
   const avgDeliveryTime = "5s";
 
+  // 🌟 Filter လုပ်မည့် Active Category သတ်မှတ်ခြင်း 🌟
+  const [activeCategory, setActiveCategory] = useState('Favorit');
+
+  // 🌟 Item အသစ်များနှင့် ၎င်းတို့၏ Category များကို ထပ်မံဖြည့်စွက်ထားပါသည် 🌟
   const games = [
-    { id: 'mobile-legends', name: 'Mobile Legend', sub: 'Myanmar (Global)', img: '/mlbb.png' },
-    { id: 'magic-chess', name: 'Magic Chess', sub: 'Myanmar (Global)', img: '/MCGG.png' },
-    { id: 'pubg-uc', name: 'PUBG UC', sub: 'Global', img: '/pubg.png' },
-    { id: 'uc-pack', name: 'UC pack', sub: 'Global', img: '/Pubgucpack.png' },
-    { id: 'heartopia', name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png' },
-    { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png' },
-    { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png' },
+    { id: 'mobile-legends', name: 'Mobile Legend', sub: 'Myanmar (Global)', img: '/mlbb.png', category: 'Topup Games' },
+    { id: 'magic-chess', name: 'Magic Chess', sub: 'Myanmar (Global)', img: '/MCGG.png', category: 'Topup Games' },
+    { id: 'pubg-uc', name: 'PUBG UC', sub: 'Global', img: '/pubg.png', category: 'Topup Games' },
+    { id: 'uc-pack', name: 'UC pack', sub: 'Global', img: '/Pubgucpack.png', category: 'Topup Games' },
+    { id: 'heartopia', name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', category: 'Topup Games' },
+    { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Topup Games' },
+    { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Topup Games' },
+    
+    // NEW ITEMS (ပုံနာမည်များ public folder နှင့် တူညီမှုရှိမရှိ ပြန်စစ်ပါ)
+    { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/aniimo.png', category: 'Topup Games' },
+    { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/jumpjump.png', category: 'VPN' },
+    { id: 'express-vpn', name: 'Express VPN', sub: 'VPN Subscription', img: '/expressvpn.png', category: 'VPN' },
+    { id: 'spotify', name: 'Spotify', sub: 'Premium', img: '/spotify.png', category: 'Gift Card & Voucher' },
   ];
+
+  // Category အလိုက် ရွေးထုတ်ခြင်း
+  const filteredGames = games.filter(game => {
+    if (activeCategory === 'Favorit') return true; // Favorit ဆိုရင် အကုန်ပေါ်မယ်
+    return game.category === activeCategory;
+  });
 
   return (
     <main className="min-h-screen pb-28 relative bg-[url('/bg.gif')] bg-cover bg-center bg-fixed font-sans">
       
-      {/* 🌟 နောက်ခံအရောင်ကို နည်းနည်း မှိန်ပေးမည့် Overlay (စာဖတ်ရ ရှင်းသွားအောင်) 🌟 */}
       <div className="absolute inset-0 bg-[#E4D5B7]/50 backdrop-blur-[2px] z-0 pointer-events-none"></div>
-
-      {/* Soft Glow Effect */}
       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-[#4A5C82]/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
       <div className="relative z-10">
         <Navbar />
 
-        <div className="max-w-4xl mx-auto px-4 mb-3 mt-6">
+        {/* ==================== Category Filter Bar (ရွှေ့ပြောင်းထည့်သွင်းထားသည်) ==================== */}
+        <div className="max-w-4xl mx-auto px-4 mb-6">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-white p-2 rounded-2xl border border-gray-200 shadow-sm">
+             <button 
+               onClick={() => setActiveCategory('Favorit')}
+               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition hover:-translate-y-0.5 ${activeCategory === 'Favorit' ? 'bg-pink-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
+             >
+                <span>⭐</span> Favorit
+             </button>
+             
+             <button 
+               onClick={() => setActiveCategory('Topup Games')}
+               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition hover:-translate-y-0.5 ${activeCategory === 'Topup Games' ? 'bg-pink-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
+             >
+                <span>🎮</span> Topup Games
+             </button>
+             
+             <button 
+               onClick={() => setActiveCategory('Gift Card & Voucher')}
+               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition hover:-translate-y-0.5 ${activeCategory === 'Gift Card & Voucher' ? 'bg-pink-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
+             >
+                <span>🎫</span> Gift Card & Voucher
+             </button>
+             
+             {/* App Items အစား VPN သို့ ပြောင်းထားပါသည် */}
+             <button 
+               onClick={() => setActiveCategory('VPN')}
+               className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition hover:-translate-y-0.5 ${activeCategory === 'VPN' ? 'bg-pink-500 text-white shadow-md' : 'text-gray-600 hover:bg-gray-50'}`}
+             >
+                <span>🛡️</span> VPN
+             </button>
+
+             <button className="ml-auto flex items-center gap-1.5 text-pink-600 text-xs font-extrabold whitespace-nowrap px-3 hover:text-pink-700 transition uppercase">
+                See More <span>→</span>
+             </button>
+          </div>
+        </div>
+
+        <div className="max-w-4xl mx-auto px-4 mb-3">
           <h2 className="text-[#4A5C82] bg-white/90 inline-block px-3 py-1.5 rounded-lg backdrop-blur-md text-xs sm:text-sm font-bold tracking-wide uppercase shadow-sm">
             ရရှိနိုင်သော ဂိမ်းနှင့် ဝန်ဆောင်မှုများ:
           </h2>
         </div>
 
-        {/* ==================== Games List ==================== */}
-        <div className="max-w-4xl mx-auto px-4 grid grid-cols-4 gap-2 sm:gap-3">
-          {games.map((game) => (
+        {/* ==================== Games List (ကတ်များကို ပိုကြီးသွားအောင် ပြင်ထားသည်) ==================== */}
+        {/* 🌟 grid-cols-2 သို့ပြောင်းထား၍ ဖုန်းတွင် ၂ ကတ်သာပေါ်ပြီး ပိုကြီးသွားပါမည် 🌟 */}
+        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+          {filteredGames.map((game) => (
             <Link
               key={game.id}
               href={`/topup/${game.id}`}
               className="bg-[#4A5C82] border border-[#4A5C82] shadow-[4px_4px_0px_rgba(74,92,130,0.3)] rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[6px_6px_0px_rgba(74,92,130,0.4)] flex flex-col group"
             >
-              <div className="w-full h-16 sm:h-20 relative bg-[#2D3A54]">
+              {/* 🌟 အမြင့် h-24 သို့ တိုးထားပါသည် 🌟 */}
+              <div className="w-full h-24 sm:h-28 md:h-32 relative bg-[#2D3A54]">
                 <img 
                   src={game.img} 
                   alt={game.name} 
@@ -51,9 +107,9 @@ export default function Home() {
                 />
               </div>
               
-              <div className="p-1.5 sm:p-2 flex flex-col justify-between flex-1 bg-[#4A5C82] border-t border-[#E4D5B7]/20">
-                <h3 className="text-[#E4D5B7] font-bold text-[9px] sm:text-[11px] truncate uppercase">{game.name}</h3>
-                <p className="text-[#D99B48] font-bold text-[7px] sm:text-[9px] truncate mt-0.5 uppercase">{game.sub}</p>
+              <div className="p-2 sm:p-3 flex flex-col justify-between flex-1 bg-[#4A5C82] border-t border-[#E4D5B7]/20">
+                <h3 className="text-[#E4D5B7] font-bold text-[11px] sm:text-[13px] truncate uppercase">{game.name}</h3>
+                <p className="text-[#D99B48] font-bold text-[9px] sm:text-[10px] truncate mt-0.5 uppercase">{game.sub}</p>
               </div>
             </Link>
           ))}
