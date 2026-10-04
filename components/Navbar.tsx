@@ -60,7 +60,8 @@ export default function Navbar() {
   return (
     <>
       <nav className="sticky top-4 mx-auto w-[95%] max-w-6xl z-50 mb-8">
-        <div className="bg-white/60 backdrop-blur-xl border border-white/80 shadow-lg rounded-full px-3 py-2 md:px-6 md:py-3 flex items-center justify-between">
+        {/* 🌟 အကြည်ရောင်အစား bg-white/95 (ပိုပိတ်သောအရောင်) ပြောင်းထားပါသည် 🌟 */}
+        <div className="bg-white/95 backdrop-blur-xl border border-white shadow-lg rounded-full px-3 py-2 md:px-6 md:py-3 flex items-center justify-between">
           
           <Link href="/" className="flex items-center gap-2 relative">
              <div className="w-9 h-9 md:w-12 md:h-12 relative rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -76,7 +77,7 @@ export default function Navbar() {
              </div>
           </Link>
 
-          <div className="hidden md:flex items-center bg-white/50 backdrop-blur-sm rounded-full p-1 border border-white/60 gap-1 relative">
+          <div className="hidden md:flex items-center bg-gray-100/80 backdrop-blur-sm rounded-full p-1 border border-gray-200 gap-1 relative">
             <Link 
               href="/" 
               className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all duration-300 ${
@@ -146,8 +147,7 @@ export default function Navbar() {
       {pathname === '/' && (
         <div className="mx-auto w-[95%] max-w-5xl z-40 mb-2 mt-4 relative">
           
-          {/* ==================== Banner Section ==================== */}
-          <div className="w-full mb-6 md:mb-8 rounded-3xl overflow-hidden shadow-lg border-2 border-[#4A5C82]/10 relative group">
+          <div className="w-full mb-6 md:mb-8 rounded-3xl overflow-hidden shadow-lg border-2 border-white/50 relative group">
              <img 
                src="https://via.placeholder.com/1200x400/2D3A54/D99B48?text=Your+Banner+Here" 
                alt="Main Banner" 
@@ -163,15 +163,13 @@ export default function Navbar() {
              </div>
           </div>
 
-          {/* ==================== 1. Announcement Bar ==================== */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center mb-4">
-            <div className="flex items-center gap-2 bg-[#4A5C82]/10 border border-[#4A5C82]/20 px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
+            <div className="flex items-center gap-2 bg-white/95 backdrop-blur-md border border-[#4A5C82]/10 px-4 py-2 rounded-full whitespace-nowrap shadow-sm">
               <div className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.6)]"></div>
               <span className="text-[#4A5C82] text-xs font-extrabold tracking-wide">Admin online</span>
             </div>
 
-            {/* 🌟 အနီရောင် လုံးဝ မပြတော့မည့် React ၏ dangerouslySetInnerHTML နည်းလမ်းကို သုံးထားပါသည် 🌟 */}
-            <div className="flex-1 bg-[#E4D5B7]/50 border border-[#4A5C82]/20 rounded-full overflow-hidden flex items-center px-4 py-2 w-full shadow-sm">
+            <div className="flex-1 bg-white/95 backdrop-blur-md border border-[#4A5C82]/10 rounded-full overflow-hidden flex items-center px-4 py-2 w-full shadow-sm">
               <span className="text-[#D99B48] mr-3 text-sm">📢</span>
               <div 
                 className="flex-1 overflow-hidden flex items-center"
@@ -182,8 +180,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* ==================== 2. Category Filter Bar ==================== */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-[#4A5C82]/5 p-2 rounded-2xl border border-[#4A5C82]/10">
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide bg-white/95 backdrop-blur-md p-2 rounded-2xl border border-[#4A5C82]/10 shadow-sm">
              <button className="flex items-center gap-2 bg-[#D99B48] text-[#E4D5B7] px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap shadow-[3px_3px_0px_rgba(74,92,130,0.2)] transition hover:-translate-y-0.5">
                 <span>⭐</span> Favorit
              </button>
@@ -215,7 +212,6 @@ export default function Navbar() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4 backdrop-blur-sm">
           <div className="bg-white p-6 rounded-3xl border border-gray-100 w-full max-w-sm shadow-2xl relative">
             <button onClick={() => setShowModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-lg">✕</button>
-            
             <h3 className="text-lg font-black text-gray-800 mb-4">My Account</h3>
             
             {user ? (
