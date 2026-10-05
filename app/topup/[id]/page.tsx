@@ -52,8 +52,9 @@ export default function TopupPage() {
   };
 
   // ==========================================
-  // 🌟 MLBB Packages ကို Region ၃ မျိုး ခွဲထုတ်ခြင်း 🌟
+  // 🌟 Packages များကို FazerCards ID အတိုင်း သတ်မှတ်ခြင်း 🌟
   // ==========================================
+  
   const mlbbGlobalPackages = [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
@@ -120,31 +121,33 @@ export default function TopupPage() {
     { id: '5035_1007_diamonds', name: '6042 Diamonds', price: 420000 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
+  // 🌟 Magic Chess Go Go Packages အသစ် (FazerCards IDs) 🌟
   const mcggPackages = [
-    { id: 'mcgg_1', name: '10', bonus: '+ 1 Diamonds', price: 900 },
-    { id: 'mcgg_2', name: '20', bonus: '+ 2 Diamonds', price: 1700 },
-    { id: 'mcgg_3', name: '51', bonus: '+ 5 Diamonds', price: 4200 },
-    { id: 'mcgg_4', name: 'Double Dia(50+50)or 55', bonus: 'No bonus', price: 4400 },
-    { id: 'mcgg_5', name: '102', bonus: '+ 10 Diamonds', price: 8300 },
-    { id: 'mcgg_6', name: 'Weekly Card', bonus: 'No bonus', price: 8800 },
-    { id: 'mcgg_7', name: 'Double Dia(150+150)or 165', bonus: 'No bonus', price: 13000 },
-    { id: 'mcgg_8', name: '203', bonus: '+ 20 Diamonds', price: 16600 },
-    { id: 'mcgg_9', name: 'Double Dia(250+250) or 275', bonus: 'No bonus', price: 21500 },
-    { id: 'mcgg_10', name: '303', bonus: '+ 33 Diamonds', price: 24900 },
-    { id: 'mcgg_11', name: '504', bonus: '+ 66 Diamonds', price: 41400 },
-    { id: 'mcgg_12', name: 'Double Dia(500+500)or 565', bonus: 'No bonus', price: 43400 },
-    { id: 'mcgg_13', name: '1007', bonus: '+ 156 Diamonds', price: 82900 },
-    { id: 'mcgg_14', name: '2015', bonus: '+ 383 Diamonds', price: 165700 },
-    { id: 'mcgg_15', name: '5035', bonus: '+ 1007 Diamonds', price: 414100 }
-  ];
+    { id: '11_diamonds', name: '11 Diamonds', price: 900 },
+    { id: '22_diamonds', name: '22 Diamonds', price: 1700 },
+    { id: '56_diamonds', name: '56 Diamonds', price: 4200 },
+    { id: 'first_recharge_100_50_50_bonus', name: 'First Recharge 100 (50+50)', price: 4400 },
+    { id: '112_diamonds', name: '112 Diamonds', price: 8300 },
+    { id: 'weekly_card', name: 'Weekly Card', price: 8800 },
+    { id: 'first_recharge_300_150_150_bonus', name: 'First Recharge 300 (150+150)', price: 13000 },
+    { id: '223_diamonds', name: '223 Diamonds', price: 16600 },
+    { id: 'first_recharge_500_250_250_bonus', name: 'First Recharge 500 (250+250)', price: 21500 },
+    { id: '336_diamonds', name: '336 Diamonds', price: 24900 },
+    { id: '570_diamonds', name: '570 Diamonds', price: 41400 },
+    { id: 'first_recharge_1000_500_500_bonus', name: 'First Recharge 1000 (500+500)', price: 43400 },
+    { id: '1163_diamonds', name: '1163 Diamonds', price: 82900 },
+    { id: '2398_diamonds', name: '2398 Diamonds', price: 165700 },
+    { id: '6042_diamonds', name: '6042 Diamonds', price: 414100 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
+  // 🌟 PUBG Packages (Manual - FazerCards IDs) 🌟
   const pubgPackages = [
-    { id: 'pubg_1', name: '60 UC', price: 4106 }, { id: 'pubg_2', name: '325 UC', price: 20529 },
-    { id: 'pubg_3', name: '660 UC', price: 41059 }, { id: 'pubg_4', name: '985 UC', price: 61588 },
-    { id: 'pubg_5', name: '1320 UC', price: 82118 }, { id: 'pubg_6', name: '1980 UC', price: 123177 },
-    { id: 'pubg_7', name: '2310 UC', price: 143706 }, { id: 'pubg_8', name: '2640 UC', price: 164236 },
-    { id: 'pubg_9', name: '3850 UC', price: 239512 }, { id: 'pubg_10', name: '4180 UC', price: 260041 },
-    { id: 'pubg_11', name: '5900 UC', price: 367277 }, { id: 'pubg_12', name: '8100 UC', price: 504112 }
+    { id: '60_uc', name: '60 UC', price: 4106 }, 
+    { id: '325_uc', name: '325 UC', price: 20529 },
+    { id: '660_uc', name: '660 UC', price: 41059 }, 
+    { id: '1800_uc', name: '1800 UC', price: 100000 },
+    { id: '3850_uc', name: '3850 UC', price: 200000 },
+    { id: '8100_uc', name: '8100 UC', price: 400000 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
   const ucPackPackages = [
@@ -170,14 +173,20 @@ export default function TopupPage() {
     { id: 'tg_15', name: '6 months premium', price: 75241 }, { id: 'tg_16', name: '12 months premium', price: 136412 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
+  // 🌟 Heartopia Packages အသစ် (FazerCards IDs) 🌟
   const heartopiaPackages = [
-    { id: 'heart_1', name: '20 Heart Diamond', price: 2588 }, { id: 'heart_2', name: '60 Heart Diamond', price: 4895 },
-    { id: 'heart_3', name: '300+20 Heart Diamond', price: 24846 }, { id: 'heart_4', name: '680+50 Heart Diamond', price: 55994 },
-    { id: 'heart_5', name: '1280+90 Heart Diamond', price: 102297 }, { id: 'heart_6', name: '1980+150 Heart Diamond', price: 155703 },
-    { id: 'heart_7', name: '3280+270 Heart Diamond', price: 253623 }, { id: 'heart_8', name: '6480+570 Heart Diamond', price: 498398 },
-    { id: 'heart_9', name: 'GAMG Junior Membership', price: 2681 }, { id: 'heart_10', name: 'GAMG Formal Membership', price: 15057 },
-    { id: 'heart_11', name: 'Fashionwave Gift Box', price: 24846 }, { id: 'heart_12', name: 'Fashionwave Gift Box Upgrade', price: 31102 },
-    { id: 'heart_13', name: 'Premium Fashionwave Gift Box', price: 55994 }
+    { id: '20_heart_diamond', name: '20 Heart Diamond', price: 2500 }, 
+    { id: '60_heart_diamond', name: '60 Heart Diamond', price: 4800 },
+    { id: 'gamg_formal_membership', name: 'GAMG Formal Membership', price: 15000 },
+    { id: '320_heart_diamond', name: '320 Heart Diamond', price: 24500 }, 
+    { id: 'festival_pack', name: 'Festival Pack', price: 24500 },
+    { id: 'festival_pack_upgrade', name: 'Festival Pack Upgrade', price: 31000 },
+    { id: '730_heart_diamond', name: '730 Heart Diamond', price: 55000 },
+    { id: 'supreme_festival_pack', name: 'Supreme Festival Pack', price: 55000 },
+    { id: '1370_heart_diamond', name: '1370 Heart Diamond', price: 100000 },
+    { id: '2130_heart_diamond', name: '2130 Heart Diamond', price: 155000 },
+    { id: '3550_heart_diamond', name: '3550 Heart Diamond', price: 250000 },
+    { id: '7050_heart_diamond', name: '7050 Heart Diamond', price: 500000 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
   const smileCoinPackages = [
@@ -237,9 +246,12 @@ export default function TopupPage() {
     'mobile-legends': { name: 'Mobile Legends', sub: 'Global Server', img: '/mlbb.png', packages: mlbbGlobalPackages, inputType: 'mlbb', dbCat: 'mobile_legends_global' },
     'mobile-legends-br': { name: 'Mobile Legends (BR)', sub: 'Brazil Server', img: '/mlbb.png', packages: mlbbBrazilPackages, inputType: 'mlbb', dbCat: 'mobile_legends_brazil' },
     'mobile-legends-ph': { name: 'Mobile Legends (PH)', sub: 'Philippines Server', img: '/mlbb.png', packages: mlbbPHPackages, inputType: 'mlbb', dbCat: 'mobile_legends_philippines' },
-    'magic-chess': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
-    'mcgg': { name: 'Magic Chess Go Go', sub: 'All Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'mcgg' },
-    'pubg-uc': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg' },
+    
+    // 🌟 MCGG ကို FazerCards ID ဖြင့် ချိတ်ဆက်ခြင်း 🌟
+    'magic-chess': { name: 'Magic Chess Go Go', sub: 'Global Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'magic_chess_gogo_global' },
+    'mcgg': { name: 'Magic Chess Go Go', sub: 'Global Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'magic_chess_gogo_global' },
+    
+    'pubg-uc': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg_mobile_manual' },
     'uc-pack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
     'telegram': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
     'heartopia': { name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', packages: heartopiaPackages, inputType: 'heartopia', dbCat: 'heartopia' },
@@ -351,12 +363,13 @@ export default function TopupPage() {
     );
   }
 
+  // 🌟 Form Validation အပိုင်း 🌟
   const isFormValid = (() => {
     if (!selectedPkg || !paymentMethod) return false;
     if (game.inputType === 'mlbb') return userId && zoneId && idCheckResult.status === 'success';
     if (game.inputType === 'pubg') return userId;
     if (game.inputType === 'username') return userId;
-    if (game.inputType === 'heartopia') return userId && aid;
+    if (game.inputType === 'heartopia') return userId && serverField;
     if (game.inputType === 'email') return userId; 
     return false;
   })();
@@ -364,7 +377,7 @@ export default function TopupPage() {
   const getTargetAccountText = () => {
     if (!userId) return 'Not filled';
     if (game.inputType === 'mlbb') return idCheckResult.name ? `${idCheckResult.name} (${userId} | ${zoneId})` : zoneId ? `${userId} (${zoneId})` : userId;
-    if (game.inputType === 'heartopia') return aid ? `UID: ${userId}, AID: ${aid} (${serverField})` : `UID: ${userId}`;
+    if (game.inputType === 'heartopia') return `UID: ${userId} (${serverField})`;
     return userId;
   };
 
@@ -446,10 +459,13 @@ export default function TopupPage() {
       // 🌟 FazerCards API သို့ Order ပို့ရန် Fields သတ်မှတ်ခြင်း 🌟
       // ==========================================
       let orderFields: any = {};
+      
       if (game.inputType === 'mlbb') {
          orderFields = { "player_id": userId, "server_id": zoneId }; 
       } else if (game.inputType === 'pubg') {
          orderFields = { "player_id": userId };
+      } else if (game.inputType === 'heartopia') {
+         orderFields = { "player_id": userId, "server": serverField };
       } else {
          orderFields = { "account": userId };
       }
@@ -628,6 +644,8 @@ export default function TopupPage() {
                 </div>
                 
                 <div className="bg-[#023E8A] p-4 md:p-5 rounded-[1.25rem] md:rounded-3xl shadow-lg space-y-4">
+                  
+                  {/* 🌟 MLBB နှင့် MCGG အတွက် Form 🌟 */}
                   {game.inputType === 'mlbb' && (
                     <div className="space-y-4">
                       <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
@@ -710,26 +728,24 @@ export default function TopupPage() {
                     </div>
                   )}
 
+                  {/* 🌟 Heartopia အတွက် Input Form အသစ် 🌟 */}
                   {game.inputType === 'heartopia' && (
-                    <div className="space-y-3 md:space-y-4">
+                    <div className="space-y-4">
                       <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
-                        <div className="w-full sm:w-1/2">
-                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">UID <span className="text-[#FBB02D]">*</span></label>
-                          <input type="text" placeholder="UID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                        <div className="w-full sm:w-1/2 relative">
+                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">User ID <span className="text-[#FBB02D]">*</span></label>
+                          <input type="text" placeholder="Enter User ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                         </div>
-                        <div className="w-full sm:w-1/2">
-                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">FIELD <span className="text-[#FBB02D]">*</span></label>
+                        <div className="w-full sm:w-1/2 relative">
+                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Server <span className="text-[#FBB02D]">*</span></label>
                           <select className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={serverField} onChange={(e) => setServerField(e.target.value)}>
-                            <option value="Global">Global</option>
-                            <option value="Asia">Asia</option>
                             <option value="America">America</option>
-                            <option value="Europe">Europe</option>
+                            <option value="Asia">Asia</option>
+                            <option value="Global">Global</option>
+                            <option value="SEA">SEA</option>
+                            <option value="TW,HK,MO">TW,HK,MO</option>
                           </select>
                         </div>
-                      </div>
-                      <div>
-                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">AID <span className="text-[#FBB02D]">*</span></label>
-                        <input type="text" placeholder="AID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={aid} onChange={(e) => setAid(e.target.value)} />
                       </div>
                     </div>
                   )}
