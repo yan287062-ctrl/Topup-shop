@@ -31,23 +31,25 @@ export default function Home() {
     { id: 'eafc-my', name: 'EAFC Mobile', sub: 'MY Server', img: '/eafc.jpg', category: 'Topup Games' },
     
     // Genshin Impact
-    { id: 'genshin-auto', name: 'Genshin Impact', sub: 'Auto Via Login', img: '/genshin.png', category: 'Topup Games' },
-    { id: 'genshin-global', name: 'Genshin Impact', sub: 'Global', img: '/genshin.png', category: 'Topup Games' },
+    { id: 'genshin-auto', name: 'Genshin Impact', sub: 'Auto Via Login', img: '/genshin.jpg', category: 'Topup Games' },
+    { id: 'genshin-global', name: 'Genshin Impact', sub: 'Global', img: '/genshin.jpg', category: 'Topup Games' },
 
     // --- 🎫 Gift Card & Voucher ---
     { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Gift Card & Voucher' },
     { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Gift Card & Voucher' },
     { id: 'spotify', name: 'Spotify', sub: 'Premium', img: '/Spotify.jpg', category: 'Gift Card & Voucher' },
-    { id: 'discord', name: 'Discord', sub: 'Global', img: '/discord.png', category: 'Gift Card & Voucher' },
-    { id: 'appstore', name: 'App Store & iTunes', sub: 'US Region', img: '/appstore.png', category: 'Gift Card & Voucher' },
-    { id: 'netflix-us', name: 'Netflix', sub: 'US Region', img: '/netflix-us.png', category: 'Gift Card & Voucher' },
-    { id: 'capcut', name: 'CapCut', sub: 'Pro Subscription', img: '/capcut.png', category: 'Gift Card & Voucher' },
+    
+    // Discord, AppStore, Netflix, CapCut
+    { id: 'discord', name: 'Discord', sub: 'Global', img: '/discord.jpg', category: 'Gift Card & Voucher' },
+    { id: 'appstore', name: 'App Store & iTunes', sub: 'US Region', img: '/appstore.jpg', category: 'Gift Card & Voucher' },
+    { id: 'netflix-us', name: 'Netflix', sub: 'US Region', img: '/netflix-us.jpg', category: 'Gift Card & Voucher' },
+    { id: 'capcut', name: 'CapCut', sub: 'Pro Subscription', img: '/capcut.jpg', category: 'Gift Card & Voucher' },
     
     // Roblox & Minecraft
-    { id: 'roblox-id', name: 'Roblox', sub: 'ID Region', img: '/roblox.png', category: 'Gift Card & Voucher' },
-    { id: 'roblox-global', name: 'Roblox', sub: 'Global', img: '/roblox-global.png', category: 'Gift Card & Voucher' },
-    { id: 'robux-us', name: 'Roblox Robux', sub: 'US Region', img: '/roblox.png', category: 'Gift Card & Voucher' },
-    { id: 'minecraft', name: 'Minecraft', sub: 'Minecoins', img: '/minecraft.png', category: 'Gift Card & Voucher' },
+    { id: 'roblox-id', name: 'Roblox', sub: 'ID Region', img: '/roblox.jpg', category: 'Gift Card & Voucher' },
+    { id: 'roblox-global', name: 'Roblox', sub: 'Global', img: '/roblox-global.jpg', category: 'Gift Card & Voucher' },
+    { id: 'robux-us', name: 'Roblox Robux', sub: 'US Region', img: '/roblox.jpg', category: 'Gift Card & Voucher' },
+    { id: 'minecraft', name: 'Minecraft', sub: 'Minecoins', img: '/minecraft.jpg', category: 'Gift Card & Voucher' },
 
     // --- 🛡️ VPN ---
     { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.jpg', category: 'VPN' },
