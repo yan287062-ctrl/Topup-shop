@@ -12,14 +12,19 @@ export default function Home() {
 
   const [activeCategory, setActiveCategory] = useState('Favorit');
 
+  // ==========================================
+  // 🌟 ဂိမ်းစာရင်း (MLBB ကို ၃ ခု ခွဲထုတ်ထားပါသည်) 🌟
+  // ==========================================
   const games = [
     { id: 'mobile-legends', name: 'Mobile Legend', sub: 'Myanmar (Global)', img: '/mlbb.png', category: 'Topup Games' },
+    { id: 'mobile-legends-br', name: 'Mobile Legend', sub: 'Brazil', img: '/mlbb.png', category: 'Topup Games' },
+    { id: 'mobile-legends-ph', name: 'Mobile Legend', sub: 'Philippines', img: '/mlbb.png', category: 'Topup Games' },
+    
     { id: 'magic-chess', name: 'Magic Chess', sub: 'Myanmar (Global)', img: '/MCGG.png', category: 'Topup Games' },
     { id: 'pubg-uc', name: 'PUBG UC', sub: 'Global', img: '/pubg.png', category: 'Topup Games' },
     { id: 'uc-pack', name: 'UC pack', sub: 'Global', img: '/Pubgucpack.png', category: 'Topup Games' },
     { id: 'heartopia', name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', category: 'Topup Games' },
     
-    // 🌟 Telegram Premium နှင့် Smile coin တို့၏ Category ကို Gift Card & Voucher သို့ ပြောင်းပေးထားပါသည် 🌟
     { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Gift Card & Voucher' },
     { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Gift Card & Voucher' },
     
