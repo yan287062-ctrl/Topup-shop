@@ -14,8 +14,10 @@ export default function TopupPage() {
 
   const [userId, setUserId] = useState('');
   const [zoneId, setZoneId] = useState('');
-  const [aid, setAid] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [serverField, setServerField] = useState('Global');
+  
   const [selectedPkg, setSelectedPkg] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
   
@@ -27,11 +29,9 @@ export default function TopupPage() {
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [orderCount, setOrderCount] = useState(0);
 
-  // 🌟 Auto Check အတွက် State များ 🌟
   const [isCheckingId, setIsCheckingId] = useState(false);
   const [idCheckResult, setIdCheckResult] = useState<{ status: 'idle' | 'success' | 'error', name: string, region: string, flag: string }>({ status: 'idle', name: '', region: '', flag: '' });
   
-  // Timer for debouncing auto-check
   const checkTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
@@ -52,9 +52,8 @@ export default function TopupPage() {
   };
 
   // ==========================================
-  // 🌟 Packages များကို FazerCards ID အတိုင်း သတ်မှတ်ခြင်း 🌟
+  // 🌟 Packages Data (FazerCards ID များနှင့်) 🌟
   // ==========================================
-  
   const mlbbGlobalPackages = [
     { id: 'mlbb_1', name: '55 Diamonds', price: 3461 }, { id: 'mlbb_2', name: '165 Diamonds', price: 10372 },
     { id: 'mlbb_3', name: '275 Diamonds', price: 16636 }, { id: 'mlbb_4', name: '565 Diamonds', price: 34160 },
@@ -121,7 +120,6 @@ export default function TopupPage() {
     { id: '5035_1007_diamonds', name: '6042 Diamonds', price: 420000 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 🌟 Magic Chess Go Go Packages အသစ် (FazerCards IDs) 🌟
   const mcggPackages = [
     { id: '11_diamonds', name: '11 Diamonds', price: 900 },
     { id: '22_diamonds', name: '22 Diamonds', price: 1700 },
@@ -140,7 +138,6 @@ export default function TopupPage() {
     { id: '6042_diamonds', name: '6042 Diamonds', price: 414100 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  // 🌟 PUBG Packages (Manual - FazerCards IDs) 🌟
   const pubgPackages = [
     { id: '60_uc', name: '60 UC', price: 4106 }, 
     { id: '325_uc', name: '325 UC', price: 20529 },
@@ -162,18 +159,6 @@ export default function TopupPage() {
     { id: 'ucp_17', name: 'Prime Plus (12 Months)', price: 487800 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
-  const telegramPackages = [
-    { id: 'tg_1', name: '50 Stars', price: 3552 }, { id: 'tg_2', name: '75 Stars', price: 5306 },
-    { id: 'tg_3', name: '100 Stars', price: 7058 }, { id: 'tg_4', name: '150 Stars', price: 10587 },
-    { id: 'tg_5', name: '250 Stars', price: 17645 }, { id: 'tg_6', name: '350 Stars', price: 24703 },
-    { id: 'tg_7', name: '500 Stars', price: 35291 }, { id: 'tg_8', name: '750 Stars', price: 52936 },
-    { id: 'tg_9', name: '1K Stars', price: 70582 }, { id: 'tg_10', name: '1.5K Stars', price: 105873 },
-    { id: 'tg_11', name: '2.5K Stars', price: 176454 }, { id: 'tg_12', name: '5K Stars', price: 352908 },
-    { id: 'tg_13', name: '10K Stars', price: 705816 }, { id: 'tg_14', name: '3 months premium', price: 56420 },
-    { id: 'tg_15', name: '6 months premium', price: 75241 }, { id: 'tg_16', name: '12 months premium', price: 136412 }
-  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
-
-  // 🌟 Heartopia Packages အသစ် (FazerCards IDs) 🌟
   const heartopiaPackages = [
     { id: '20_heart_diamond', name: '20 Heart Diamond', price: 2500 }, 
     { id: '60_heart_diamond', name: '60 Heart Diamond', price: 4800 },
@@ -187,6 +172,130 @@ export default function TopupPage() {
     { id: '2130_heart_diamond', name: '2130 Heart Diamond', price: 155000 },
     { id: '3550_heart_diamond', name: '3550 Heart Diamond', price: 250000 },
     { id: '7050_heart_diamond', name: '7050 Heart Diamond', price: 500000 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const eafcIdPackages = [
+    { id: '40_fc_points', name: '40 FC Points', price: 1500 },
+    { id: '100_fc_points', name: '100 FC Points', price: 3800 },
+    { id: '520_fc_points', name: '520 FC Points', price: 18700 },
+    { id: '1070_fc_points', name: '1070 FC Points', price: 37600 },
+    { id: '2200_fc_points', name: '2200 FC Points', price: 77900 },
+    { id: '5750_fc_points', name: '5750 FC Points', price: 189300 },
+    { id: '12000_fc_points', name: '12000 FC Points', price: 378900 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const eafcMyPackages = [
+    { id: '40_fc_points', name: '40 FC Points', price: 2100 },
+    { id: '100_fc_points', name: '100 FC Points', price: 5200 },
+    { id: '520_fc_points', name: '520 FC Points', price: 25400 },
+    { id: '1070_fc_points', name: '1070 FC Points', price: 47800 },
+    { id: '2200_fc_points', name: '2200 FC Points', price: 101100 },
+    { id: '5750_fc_points', name: '5750 FC Points', price: 255700 },
+    { id: '12000_fc_points', name: '12000 FC Points', price: 511600 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const genshinLoginPackages = [
+    { id: '60', name: '60 Genesis Crystals', price: 3600 },
+    { id: 'blessing_of_the_welkin_moon', name: 'Blessing of the Welkin Moon', price: 18400 },
+    { id: '330', name: '300 + 30 Genesis Crystals', price: 18400 },
+    { id: 'gnostic_hymn', name: 'Gnostic Hymn', price: 37000 },
+    { id: '1090', name: '980 + 110 Genesis Crystals', price: 54800 },
+    { id: 'gnostic_chorus', name: 'Gnostic Chorus', price: 73300 },
+    { id: '2240', name: '1980 + 260 Genesis Crystals', price: 110400 },
+    { id: '3880', name: '3280 + 600 Genesis Crystals', price: 185000 },
+    { id: '8080', name: '6480 + 1600 Genesis Crystals', price: 363500 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const genshinGlobalPackages = [
+    { id: '60_genesis_crystals', name: '60 Genesis Crystals', price: 4500 },
+    { id: 'blessing_of_the_welkin_moon', name: 'Blessing of the Welkin Moon', price: 22600 },
+    { id: '300_30_genesis_crystals', name: '300 + 30 Genesis Crystals', price: 22600 },
+    { id: '980_110_genesis_crystals', name: '980 + 110 Genesis Crystals', price: 67800 },
+    { id: '1980_260_genesis_crystals', name: '1980 + 260 Genesis Crystals', price: 135600 },
+    { id: '3280_600_genesis_crystals', name: '3280 + 600 Genesis Crystals', price: 226000 },
+    { id: '6480_1600_genesis_crystals', name: '6480 + 1600 Genesis Crystals', price: 452000 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const capcutPackages = [
+    { id: '1_month_eu_standard', name: '1 Month (EU) Standard', price: 38500 },
+    { id: '1_month_uk_standard', name: '1 Month (UK) Standard', price: 27500 },
+    { id: '1_month_us_standard', name: '1 Month (US) Standard', price: 74200 },
+    { id: '1_month_eu_pro', name: '1 Month (EU) Pro', price: 79700 },
+    { id: '1_month_uk_pro', name: '1 Month (UK) Pro', price: 79700 },
+    { id: '1_month_us_pro', name: '1 Month (US) Pro', price: 55000 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const discordPackages = [
+    { id: 'discord_basic_1_month_subscription', name: 'Discord Basic: 1 Month', price: 20000 },
+    { id: 'discord_nitro_1_month_subscription', name: 'Discord Nitro: 1 Month', price: 40000 },
+    { id: 'discord_nitro_12_months_subscription', name: 'Discord Nitro: 12 Months', price: 400000 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const itunesUSPackages = [
+    { id: '2_usd', name: '2 USD', price: 10000 },
+    { id: '3_usd', name: '3 USD', price: 15000 },
+    { id: '5_usd', name: '5 USD', price: 25000 },
+    { id: '10_usd', name: '10 USD', price: 47000 },
+    { id: '15_usd', name: '15 USD', price: 70000 },
+    { id: '20_usd', name: '20 USD', price: 94000 },
+    { id: '50_usd', name: '50 USD', price: 235000 },
+    { id: '100_usd', name: '100 USD', price: 470000 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 🌟 Netflix Packages 🌟
+  const netflixUSPackages = [
+    { id: '15_usd', name: '15 USD', price: 63000 },
+    { id: '20_usd', name: '20 USD', price: 84000 },
+    { id: '25_usd', name: '25 USD', price: 107500 },
+    { id: '30_usd', name: '30 USD', price: 126500 },
+    { id: '50_usd', name: '50 USD', price: 211000 },
+    { id: '100_usd', name: '100 USD', price: 437500 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 🌟 Roblox Packages 🌟
+  const robloxGlobalPackages = [
+    { id: '50_robux', name: '50 Robux', price: 4000 },
+    { id: '100_robux', name: '100 Robux', price: 6500 },
+    { id: '800_robux', name: '800 Robux', price: 40300 },
+    { id: '1000_robux', name: '1000 Robux', price: 50000 },
+    { id: '2000_robux', name: '2000 Robux', price: 99000 },
+    { id: '4500_robux', name: '4500 Robux', price: 213800 },
+    { id: '10000_robux', name: '10000 Robux', price: 438800 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const robloxIDPackages = [
+    { id: '50000_idr', name: '50000 IDR', price: 11500 },
+    { id: '100000_idr', name: '100000 IDR', price: 23000 },
+    { id: '300000_idr', name: '300000 IDR', price: 75000 },
+    { id: '500000_idr', name: '500000 IDR', price: 124000 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const robloxUSPackages = [
+    { id: '50_robux', name: '50 Robux', price: 4000 },
+    { id: '100_robux', name: '100 Robux', price: 7600 },
+    { id: '555_robux', name: '555 Robux', price: 23000 },
+    { id: '1000_robux', name: '1000 Robux', price: 40500 },
+    { id: '2500_robux', name: '2500 Robux', price: 105500 },
+    { id: '11000_robux', name: '11000 Robux', price: 420500 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  // 🌟 Minecraft Packages 🌟
+  const minecraftPackages = [
+    { id: '330_minecoins', name: '330 Minecoins', price: 18600 },
+    { id: '1720_minecoins', name: '1720 Minecoins', price: 36500 },
+    { id: '3500_minecoins', name: '3500 Minecoins', price: 50800 },
+    { id: '8800_minecoins', name: '8800 Minecoins', price: 200800 }
+  ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
+
+  const telegramPackages = [
+    { id: 'tg_1', name: '50 Stars', price: 3552 }, { id: 'tg_2', name: '75 Stars', price: 5306 },
+    { id: 'tg_3', name: '100 Stars', price: 7058 }, { id: 'tg_4', name: '150 Stars', price: 10587 },
+    { id: 'tg_5', name: '250 Stars', price: 17645 }, { id: 'tg_6', name: '350 Stars', price: 24703 },
+    { id: 'tg_7', name: '500 Stars', price: 35291 }, { id: 'tg_8', name: '750 Stars', price: 52936 },
+    { id: 'tg_9', name: '1K Stars', price: 70582 }, { id: 'tg_10', name: '1.5K Stars', price: 105873 },
+    { id: 'tg_11', name: '2.5K Stars', price: 176454 }, { id: 'tg_12', name: '5K Stars', price: 352908 },
+    { id: 'tg_13', name: '10K Stars', price: 705816 }, { id: 'tg_14', name: '3 months premium', price: 56420 },
+    { id: 'tg_15', name: '6 months premium', price: 75241 }, { id: 'tg_16', name: '12 months premium', price: 136412 }
   ].map(pkg => ({ ...pkg, bonus: 'No bonus' }));
 
   const smileCoinPackages = [
@@ -215,17 +324,6 @@ export default function TopupPage() {
     { id: 'sp8', name: '1yr - Family', bonus: 'Family plan', price: 50000 },
   ];
 
-  const netflixPackages = [
-    { id: 'nf1', name: '1 Month - Share Profile', bonus: 'Share Profile', price: 8000 },
-    { id: 'nf2', name: '1 Month - Own Profile', bonus: 'Own Profile', price: 14000 },
-    { id: 'nf3', name: '2 Month - Share', bonus: 'Share Profile', price: 15500 },
-    { id: 'nf4', name: '2 Month - Own Profile', bonus: 'Own Profile', price: 27500 },
-    { id: 'nf5', name: '3 Month - Share', bonus: 'Share Profile', price: 23000 },
-    { id: 'nf6', name: '3 Month - Own', bonus: 'Own Profile', price: 40000 },
-    { id: 'nf7', name: '6 Month - Share', bonus: 'Share Profile', price: 45000 },
-    { id: 'nf8', name: '6 Month - Own', bonus: 'Own Profile', price: 80000 },
-  ];
-
   const jumpJumpPackages = [
     { id: 'jv1', name: '1 Month - 1 Device (Share)', bonus: 'Share', price: 10000 },
     { id: 'jv2', name: '1 Month - 1 Device (Own)', bonus: 'Own', price: 14500 },
@@ -240,25 +338,38 @@ export default function TopupPage() {
   ];
 
   // ==========================================
-  // 🌟 DB Categorie ကို FazerCards Category IDs အတိုင်း သတ်မှတ်ခြင်း 🌟
+  // 🌟 DB Category Mapping 🌟
   // ==========================================
   const gameConfigs: Record<string, any> = {
     'mobile-legends': { name: 'Mobile Legends', sub: 'Global Server', img: '/mlbb.png', packages: mlbbGlobalPackages, inputType: 'mlbb', dbCat: 'mobile_legends_global' },
     'mobile-legends-br': { name: 'Mobile Legends (BR)', sub: 'Brazil Server', img: '/mlbb.png', packages: mlbbBrazilPackages, inputType: 'mlbb', dbCat: 'mobile_legends_brazil' },
     'mobile-legends-ph': { name: 'Mobile Legends (PH)', sub: 'Philippines Server', img: '/mlbb.png', packages: mlbbPHPackages, inputType: 'mlbb', dbCat: 'mobile_legends_philippines' },
-    
-    // 🌟 MCGG ကို FazerCards ID ဖြင့် ချိတ်ဆက်ခြင်း 🌟
     'magic-chess': { name: 'Magic Chess Go Go', sub: 'Global Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'magic_chess_gogo_global' },
     'mcgg': { name: 'Magic Chess Go Go', sub: 'Global Server', img: '/MCGG.png', packages: mcggPackages, inputType: 'mlbb', dbCat: 'magic_chess_gogo_global' },
-    
     'pubg-uc': { name: 'PUBG UC', sub: 'Global', img: '/pubg.png', packages: pubgPackages, inputType: 'pubg', dbCat: 'pubg_mobile_manual' },
     'uc-pack': { name: 'UC Pack', sub: 'Global', img: '/Pubgucpack.png', packages: ucPackPackages, inputType: 'pubg', dbCat: 'ucPack' },
-    'telegram': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
     'heartopia': { name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', packages: heartopiaPackages, inputType: 'heartopia', dbCat: 'heartopia' },
+    
+    // EAFC, Genshin, CapCut
+    'eafc-id': { name: 'EAFC Mobile (ID)', sub: 'ID Server', img: '/eafc.jpg', packages: eafcIdPackages, inputType: 'eafc', dbCat: 'eafc_mobile_id' },
+    'eafc-my': { name: 'EAFC Mobile (MY)', sub: 'MY Server', img: '/eafc.jpg', packages: eafcMyPackages, inputType: 'eafc', dbCat: 'eafc_mobile_my' },
+    'genshin-auto': { name: 'Genshin Impact', sub: 'Auto Via Login', img: '/genshin.jpg', packages: genshinLoginPackages, inputType: 'genshin_login', dbCat: 'genshin_impact_login' },
+    'genshin-global': { name: 'Genshin Impact (Global)', sub: 'Global', img: '/genshin.jpg', packages: genshinGlobalPackages, inputType: 'genshin_global', dbCat: 'genshin_impact_global' },
+    'capcut': { name: 'CapCut', sub: 'Pro Subscription', img: '/capcut.jpg', packages: capcutPackages, inputType: 'capcut', dbCat: 'capcut' },
+    
+    // Gift Cards
+    'discord': { name: 'Discord', sub: 'Global', img: '/discord.jpg', packages: discordPackages, inputType: 'email', dbCat: 'discord_global' },
+    'appstore': { name: 'App Store & iTunes', sub: 'US Region', img: '/appstore.jpg', packages: itunesUSPackages, inputType: 'email', dbCat: 'app_store_itunes_us' },
+    'netflix-us': { name: 'Netflix', sub: 'US Region', img: '/netflix-us.jpg', packages: netflixUSPackages, inputType: 'email', dbCat: 'netflix_us' },
+    'roblox-global': { name: 'Roblox (Global)', sub: 'Global', img: '/roblox-global.jpg', packages: robloxGlobalPackages, inputType: 'email', dbCat: 'roblox_global' },
+    'roblox-id': { name: 'Roblox (ID)', sub: 'ID Region', img: '/roblox.jpg', packages: robloxIDPackages, inputType: 'email', dbCat: 'roblox_id' },
+    'robux-us': { name: 'Roblox Robux (US)', sub: 'US Region', img: '/roblox.jpg', packages: robloxUSPackages, inputType: 'email', dbCat: 'roblox_robux_us' },
+    'minecraft': { name: 'Minecraft', sub: 'Minecoins', img: '/minecraft.jpg', packages: minecraftPackages, inputType: 'email', dbCat: 'minecraft_minecoins' },
+
+    'telegram': { name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', packages: telegramPackages, inputType: 'username', dbCat: 'telegram' },
     'smile-coin': { name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', packages: smileCoinPackages, inputType: 'username', dbCat: 'smileCoin' },
     'aniimo': { name: 'Aniimo', sub: 'Global', img: '/Aniimo.jpg', packages: aniimoPackages, inputType: 'pubg', dbCat: 'aniimo' }, 
     'spotify': { name: 'Spotify Premium', sub: 'Music Subscription', img: '/Spotify.jpg', packages: spotifyPackages, inputType: 'email', dbCat: 'spotify' },
-    'netflix-premium': { name: 'Netflix Premium', sub: 'Streaming', img: '/Netflix.jpg', packages: netflixPackages, inputType: 'email', dbCat: 'netflix' },
     'jump-jump-vpn': { name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.jpg', packages: jumpJumpPackages, inputType: 'email', dbCat: 'jumpjump' },
     'express-vpn': { name: 'Express VPN', sub: 'VPN Subscription', img: '/Express Vpn.jpg', packages: expressVpnPackages, inputType: 'email', dbCat: 'expressvpn' },
   };
@@ -278,13 +389,12 @@ export default function TopupPage() {
           setDisplayPackages(game.packages || []);
         }
       } catch (error) {
-        console.error("Error fetching prices:", error);
         setDisplayPackages(game.packages || []);
       } finally {
         setIsLoadingPrices(false);
       }
     };
-
+    
     const fetchRealOrderCount = async () => {
       try {
         const { count, error } = await supabase.from('orders').select('*', { count: 'exact', head: true }).eq('game_name', game.name); 
@@ -292,43 +402,31 @@ export default function TopupPage() {
           setOrderCount(count);
         }
       } catch (err) {
-        console.error("Error fetching order count:", err);
+        console.error(err);
       }
     };
-
     fetchRealPrices();
     fetchRealOrderCount();
   }, [game]);
 
   useEffect(() => {
     if (game?.inputType !== 'mlbb') return;
-
     setIdCheckResult({ status: 'idle', name: '', region: '', flag: '' });
 
     if (userId.trim() && zoneId.trim()) {
       if (checkTimeoutRef.current) clearTimeout(checkTimeoutRef.current);
       setIsCheckingId(true);
-
       checkTimeoutRef.current = setTimeout(async () => {
         try {
           const response = await fetch(`https://api.isan.eu.org/nickname/ml?id=${userId}&zone=${zoneId}`);
           if (!response.ok) throw new Error('API Error');
-          
           const data = await response.json();
-          
           if (!data.name || data.name === "User not found" || data.error) {
             setIdCheckResult({ status: 'error', name: '', region: '', flag: '' });
           } else {
             const flagMap: Record<string, string> = { "MM": "🇲🇲", "ID": "🇮🇩", "PH": "🇵🇭", "MY": "🇲🇾", "SG": "🇸🇬", "TH": "🇹🇭", "VN": "🇻🇳", "GLOBAL": "🌐" };
             const regionCode = data.region?.toUpperCase() || "GLOBAL";
-            const emoji = flagMap[regionCode] || "🌐";
-            
-            setIdCheckResult({ 
-              status: 'success', 
-              name: data.name, 
-              region: regionCode,
-              flag: emoji
-            });
+            setIdCheckResult({ status: 'success', name: data.name, region: regionCode, flag: flagMap[regionCode] || "🌐" });
           }
         } catch (error) {
           setIdCheckResult({ status: 'error', name: '', region: '', flag: '' });
@@ -339,10 +437,7 @@ export default function TopupPage() {
     } else {
       setIsCheckingId(false);
     }
-
-    return () => {
-      if (checkTimeoutRef.current) clearTimeout(checkTimeoutRef.current);
-    };
+    return () => { if (checkTimeoutRef.current) clearTimeout(checkTimeoutRef.current); };
   }, [userId, zoneId, game?.inputType]);
 
   const paymentMethods = [
@@ -368,16 +463,22 @@ export default function TopupPage() {
     if (!selectedPkg || !paymentMethod) return false;
     if (game.inputType === 'mlbb') return userId && zoneId && idCheckResult.status === 'success';
     if (game.inputType === 'pubg') return userId;
-    if (game.inputType === 'username') return userId;
     if (game.inputType === 'heartopia') return userId && serverField;
-    if (game.inputType === 'email') return userId; 
+    if (game.inputType === 'eafc') return userId; 
+    if (game.inputType === 'capcut') return userId; 
+    if (game.inputType === 'genshin_global') return userId && serverField; 
+    if (game.inputType === 'genshin_login') return email && password && userId; 
+    if (game.inputType === 'username' || game.inputType === 'email') return userId; 
     return false;
   })();
 
   const getTargetAccountText = () => {
-    if (!userId) return 'Not filled';
+    if (!userId && !email) return 'Not filled';
     if (game.inputType === 'mlbb') return idCheckResult.name ? `${idCheckResult.name} (${userId} | ${zoneId})` : zoneId ? `${userId} (${zoneId})` : userId;
     if (game.inputType === 'heartopia') return `UID: ${userId} (${serverField})`;
+    if (game.inputType === 'genshin_login') return `UID: ${userId} (${email})`;
+    if (game.inputType === 'genshin_global') return `UID: ${userId} (${serverField})`;
+    if (game.inputType === 'eafc' || game.inputType === 'capcut' || game.inputType === 'email' || game.inputType === 'username') return userId;
     return userId;
   };
 
@@ -410,7 +511,7 @@ export default function TopupPage() {
           .ilike('email', cleanEmail);
         
         if (walletError) {
-          alert("Database Error (ခဏစောင့်ပြီး ပြန်ဝယ်ကြည့်ပါ): " + walletError.message);
+          alert("Database Error: " + walletError.message);
           setIsUploading(false);
           return;
         }
@@ -456,17 +557,24 @@ export default function TopupPage() {
       }
 
       // ==========================================
-      // 🌟 FazerCards API သို့ Order ပို့ရန် Fields သတ်မှတ်ခြင်း 🌟
+      // 🌟 FazerCards သို့ ပို့မည့် Fields အသစ်များ 🌟
       // ==========================================
       let orderFields: any = {};
       
       if (game.inputType === 'mlbb') {
          orderFields = { "player_id": userId, "server_id": zoneId }; 
-      } else if (game.inputType === 'pubg') {
+      } else if (game.inputType === 'pubg' || game.inputType === 'eafc') {
          orderFields = { "player_id": userId };
       } else if (game.inputType === 'heartopia') {
          orderFields = { "player_id": userId, "server": serverField };
+      } else if (game.inputType === 'capcut') {
+         orderFields = { "user_id": userId };
+      } else if (game.inputType === 'genshin_global') {
+         orderFields = { "player_id": userId, "server": serverField };
+      } else if (game.inputType === 'genshin_login') {
+         orderFields = { "email": email, "password": password, "genshin_uid": userId };
       } else {
+         // Discord, iTunes, Netflix, Roblox, Minecraft
          orderFields = { "account": userId };
       }
 
@@ -707,45 +815,91 @@ export default function TopupPage() {
                     </div>
                   )}
 
-                  {game.inputType === 'pubg' && (
+                  {/* 🌟 EAFC & PUBG Form 🌟 */}
+                  {(game.inputType === 'pubg' || game.inputType === 'eafc') && (
                     <div>
                       <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Player ID <span className="text-[#FBB02D]">*</span></label>
                       <input type="text" placeholder="Enter Player ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                     </div>
                   )}
 
-                  {game.inputType === 'username' && (
+                  {/* 🌟 CapCut Form 🌟 */}
+                  {game.inputType === 'capcut' && (
                     <div>
-                      <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Telegram Username <span className="text-[#FBB02D]">*</span></label>
-                      <input type="text" placeholder="ဥပမာ: @username သို့မဟုတ် phone number" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                      <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">CapCut User ID <span className="text-[#FBB02D]">*</span></label>
+                      <input type="text" placeholder="Enter User ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
                     </div>
                   )}
 
-                  {game.inputType === 'email' && (
-                    <div>
-                      <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Email or Account Info <span className="text-[#FBB02D]">*</span></label>
-                      <input type="text" placeholder="Enter your Email / Account details" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                  {/* 🌟 Genshin Global Form 🌟 */}
+                  {game.inputType === 'genshin_global' && (
+                    <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                      <div className="w-full sm:w-1/2 relative">
+                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Genshin UID <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="Enter Genshin UID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                      </div>
+                      <div className="w-full sm:w-1/2 relative">
+                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Server <span className="text-[#FBB02D]">*</span></label>
+                        <select className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={serverField} onChange={(e) => setServerField(e.target.value)}>
+                          <option value="america">America</option>
+                          <option value="asia">Asia</option>
+                          <option value="europe">Europe</option>
+                          <option value="tw_hk_mo">TW, HK, MO</option>
+                        </select>
+                      </div>
                     </div>
                   )}
 
-                  {/* 🌟 Heartopia အတွက် Input Form အသစ် 🌟 */}
-                  {game.inputType === 'heartopia' && (
+                  {/* 🌟 Genshin Login Form 🌟 */}
+                  {game.inputType === 'genshin_login' && (
                     <div className="space-y-4">
                       <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                         <div className="w-full sm:w-1/2 relative">
-                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">User ID <span className="text-[#FBB02D]">*</span></label>
-                          <input type="text" placeholder="Enter User ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">HoYoverse Email <span className="text-[#FBB02D]">*</span></label>
+                          <input type="email" placeholder="Email Address" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={email} onChange={(e) => setEmail(e.target.value)} />
                         </div>
                         <div className="w-full sm:w-1/2 relative">
-                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Server <span className="text-[#FBB02D]">*</span></label>
-                          <select className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={serverField} onChange={(e) => setServerField(e.target.value)}>
-                            <option value="America">America</option>
-                            <option value="Asia">Asia</option>
-                            <option value="Global">Global</option>
-                            <option value="SEA">SEA</option>
-                            <option value="TW,HK,MO">TW,HK,MO</option>
-                          </select>
+                          <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Password <span className="text-[#FBB02D]">*</span></label>
+                          <input type="password" placeholder="Password" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={password} onChange={(e) => setPassword(e.target.value)} />
                         </div>
+                      </div>
+                      <div>
+                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Genshin UID <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="Enter Genshin UID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                      </div>
+                      <p className="text-[#FBB02D] text-[10px] italic">* HoYoverse (Email/Password) ဖြင့်သာ Login ဝင်၍ရပါမည်။</p>
+                    </div>
+                  )}
+
+                  {/* 🌟 Gift Cards (Email/Username) Form 🌟 */}
+                  {(game.inputType === 'username' || game.inputType === 'email') && (
+                    <div>
+                      <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">
+                        {['Discord', 'App Store & iTunes', 'Netflix', 'Roblox', 'Minecraft'].some(n => game.name.includes(n)) ? 'Email Address' : 'Account Info'} <span className="text-[#FBB02D]">*</span>
+                      </label>
+                      <input type="text" placeholder={['Discord', 'App Store & iTunes', 'Netflix', 'Roblox', 'Minecraft'].some(n => game.name.includes(n)) ? "Enter your email to receive code" : "Enter username or email"} className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                      {['Discord', 'App Store & iTunes', 'Netflix', 'Roblox', 'Minecraft'].some(n => game.name.includes(n)) && (
+                        <p className="text-[#FBB02D] text-[10px] italic mt-2">* Redeem Code (ကုဒ်) ကို ထည့်သွင်းထားသော Email သို့ ပို့ပေးပါမည်။</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* 🌟 Heartopia Form 🌟 */}
+                  {game.inputType === 'heartopia' && (
+                    <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
+                      <div className="w-full sm:w-1/2 relative">
+                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">User ID <span className="text-[#FBB02D]">*</span></label>
+                        <input type="text" placeholder="Enter User ID" className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={userId} onChange={(e) => setUserId(e.target.value)} />
+                      </div>
+                      <div className="w-full sm:w-1/2 relative">
+                        <label className="text-[9px] md:text-[10px] font-bold text-[#CAF0F8] mb-1.5 md:mb-2 block uppercase tracking-wider">Server <span className="text-[#FBB02D]">*</span></label>
+                        <select className="w-full bg-[#CAF0F8]/10 border border-[#00B4D8]/30 rounded-xl px-3 md:px-4 py-2.5 md:py-3 text-white text-xs md:text-sm focus:outline-none focus:border-[#00B4D8] transition-colors" value={serverField} onChange={(e) => setServerField(e.target.value)}>
+                          <option value="America">America</option>
+                          <option value="Asia">Asia</option>
+                          <option value="Global">Global</option>
+                          <option value="SEA">SEA</option>
+                          <option value="TW,HK,MO">TW,HK,MO</option>
+                        </select>
                       </div>
                     </div>
                   )}
@@ -835,7 +989,7 @@ export default function TopupPage() {
                     : 'bg-[#CAF0F8]/20 text-[#CAF0F8]/50 cursor-not-allowed'
                   }`}
                 >
-                  {!isFormValid ? (game.inputType === 'mlbb' ? (idCheckResult.status !== 'success' ? 'Waiting for valid ID' : 'Select a package') : 'Complete the data first') : 'Buy Now'}
+                  {!isFormValid ? 'Complete data first' : 'Buy Now'}
                 </button>
               </div>
             </div>
