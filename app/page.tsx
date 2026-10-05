@@ -13,25 +13,45 @@ export default function Home() {
   const [activeCategory, setActiveCategory] = useState('Favorit');
 
   // ==========================================
-  // 🌟 ဂိမ်းစာရင်း (MLBB ကို ၃ ခု ခွဲထုတ်ထားပါသည်) 🌟
+  // 🌟 ဂိမ်းစာရင်း (Games List အသစ်များ အားလုံးပါဝင်သည်) 🌟
   // ==========================================
   const games = [
+    // --- 🎮 Topup Games ---
     { id: 'mobile-legends', name: 'Mobile Legend', sub: 'Myanmar (Global)', img: '/mlbb.png', category: 'Topup Games' },
     { id: 'mobile-legends-br', name: 'Mobile Legend', sub: 'Brazil', img: '/mlbb.png', category: 'Topup Games' },
     { id: 'mobile-legends-ph', name: 'Mobile Legend', sub: 'Philippines', img: '/mlbb.png', category: 'Topup Games' },
-    
     { id: 'magic-chess', name: 'Magic Chess', sub: 'Myanmar (Global)', img: '/MCGG.png', category: 'Topup Games' },
     { id: 'pubg-uc', name: 'PUBG UC', sub: 'Global', img: '/pubg.png', category: 'Topup Games' },
     { id: 'uc-pack', name: 'UC pack', sub: 'Global', img: '/Pubgucpack.png', category: 'Topup Games' },
     { id: 'heartopia', name: 'Heartopia', sub: 'Game Topup', img: '/heartopia.png', category: 'Topup Games' },
+    { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/Aniimo.jpg', category: 'Topup Games' },
     
+    // EAFC Mobile
+    { id: 'eafc-id', name: 'EAFC Mobile', sub: 'ID Server', img: '/eafc.jpg', category: 'Topup Games' },
+    { id: 'eafc-my', name: 'EAFC Mobile', sub: 'MY Server', img: '/eafc.jpg', category: 'Topup Games' },
+    
+    // Genshin Impact
+    { id: 'genshin-auto', name: 'Genshin Impact', sub: 'Auto Via Login', img: '/genshin.png', category: 'Topup Games' },
+    { id: 'genshin-global', name: 'Genshin Impact', sub: 'Global', img: '/genshin.png', category: 'Topup Games' },
+
+    // --- 🎫 Gift Card & Voucher ---
     { id: 'telegram', name: 'Telegram Premium', sub: 'Social App', img: '/telegram.png', category: 'Gift Card & Voucher' },
     { id: 'smile-coin', name: 'Smile coin', sub: 'Game Currency', img: '/smile_coin.png', category: 'Gift Card & Voucher' },
+    { id: 'spotify', name: 'Spotify', sub: 'Premium', img: '/Spotify.jpg', category: 'Gift Card & Voucher' },
+    { id: 'discord', name: 'Discord', sub: 'Global', img: '/discord.png', category: 'Gift Card & Voucher' },
+    { id: 'appstore', name: 'App Store & iTunes', sub: 'US Region', img: '/appstore.png', category: 'Gift Card & Voucher' },
+    { id: 'netflix-us', name: 'Netflix', sub: 'US Region', img: '/netflix-us.png', category: 'Gift Card & Voucher' },
+    { id: 'capcut', name: 'CapCut', sub: 'Pro Subscription', img: '/capcut.png', category: 'Gift Card & Voucher' },
     
-    { id: 'aniimo', name: 'Aniimo', sub: 'Global', img: '/Aniimo.jpg', category: 'Topup Games' },
+    // Roblox & Minecraft
+    { id: 'roblox-id', name: 'Roblox', sub: 'ID Region', img: '/roblox.png', category: 'Gift Card & Voucher' },
+    { id: 'roblox-global', name: 'Roblox', sub: 'Global', img: '/roblox-global.png', category: 'Gift Card & Voucher' },
+    { id: 'robux-us', name: 'Roblox Robux', sub: 'US Region', img: '/roblox.png', category: 'Gift Card & Voucher' },
+    { id: 'minecraft', name: 'Minecraft', sub: 'Minecoins', img: '/minecraft.png', category: 'Gift Card & Voucher' },
+
+    // --- 🛡️ VPN ---
     { id: 'jump-jump-vpn', name: 'Jump Jump VPN', sub: 'VPN Subscription', img: '/JumpJump vpn.jpg', category: 'VPN' },
     { id: 'express-vpn', name: 'Express VPN', sub: 'VPN Subscription', img: '/Express Vpn.jpg', category: 'VPN' },
-    { id: 'spotify', name: 'Spotify', sub: 'Premium', img: '/Spotify.jpg', category: 'Gift Card & Voucher' },
   ];
 
   const filteredGames = games.filter(game => {
